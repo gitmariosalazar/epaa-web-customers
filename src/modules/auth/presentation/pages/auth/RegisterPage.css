@@ -1,0 +1,122 @@
+/* RegisterPage extra styles — extends LoginPage.css */
+
+.register-card {
+  max-width: 750px !important;
+  border-top: 4px solid var(--accent); /* Attractive colorful top border */
+}
+
+.register-form {
+  padding-bottom: 0 !important;
+}
+
+.register-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.register-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
+}
+
+.register-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 520px) {
+  .register-grid { grid-template-columns: 1fr; }
+}
+
+.register-footer {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: var(--spacing-sm);
+}
+
+.register-footer a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Enhance the main register button with a gradient to be more attractive */
+.register-form .login-page__button {
+  background: linear-gradient(135deg, var(--accent), #3b82f6); /* Slightly more vibrant blue/cyan gradient */
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.register-form .login-page__button:hover {
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 40%, transparent);
+  transform: translateY(-2px);
+}
+
+/* Success state */
+.register-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-2xl) !important;
+  gap: var(--spacing-lg);
+  max-width: 440px !important;
+}
+
+.register-success .card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.register-success__icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.register-success h2 {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.register-success p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+@keyframes successPop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

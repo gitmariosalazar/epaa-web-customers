@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap');
+
+.epaa-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  user-select: none;
+  transition: max-width 0.3s ease;
+}
+
+/* --- Sizes --- */
+.epaa-logo-wrapper.size-xs { max-width: 80px; }
+.epaa-logo-wrapper.size-sm { max-width: 130px; } /* ~30px equivalent */
+.epaa-logo-wrapper.size-md { max-width: 170px; } /* default equivalent */
+.epaa-logo-wrapper.size-lg { max-width: 220px; }
+.epaa-logo-wrapper.size-xl { max-width: 300px; }
+
+.epaa-logo-wrapper.collapsed {
+  max-width: 40px;
+}
+
+.epaa-logo-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.epaa-text-dark {
+  fill: var(--logo-primary, #1d4ed8);
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', sans-serif;
+  font-weight: 700;
+  font-size: 52px; /* DO NOT change: internal SVG coordinate size */
+  transition: fill 0.3s ease;
+  letter-spacing: 1.5px;
+}
+
+.epaa-text-light {
+  fill: var(--logo-secondary, #0ea5e9);
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', sans-serif;
+  font-weight: 700;
+  font-size: 52px; /* DO NOT change: internal SVG coordinate size */
+  transition: fill 0.3s ease;
+  letter-spacing: 1.5px;
+}
+
+.epaa-wave {
+  fill: var(--logo-primary, #1d4ed8);
+  transition: all 0.4s ease;
+}
+
+.epaa-sub {
+  fill: var(--logo-secondary, #0ea5e9);
+  font-family: 'Fredoka', 'Arial Rounded MT Bold', sans-serif;
+  font-weight: 700;
+  font-size: 13px; /* DO NOT change: internal SVG coordinate size */
+  letter-spacing: 2px;
+  transform: translateY(0) translateX(0); /* Reset transform */
+  transition: fill 0.3s ease;
+}
+
+/* --- Dark Mode Adaptation --- */
+.dark .epaa-logo-wrapper {
+  --logo-primary: #3b82f6; /* Blue 500 */
+  --logo-secondary: #38bdf8; /* Sky 400 */
+}

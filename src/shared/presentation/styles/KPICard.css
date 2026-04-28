@@ -1,0 +1,402 @@
+/* ==========================================================================
+   Global KPICard Styles
+   Clean Architecture & SOLID principles applied to UI
+   ========================================================================== */
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  will-change: transform, box-shadow;
+  cursor: pointer;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 20px -5px rgba(0, 0, 0, 0.08),
+    0 8px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: var(--kpi-theme-main, var(--border-color));
+}
+
+/* Decorative accent line at the top */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--kpi-theme-main, transparent);
+  opacity: 0.8;
+}
+
+/* Background subtle glow effect */
+.kpi-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: var(--kpi-theme-main, transparent);
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.1;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.kpi-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 1;
+}
+
+.kpi-card-label {
+  font-size: 0.775rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding-right: 12px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.kpi-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--kpi-theme-bg, var(--surface-hover));
+  color: var(--kpi-theme-text, var(--text-primary));
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.kpi-card-value {
+  font-size: 1.4rem; /* Reduced from 1.75rem for a tighter look */
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--kpi-value-color, var(--text-primary));
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  justify-content: center; /* Centers the value completely */
+  align-items: center;
+  width: 100%;
+  margin-top: 8px; /* Breathing room from header */
+}
+
+.kpi-card-description {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  text-align: center; /* Centers the description below the value */
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+     Color Themes (Defined as CSS Variables within modifier classes)
+     ========================================================================== */
+
+/* Blue / Primary */
+.kpi-card--blue {
+  --kpi-theme-main: var(--primary);
+  --kpi-theme-bg: rgba(59, 130, 246, 0.1);
+  --kpi-theme-text: #2563eb;
+}
+
+/* Green / Success */
+.kpi-card--green {
+  --kpi-theme-main: var(--success);
+  --kpi-theme-bg: rgba(34, 197, 94, 0.1);
+  --kpi-theme-text: #16a34a;
+}
+
+/* Red / Danger */
+.kpi-card--red {
+  --kpi-theme-main: var(--error);
+  --kpi-theme-bg: rgba(239, 68, 68, 0.1);
+  --kpi-theme-text: #dc2626;
+}
+
+/* Amber / Warning */
+.kpi-card--amber {
+  --kpi-theme-main: var(--warning);
+  --kpi-theme-bg: rgba(245, 158, 11, 0.1);
+  --kpi-theme-text: #d97706;
+}
+
+/* Purple / Indigo */
+.kpi-card--purple {
+  --kpi-theme-main: #8b5cf6;
+  --kpi-theme-bg: rgba(139, 92, 246, 0.1);
+  --kpi-theme-text: #7c3aed;
+}
+
+/* Teal / Info */
+.kpi-card--teal {
+  --kpi-theme-main: #14b8a6;
+  --kpi-theme-bg: rgba(20, 184, 166, 0.1);
+  --kpi-theme-text: #0d9488;
+}
+
+/* Rose */
+.kpi-card--rose {
+  --kpi-theme-main: #f43f5e;
+  --kpi-theme-bg: rgba(244, 63, 94, 0.1);
+  --kpi-theme-text: #e11d48;
+}
+
+/* Orange */
+.kpi-card--orange {
+  --kpi-theme-main: #f97316;
+  --kpi-theme-bg: rgba(249, 115, 22, 0.1);
+  --kpi-theme-text: #ea580c;
+}
+
+/* Yellow */
+.kpi-card--yellow {
+  --kpi-theme-main: #eab308;
+  --kpi-theme-bg: rgba(234, 179, 8, 0.1);
+  --kpi-theme-text: #ca8a04;
+}
+
+/* Lime */
+.kpi-card--lime {
+  --kpi-theme-main: #84cc16;
+  --kpi-theme-bg: rgba(132, 204, 22, 0.1);
+  --kpi-theme-text: #65a30d;
+}
+
+/* Emerald */
+.kpi-card--emerald {
+  --kpi-theme-main: #10b981;
+  --kpi-theme-bg: rgba(16, 185, 129, 0.1);
+  --kpi-theme-text: #059669;
+}
+
+/* Cyan */
+.kpi-card--cyan {
+  --kpi-theme-main: #06b6d4;
+  --kpi-theme-bg: rgba(6, 182, 212, 0.1);
+  --kpi-theme-text: #0891b2;
+}
+
+/* Sky */
+.kpi-card--sky {
+  --kpi-theme-main: #0ea5e9;
+  --kpi-theme-bg: rgba(14, 165, 233, 0.1);
+  --kpi-theme-text: #0284c7;
+}
+
+/* Indigo */
+.kpi-card--indigo {
+  --kpi-theme-main: #6366f1;
+  --kpi-theme-bg: rgba(99, 102, 241, 0.1);
+  --kpi-theme-text: #4f46e5;
+}
+
+/* Pink */
+.kpi-card--pink {
+  --kpi-theme-main: #ec4899;
+  --kpi-theme-bg: rgba(236, 72, 153, 0.1);
+  --kpi-theme-text: #db2777;
+}
+
+/* Fuchsia */
+.kpi-card--fuchsia {
+  --kpi-theme-main: #d946ef;
+  --kpi-theme-bg: rgba(217, 70, 239, 0.1);
+  --kpi-theme-text: #c026d3;
+}
+
+/* Slate */
+.kpi-card--slate {
+  --kpi-theme-main: #64748b;
+  --kpi-theme-bg: rgba(100, 116, 139, 0.1);
+  --kpi-theme-text: #475569;
+}
+
+/* Gray */
+.kpi-card--gray {
+  --kpi-theme-main: #6b7280;
+  --kpi-theme-bg: rgba(107, 114, 128, 0.1);
+  --kpi-theme-text: #4b5563;
+}
+
+/* Zinc */
+.kpi-card--zinc {
+  --kpi-theme-main: #71717a;
+  --kpi-theme-bg: rgba(113, 113, 122, 0.1);
+  --kpi-theme-text: #52525b;
+}
+
+/* Neutral */
+.kpi-card--neutral {
+  --kpi-theme-main: #737373;
+  --kpi-theme-bg: rgba(115, 115, 115, 0.1);
+  --kpi-theme-text: #525252;
+}
+
+/* Value override colors */
+.kpi-card-value--green {
+  --kpi-value-color: var(--success);
+}
+
+.kpi-card-value--red {
+  --kpi-value-color: var(--error);
+}
+
+.kpi-card-value--amber {
+  --kpi-value-color: var(--warning);
+}
+
+/* ==========================================================================
+     Dark Mode Adjustments
+     ========================================================================== */
+
+.dark .kpi-card {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dark .kpi-card:hover {
+  box-shadow:
+    0 12px 20px -5px rgba(0, 0, 0, 0.3),
+    0 8px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.dark .kpi-card-icon {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.dark .kpi-card--blue {
+  --kpi-theme-text: #60a5fa;
+  --kpi-theme-bg: rgba(59, 130, 246, 0.15);
+}
+
+.dark .kpi-card--green {
+  --kpi-theme-text: #4ade80;
+  --kpi-theme-bg: rgba(34, 197, 94, 0.15);
+}
+
+.dark .kpi-card--red {
+  --kpi-theme-text: #f87171;
+  --kpi-theme-bg: rgba(239, 68, 68, 0.15);
+}
+
+.dark .kpi-card--amber {
+  --kpi-theme-text: #fbbf24;
+  --kpi-theme-bg: rgba(245, 158, 11, 0.15);
+}
+
+.dark .kpi-card--purple {
+  --kpi-theme-text: #a78bfa;
+  --kpi-theme-bg: rgba(139, 92, 246, 0.15);
+}
+
+.dark .kpi-card--teal {
+  --kpi-theme-text: #2dd4bf;
+  --kpi-theme-bg: rgba(20, 184, 166, 0.15);
+}
+
+.dark .kpi-card--rose {
+  --kpi-theme-text: #fb7185;
+  --kpi-theme-bg: rgba(244, 63, 94, 0.15);
+}
+
+.dark .kpi-card--orange {
+  --kpi-theme-text: #fb923c;
+  --kpi-theme-bg: rgba(249, 115, 22, 0.15);
+}
+
+.dark .kpi-card--yellow {
+  --kpi-theme-text: #fde047;
+  --kpi-theme-bg: rgba(234, 179, 8, 0.15);
+}
+
+.dark .kpi-card--lime {
+  --kpi-theme-text: #bef264;
+  --kpi-theme-bg: rgba(132, 204, 22, 0.15);
+}
+
+.dark .kpi-card--emerald {
+  --kpi-theme-text: #34d399;
+  --kpi-theme-bg: rgba(16, 185, 129, 0.15);
+}
+
+.dark .kpi-card--cyan {
+  --kpi-theme-text: #22d3ee;
+  --kpi-theme-bg: rgba(6, 182, 212, 0.15);
+}
+
+.dark .kpi-card--sky {
+  --kpi-theme-text: #38bdf8;
+  --kpi-theme-bg: rgba(14, 165, 233, 0.15);
+}
+
+.dark .kpi-card--indigo {
+  --kpi-theme-text: #818cf8;
+  --kpi-theme-bg: rgba(99, 102, 241, 0.15);
+}
+
+.dark .kpi-card--pink {
+  --kpi-theme-text: #f472b6;
+  --kpi-theme-bg: rgba(236, 72, 153, 0.15);
+}
+
+.dark .kpi-card--fuchsia {
+  --kpi-theme-text: #e879f9;
+  --kpi-theme-bg: rgba(217, 70, 239, 0.15);
+}
+
+.dark .kpi-card--slate {
+  --kpi-theme-text: #94a3b8;
+  --kpi-theme-bg: rgba(100, 116, 139, 0.15);
+}
+
+.dark .kpi-card--gray {
+  --kpi-theme-text: #9ca3af;
+  --kpi-theme-bg: rgba(107, 114, 128, 0.15);
+}
+
+.dark .kpi-card--zinc {
+  --kpi-theme-text: #a1a1aa;
+  --kpi-theme-bg: rgba(113, 113, 122, 0.15);
+}
+
+.dark .kpi-card--neutral {
+  --kpi-theme-text: #a3a3a3;
+  --kpi-theme-bg: rgba(115, 115, 115, 0.15);
+}

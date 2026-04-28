@@ -1,0 +1,144 @@
+.tracking-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  width: 100%;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+}
+
+.tracking-page-search {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0 var(--spacing-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.tracking-page-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.tracking-page-search__icon {
+  color: var(--text-muted);
+  margin-right: var(--spacing-sm);
+}
+
+.tracking-page-search__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: var(--spacing-md) 0;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  outline: none;
+}
+
+.tracking-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.tracking-list__empty {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-color);
+}
+
+/* ── Card ── */
+.tracking-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  padding: var(--spacing-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.tracking-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.tracking-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tracking-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: 0.25rem;
+}
+
+.tracking-card__codigo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  background: linear-gradient(90deg, var(--accent), var(--text-main));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.tracking-card__pill {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.tracking-card__direccion {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.tracking-card__fecha {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.tracking-card__timeline-wrapper {
+  overflow-x: auto;
+  padding-bottom: var(--spacing-md);
+  /* Hide scrollbar for clean look but allow scrolling */
+  scrollbar-width: none;
+  width: 100%;
+  padding: 20px;
+}
+.tracking-card__timeline-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.tracking-card__footer {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.tracking-card__footer strong {
+  color: var(--text-main);
+}
+
+

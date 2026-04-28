@@ -1,0 +1,342 @@
+/* ── Login Page ── */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.login-page__background {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 45%),
+    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.08), transparent 45%),
+    radial-gradient(circle at center, rgba(99, 102, 241, 0.04), transparent 60%);
+  z-index: 0;
+}
+
+.login-page__card {
+  width: 100%;
+  max-width: 440px;
+  z-index: 1;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-xl);
+  margin: 1rem;
+}
+
+.login-page__controls {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 10;
+}
+
+.icon-btn {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.icon-btn:hover {
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.login-page__header {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-md);
+}
+
+.login-page__logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.login-page__logo-img {
+  width: 44px;
+  height: 44px;
+  filter: brightness(0) invert(1);
+}
+
+.login-page__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-main);
+}
+
+.login-page__subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.login-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+}
+
+.login-page__button {
+  margin-top: var(--spacing-sm);
+}
+
+.login-page__error {
+  color: var(--error);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-sm);
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.login-page__success {
+  color: var(--success);
+  font-size: 0.875rem;
+  text-align: center;
+  padding: var(--spacing-sm);
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.login-page__footer {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.login-page__footer a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.login-page__footer a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* ── Register Page ── */
+.register-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--background);
+  padding: 2rem 1rem;
+}
+
+.register-page__background {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.1), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.08), transparent 45%);
+  z-index: 0;
+}
+
+.register-page__card {
+  width: 100%;
+  max-width: 580px;
+  z-index: 1;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-xl);
+}
+
+.register-page__header {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-md);
+}
+
+.register-page__logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+}
+
+.register-page__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-main);
+}
+
+.register-page__subtitle {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.register-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.register-page__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 520px) {
+  .register-page__grid { grid-template-columns: 1fr; }
+}
+
+.register-page__section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: var(--spacing-sm);
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.register-page__section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.register-page__button {
+  margin-top: var(--spacing-sm);
+}
+
+.register-page__footer {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.register-page__footer a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-page__footer a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* ── Step indicator ── */
+.auth-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 var(--spacing-lg) var(--spacing-md);
+}
+
+.auth-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+}
+
+.auth-step__dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.auth-step--active .auth-step__dot {
+  background-color: var(--accent);
+  color: white;
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.auth-step--done .auth-step__dot {
+  background-color: var(--success);
+  color: white;
+}
+
+.auth-step__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-step--active .auth-step__label {
+  color: var(--accent);
+}
+
+.auth-step--done .auth-step__label {
+  color: var(--success);
+}
+
+.auth-steps__line {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  margin-bottom: 1rem;
+  max-width: 40px;
+  transition: background 0.3s;
+}
+
+.auth-steps__line--done {
+  background: var(--success);
+}

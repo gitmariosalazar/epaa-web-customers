@@ -1,0 +1,265 @@
+/* Solicitud Wizard Styles */
+
+/* Step Indicator */
+.solicitud-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.solicitud-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.solicitud-step__dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--surface);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.solicitud-step--active .solicitud-step__dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
+}
+
+.solicitud-step--done .solicitud-step__dot {
+  border-color: var(--success);
+  background: var(--success);
+  color: white;
+}
+
+.solicitud-step__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.solicitud-step--active .solicitud-step__label { color: var(--accent); }
+.solicitud-step--done .solicitud-step__label { color: var(--success); }
+
+.solicitud-steps__line {
+  flex: 1;
+  max-width: 60px;
+  height: 2px;
+  background: var(--border-color);
+  margin-bottom: 1.4rem;
+  transition: background 0.3s;
+}
+
+.solicitud-steps__line--done {
+  background: var(--success);
+}
+
+/* Card — grows with content, body pads normally */
+.solicitud-card {
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.solicitud-card .card__body {
+  padding: var(--spacing-xl);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form Section */
+.solicitud-form-section__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--accent);
+}
+
+.solicitud-form-section__header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Grid */
+.solicitud-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.solicitud-grid-2__full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .solicitud-grid-2 { grid-template-columns: 1fr; }
+  .solicitud-grid-2__full { grid-column: 1; }
+}
+
+/* Textarea */
+.solicitud-textarea {
+  height: auto !important;
+  resize: vertical;
+  padding-top: 0.6rem !important;
+  padding-bottom: 0.6rem !important;
+}
+
+/* Navigation — sticky at bottom of scrollable card body */
+.solicitud-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: auto;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  z-index: 10;
+}
+
+/* Summary */
+.solicitud-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.solicitud-summary__group {
+  background: var(--surface-hover);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.solicitud-summary__group h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.solicitud-summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--border-color);
+  font-size: 0.875rem;
+}
+
+.solicitud-summary__row:last-child {
+  border-bottom: none;
+}
+
+.solicitud-summary__row span {
+  color: var(--text-secondary);
+}
+
+.solicitud-summary__row strong {
+  color: var(--text-main);
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+/* Success State */
+.solicitud-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-2xl);
+  gap: var(--spacing-lg);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.solicitud-success__icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.solicitud-success h2 {
+  color: var(--text-main);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.solicitud-success p {
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.solicitud-success__info {
+  background: var(--surface-hover);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+/* Documents step specifics */
+.solicitud-docs-step {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.solicitud-docs-step__subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-lg);
+}
+
+.solicitud-docs-step__warning {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(245,158,11,0.07);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  color: #b45309;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+}

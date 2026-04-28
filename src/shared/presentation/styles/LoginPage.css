@@ -1,0 +1,149 @@
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.login-page__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://epaa.gob.ec/images/xavatar1.png.pagespeed.ic.sKw1W4fX77.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.login-page__background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Overlay that adapts to light/dark theme */
+  background: linear-gradient(
+    135deg, 
+    color-mix(in srgb, var(--background) 92%, transparent), 
+    color-mix(in srgb, var(--accent) 15%, var(--background) 60%)
+  );
+  z-index: 1;
+}
+
+.login-page__card {
+  width: 100%;
+  max-width: 440px;
+  z-index: 2;
+  border: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-color: color-mix(in srgb, var(--surface) 75%, transparent);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.login-page__controls {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.login-page__logo-img {
+  width: 125px;
+}
+
+.icon-btn {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+.icon-btn:hover {
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+}
+
+.lang-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 4px; /* Space if globe is there, but design might be tight */
+  display: none; /* Hide text for circle design, or adjust */
+}
+
+.login-page__header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.login-page__logo {
+  display: inline-flex;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.login-page__title {
+  font-size: 1.75rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-main);
+}
+
+.login-page__subtitle {
+  color: var(--text-secondary);
+}
+
+.login-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  margin: var(--spacing-sm);
+}
+
+.login-page__button {
+  margin-top: var(--spacing-md);
+}
+
+.login-page__error {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  text-align: center;
+  padding: var(--spacing-sm);
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-sm);
+}
+
+.login-page__input {
+  margin-bottom: var(--spacing-md);
+}
+
+.login-page__input label {
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-main);
+}
+
+.login-page__input input {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text-main);
+}
