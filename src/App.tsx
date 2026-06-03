@@ -27,6 +27,7 @@ import { SuspensionPage } from '@/modules/suspension/presentation/pages/Suspensi
 import { BeneficioTerceraEdadPage } from '@/modules/beneficio-tercera-edad/presentation/pages/BeneficioTerceraEdadPage';
 import { BeneficioDiscapacidadPage } from '@/modules/beneficio-discapacidad/presentation/pages/BeneficioDiscapacidadPage';
 import { SolicitudesProvider } from '@/modules/solicitudes/presentation/context/SolicitudesContext';
+import { SolicitudDetailPage } from '@/modules/solicitudes/presentation/pages/SolicitudDetailPage';
 import { ProfilePage } from '@/modules/settings/presentation/pages/profile/ProfilePage';
 import { NotificationsPage } from '@/modules/notifications/presentation/pages/NotificationsPage';
 import { ToastContainer } from 'react-toastify';
@@ -98,6 +99,19 @@ function App() {
                 <Route path="/requests/new" element={<SolicitudNuevaPage />} />
                 <Route path="/requests/new/:procedureId" element={<SolicitudNuevaPage />} />
                 
+                {/* Fallbacks/Aliases for /solicitudes/ paths */}
+                <Route path="/solicitudes/nueva" element={<Navigate to="/requests/new" replace />} />
+                <Route path="/solicitudes/nueva/:procedureId" element={<Navigate to="/requests/new/:procedureId" replace />} />
+                <Route path="/solicitudes/lista" element={<Navigate to="/requests/list" replace />} />
+                <Route path="/solicitudes/en-proceso" element={<Navigate to="/requests/pending" replace />} />
+                <Route path="/solicitudes/aprobadas" element={<Navigate to="/requests/approved" replace />} />
+                <Route path="/solicitudes/rechazadas" element={<Navigate to="/requests/rejected" replace />} />
+
+                {/* Solicitud Detail */}
+                <Route path="/solicitudes/:id" element={<SolicitudDetailPage />} />
+                <Route path="/requests/:id" element={<SolicitudDetailPage />} />
+                <Route path="/requests/:categoria/:id" element={<SolicitudDetailPage />} />
+
                 {/* Fallbacks for backwards compatibility */}
                 <Route path="/requests/tracking" element={<SolicitudesTrackingPage />} />
                 <Route path="/requests/list" element={<SolicitudesListPage />} />

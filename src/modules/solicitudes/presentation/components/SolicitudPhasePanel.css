@@ -1,0 +1,294 @@
+/* ============================================================
+   SolicitudPhasePanel — contextual status panels per BPMN phase
+   ============================================================ */
+
+/* ── Base panel ── */
+.phase-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid;
+  margin-bottom: 0;
+  animation: phaseIn 0.35s ease;
+}
+
+@keyframes phaseIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Variants ── */
+.phase-panel--info {
+  background: rgba(99,102,241,0.06);
+  border-color: rgba(99,102,241,0.25);
+}
+
+.phase-panel--warning {
+  background: rgba(245,158,11,0.07);
+  border-color: rgba(245,158,11,0.3);
+}
+
+.phase-panel--success {
+  background: rgba(16,185,129,0.07);
+  border-color: rgba(16,185,129,0.3);
+}
+
+.phase-panel--error {
+  background: rgba(239,68,68,0.07);
+  border-color: rgba(239,68,68,0.3);
+}
+
+.phase-panel--contract {
+  background: rgba(236,72,153,0.06);
+  border-color: rgba(236,72,153,0.25);
+}
+
+.phase-panel--installation {
+  background: rgba(249,115,22,0.07);
+  border-color: rgba(249,115,22,0.3);
+}
+
+/* ── Icon Wrap ── */
+.phase-panel__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.phase-panel__icon-wrap--indigo  { background: rgba(99,102,241,0.12);  color: #6366f1; }
+.phase-panel__icon-wrap--purple  { background: rgba(139,92,246,0.12);  color: #8b5cf6; }
+.phase-panel__icon-wrap--green   { background: rgba(16,185,129,0.12);  color: #10b981; }
+.phase-panel__icon-wrap--red     { background: rgba(239,68,68,0.12);   color: #ef4444; }
+.phase-panel__icon-wrap--pink    { background: rgba(236,72,153,0.12);  color: #ec4899; }
+.phase-panel__icon-wrap--orange  { background: rgba(249,115,22,0.12);  color: #f97316; }
+.phase-panel__icon-wrap--cyan    { background: rgba(6,182,212,0.12);   color: #06b6d4; }
+
+/* ── Body ── */
+.phase-panel__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.phase-panel__title {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.phase-panel__description {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── Tip bar ── */
+.phase-panel__tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: rgba(99,102,241,0.06);
+  line-height: 1.5;
+}
+
+.phase-panel__tip--warning {
+  background: rgba(245,158,11,0.08);
+  color: #b45309;
+}
+
+.phase-panel__tip--error {
+  background: rgba(239,68,68,0.08);
+  color: #b91c1c;
+}
+
+/* ── Data grid ── */
+.phase-panel__data-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.04);
+}
+
+.phase-panel__data-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.phase-panel__data-item--highlight {
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.phase-panel__data-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.phase-panel__data-label {
+  color: var(--text-muted);
+  min-width: 120px;
+}
+
+.phase-panel__data-value {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.phase-panel__data-value--big {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ── Rejection reason ── */
+.phase-panel__rejection-reason {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: rgba(239,68,68,0.06);
+  border-left: 3px solid #ef4444;
+}
+
+.phase-panel__rejection-reason__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phase-panel__rejection-reason__text {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUMINISTRO ACTIVO — special celebration panel
+═══════════════════════════════════════════════════════════════ */
+.phase-panel--active {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(99,102,241,0.06) 100%);
+  border: 1px solid rgba(16,185,129,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.phase-panel__active-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(16,185,129,0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.phase-panel__active-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.phase-panel__active-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(16,185,129,0.35);
+  animation: pulseGreen 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 4px 20px rgba(16,185,129,0.35); }
+  50%       { box-shadow: 0 4px 30px rgba(16,185,129,0.6); }
+}
+
+.phase-panel__active-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+.phase-panel__active-subtitle {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+}
+
+.phase-panel__active-data {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  position: relative;
+}
+
+.phase-panel__active-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+.phase-panel__active-card__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #059669;
+}
+
+.phase-panel__active-card__value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.phase-panel__active-notice {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  position: relative;
+}
+
+/* ── Dark-mode adjustments ── */
+@media (prefers-color-scheme: dark) {
+  .phase-panel__data-grid {
+    background: rgba(255,255,255,0.03);
+  }
+  .phase-panel__data-item--highlight {
+    border-top-color: rgba(255,255,255,0.08);
+  }
+}

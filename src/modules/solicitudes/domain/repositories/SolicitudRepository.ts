@@ -1,4 +1,4 @@
-import type { Solicitud, TrackingSolicitudResponse } from '../models/Solicitud';
+import type { RequestDetailByClientResponse, Solicitud, TrackingSolicitudResponse } from '../models/Solicitud';
 
 export interface SolicitudRepository {
   /**
@@ -7,5 +7,24 @@ export interface SolicitudRepository {
    */
   getExpedientesByCliente(clienteId: string): Promise<Solicitud[]>;
   getTrackingByClienteId(clienteId: string): Promise<TrackingSolicitudResponse[]>;
+    getRequestDetailByRequestIdOrNumber(
+    requestNumberOrId: string
+    ): Promise<RequestDetailByClientResponse | null>;
+  
+  getTrackingBySolicitudId(
+    solicitudId: string
+  ): Promise<TrackingSolicitudResponse | null>;
 
+  updateConnectionDocument(
+    documentId: string,
+    file: File,
+    userId: string,
+    requestId: string,
+    documentTypeId: number
+  ): Promise<boolean>;
+
+  uploadInspectionInvoiceReceipt(
+    invoiceId: string,
+    file: File
+  ): Promise<boolean>;
 }

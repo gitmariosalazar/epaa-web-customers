@@ -1,0 +1,135 @@
+/* ============================================================
+   SolicitudProgressBar — BPMN phase progress stepper
+   ============================================================ */
+
+.sol-progress-bar {
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: var(--card-bg, rgba(255,255,255,0.04));
+  border: 1px solid var(--border-light, rgba(255,255,255,0.08));
+}
+
+/* ── Track (horizontal stepper) ── */
+.sol-progress-bar__track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: none;
+}
+
+.sol-progress-bar__track::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Connector line between steps ── */
+.sol-progress-bar__connector {
+  flex: 1;
+  height: 2px;
+  background: var(--border-light, rgba(148,163,184,0.2));
+  transition: background 0.3s ease;
+  min-width: 16px;
+}
+
+.sol-progress-bar__connector--filled {
+  background: var(--accent, #6366f1);
+}
+
+/* ── Individual step ── */
+.sol-progress-bar__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.sol-progress-bar__step-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid;
+  transition: all 0.25s ease;
+}
+
+/* Done step */
+.sol-progress-bar__step--done .sol-progress-bar__step-dot {
+  background: var(--accent, #6366f1);
+  border-color: var(--accent, #6366f1);
+  color: #fff;
+}
+
+/* Current step */
+.sol-progress-bar__step--current .sol-progress-bar__step-dot {
+  background: rgba(99,102,241,0.15);
+  border-color: var(--accent, #6366f1);
+  color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+  animation: pulse-step 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-step {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+  50%       { box-shadow: 0 0 0 6px rgba(99,102,241,0.18); }
+}
+
+/* Future step */
+.sol-progress-bar__step--future .sol-progress-bar__step-dot {
+  background: transparent;
+  border-color: var(--border-light, rgba(148,163,184,0.3));
+  color: var(--text-muted, #94a3b8);
+}
+
+/* Labels */
+.sol-progress-bar__step-label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+
+.sol-progress-bar__step--done .sol-progress-bar__step-label {
+  color: var(--accent, #6366f1);
+}
+
+.sol-progress-bar__step--current .sol-progress-bar__step-label {
+  color: var(--accent, #6366f1);
+  font-weight: 700;
+}
+
+.sol-progress-bar__step--future .sol-progress-bar__step-label {
+  color: var(--text-muted, #94a3b8);
+}
+
+/* ── Terminal negative ── */
+.sol-progress-bar--terminal {
+  padding: 0.75rem 1.25rem;
+}
+
+.sol-progress-bar__terminal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .sol-progress-bar__step-label {
+    font-size: 0.6rem;
+  }
+  .sol-progress-bar__step-dot {
+    width: 26px;
+    height: 26px;
+  }
+}

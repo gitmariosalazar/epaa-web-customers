@@ -1,4 +1,4 @@
-import type { Solicitud, TrackingSolicitudResponse } from '../../domain/models/Solicitud';
+import type { RequestDetailByClientResponse, Solicitud, TrackingSolicitudResponse } from '../../domain/models/Solicitud';
 import type { SolicitudRepository } from '../../domain/repositories/SolicitudRepository';
 import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
 import type { HttpClientInterface } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
@@ -36,6 +36,7 @@ export interface ExpedienteResponse {
   fechaVencimiento: Date | string | null;
   fechaPago: Date | string | null;
   metodoPago: string | null;
+  urlComprobante: string | null;
   informeId: string | null;
   resultadoInforme: string | null;
   costoMateriales: number | null;
@@ -122,4 +123,96 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
       throw err;
     }
   }
+
+
+  async getRequestDetailByRequestIdOrNumber(
+    requestNumberOrId: string
+  ): Promise<RequestDetailByClientResponse | null> {
+    if (!requestNumberOrId) {
+      throw new Error('El número o ID de la solicitud es requerido');
+    }
+    try {
+      const response = await this.client.get<
+        ApiResponse<RequestDetailByClientResponse>
+      >(`/requests/${requestNumberOrId}/detail-by-id-or-number`);
+      return response.data?.data || null;
+    } catch (err: any) {
+      if (isNotFoundError(err)) return null;
+      throw err;
+    }
+  }
+  async getTrackingBySolicitudId(
+    solicitudId: string
+  ): Promise<TrackingSolicitudResponse | null> {
+    if (!solicitudId) throw new Error('Solicitud ID is required');
+
+    try {
+      const response = await this.client.get<
+        ApiResponse<TrackingSolicitudResponse>
+      >(`/requests/${solicitudId}/tracking-by-solicitud-id`);
+      return response.data?.data || null;
+    } catch (err: any) {
+      if (isNotFoundError(err)) return null;
+      throw err;
+    }
+  }
+
+  async updateConnectionDocument(
+    documentId: string,
+    file: File,
+    userId: string,
+    requestId: string,
+    documentTypeId: number
+  ): Promise<boolean> {
+    if (!documentId) throw new Error('El ID del documento es requerido');
+    if (!file) throw new Error('El archivo es requerido');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('requestId', requestId);
+    formData.append('documentTypeId', String(documentTypeId));
+    formData.append('validatorId', userId);
+
+    try {
+      const response = await this.client.put<any>(
+        `/connection-documents/${documentId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.status_code === 200 || response.status_code === 201;
+    } catch (err: any) {
+      throw err;
+    }
+  }
+
+  async uploadInspectionInvoiceReceipt(
+    invoiceId: string,
+    file: File
+  ): Promise<boolean> {
+    if (!invoiceId) throw new Error('El ID de la factura es requerido');
+    if (!file) throw new Error('El archivo del comprobante es requerido');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await this.client.put<any>(
+        `/inspection-invoice/update/${invoiceId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.status_code === 200 || response.status_code === 201;
+    } catch (err: any) {
+      throw err;
+    }
+  }
+
 }

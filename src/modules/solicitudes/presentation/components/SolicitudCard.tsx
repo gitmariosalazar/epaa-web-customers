@@ -414,6 +414,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
         onClose={() => setDocsOpen(false)}
         documentos={solicitud.documentos}
         solicitudNumero={solicitud.solicitudNumero}
+        solicitudId={solicitud.solicitudId}
       />
     </>
   );
