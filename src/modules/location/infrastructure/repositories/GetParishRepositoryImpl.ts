@@ -1,0 +1,43 @@
+import type { HttpClientInterface } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
+import type { Parish } from '../../domain/models/Parish';
+import type { ParishRepository } from '../../domain/repositories/usecases/ParishRepository';
+import type { ApiResponse } from '@/shared/infrastructure/api/response/ApiResponse';
+
+/** Location data is always public — no token required. */
+const PUBLIC = { skipAuth: true } as const;
+
+export class GetParishRepositoryImpl implements ParishRepository {
+  private readonly httpClient: HttpClientInterface;
+
+  constructor(httpClient: HttpClientInterface) {
+    this.httpClient = httpClient;
+  }
+
+  async getAllParishes(): Promise<Parish[]> {
+    const response = await this.httpClient.get<ApiResponse<Parish[]>>(
+      '/location-global/get-parishes', PUBLIC
+    );
+    return response.data.data;
+  }
+
+  async getParishById(id: string): Promise<Parish | null> {
+    const response = await this.httpClient.get<ApiResponse<Parish>>(
+      `/location-global/get-parish-by-id/${id}`, PUBLIC
+    );
+    return response.data.data;
+  }
+
+  async getParishByName(name: string): Promise<Parish | null> {
+    const response = await this.httpClient.get<ApiResponse<Parish>>(
+      `/location-global/get-parish-by-name/${name}`, PUBLIC
+    );
+    return response.data.data;
+  }
+
+  async getParishesByCantonId(cantonId: string): Promise<Parish[]> {
+    const response = await this.httpClient.get<ApiResponse<Parish[]>>(
+      `/location-global/get-parishes-by-canton-id/${cantonId}`, PUBLIC
+    );
+    return response.data.data;
+  }
+}

@@ -1,5 +1,5 @@
 import type { ApiResponse } from '@/shared/infrastructure/api/response/ApiResponse';
-import type { HttpClientInterface } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
+import type { HttpClientInterface, HttpRequestOptions } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
 import { environments } from '@/settings/environments/environments';
 import { dateService } from '@/shared/infrastructure/services/EcuadorDateService';
 
@@ -20,21 +20,22 @@ export class FetchHttpClient implements HttpClientInterface {
     method: string,
     url: string,
     body?: unknown,
-    options: Record<string, any> = {}
+    options: HttpRequestOptions = {}
   ): Promise<ApiResponse<T>> {
-    const headers: HeadersInit = {
+    const { skipAuth = false, params, headers: extraHeaders, ...fetchOptions } = options;
+
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...((options.headers as Record<string, any>) || {})
+      ...(extraHeaders || {})
     };
 
     const token = localStorage.getItem('token');
-    const isPublicEndpoint =
-      url.includes('/auth/signin') || url.includes('/auth/refresh-token');
 
     if (token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-    } else if (!isPublicEndpoint) {
-      // If no token and not a public endpoint, cancel request (simulate 401)
+      // Always attach token if present — it never hurts public endpoints
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (!skipAuth) {
+      // No token and the repository did not mark this as public → abort
       const error: any = new Error('No token found');
       if (this.unauthorizedHandler) {
         await this.unauthorizedHandler(error);
@@ -44,8 +45,6 @@ export class FetchHttpClient implements HttpClientInterface {
 
     let fullUrl = `${environments.API_URL}${url}`;
 
-    // Handle query parameters if they exist in options
-    const { params, ...fetchOptions } = options;
     if (params) {
       const queryParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
@@ -72,7 +71,15 @@ export class FetchHttpClient implements HttpClientInterface {
 
       if (!response.ok) {
         if (response.status === 401 && this.unauthorizedHandler) {
-          await this.unauthorizedHandler(new Error('Unauthorized'));
+          const isAuthRequest =
+            url.includes('/auth/client/signin') ||
+            url.includes('/auth/register') ||
+            url.includes('/auth/signin') ||
+            url.includes('/auth/login');
+
+          if (!isAuthRequest) {
+            await this.unauthorizedHandler(new Error('Unauthorized'));
+          }
         }
 
         const errorMessage =
@@ -95,46 +102,27 @@ export class FetchHttpClient implements HttpClientInterface {
       if (error.name === 'AbortError') {
         throw new Error('Request was aborted');
       }
-
       throw new Error(error.message || 'Unexpected error occurred');
     }
   }
 
-  async get<T>(
-    url: string,
-    options: Record<string, any> = {}
-  ): Promise<ApiResponse<T>> {
+  async get<T>(url: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('GET', url, undefined, options);
   }
 
-  async post<T>(
-    url: string,
-    body?: unknown,
-    options: Record<string, any> = {}
-  ): Promise<ApiResponse<T>> {
+  async post<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('POST', url, body, options);
   }
 
-  async put<T>(
-    url: string,
-    body?: unknown,
-    options: Record<string, any> = {}
-  ): Promise<ApiResponse<T>> {
+  async put<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('PUT', url, body, options);
   }
 
-  async delete<T>(
-    url: string,
-    options: Record<string, any> = {}
-  ): Promise<ApiResponse<T>> {
+  async delete<T>(url: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('DELETE', url, undefined, options);
   }
 
-  async patch<T>(
-    url: string,
-    body?: unknown,
-    options: Record<string, any> = {}
-  ): Promise<ApiResponse<T>> {
+  async patch<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('PATCH', url, body, options);
   }
 }

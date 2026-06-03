@@ -3,21 +3,27 @@ import './PageLayout.css';
 
 export interface PageLayoutProps {
   /**
-   * Optional sticky header row. Usually houses components like <Tabs /> 
+   * Optional sticky header row. Usually houses components like <Tabs />
    * or page-level titles that must permanently stay visible.
    */
   header?: React.ReactNode;
-  
+
   /**
    * Optional sticky filters row. Displays permanently right below the header.
    */
   filters?: React.ReactNode;
-  
+
   /**
    * The primary scrollable content of the page (e.g. Tables, Dashboards, Charts).
    */
   children: React.ReactNode;
-  
+
+  /**
+   * Optional sticky footer row. Displays permanently at the very bottom — never
+   * scrolls away. Ideal for pagination controls.
+   */
+  footer?: React.ReactNode;
+
   /**
    * Custom CSS classes appended to the root layout container.
    */
@@ -32,6 +38,7 @@ export interface PageLayoutProps {
 export const PageLayout: React.FC<PageLayoutProps> = ({
   header,
   filters,
+  footer,
   children,
   className = ''
 }) => {
@@ -42,7 +49,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
           {header}
         </section>
       )}
-      
+
       {filters && (
         <section className="epaa-page-layout__filters">
           {filters}
@@ -52,6 +59,12 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
       <main className="epaa-page-layout__body">
         {children}
       </main>
+
+      {footer && (
+        <section className="epaa-page-layout__footer">
+          {footer}
+        </section>
+      )}
     </div>
   );
 };

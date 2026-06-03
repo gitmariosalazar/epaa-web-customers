@@ -39,13 +39,8 @@ export class TramiteRepositoryImpl implements TramiteRepository {
   }
 
   async getMisSolicitudes(): Promise<SolicitudTramite[]> {
-    try {
-      const res = await apiClient.get<{ data: SolicitudTramite[] }>('/tramites/mis-solicitudes');
-      return res.data.data;
-    } catch {
-      // Graceful fallback to in-memory until API is ready
-      return MOCK_SOLICITUDES;
-    }
+    // Quitado para evitar el error NotFoundException: Cannot GET /tramites/mis-solicitudes
+    return MOCK_SOLICITUDES;
   }
 
   async submitSolicitud(

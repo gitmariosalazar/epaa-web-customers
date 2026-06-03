@@ -19,6 +19,8 @@ export interface Requisito {
   /** Extra clarification / note */
   nota?: string;
   obligatorio: boolean;
+  /** DB document type ID for backend mapping */
+  documentTypeId?: number;
 }
 
 /** Who can apply for this tramite */

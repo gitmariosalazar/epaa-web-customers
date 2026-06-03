@@ -15,158 +15,35 @@
 //   - DIP: depends on Tramite domain type, not on implementations.
 // ============================================================
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PageLayout } from '@/shared/presentation/components/Layout/PageLayout';
-import { Input } from '@/shared/presentation/components/Input/Input';
 import { Button } from '@/shared/presentation/components/Button/Button';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import {
-  User,
   Droplets,
-  UploadCloud,
-  FileText,
   ChevronRight,
   ChevronLeft,
   Check,
-  AlertCircle,
-  CheckCircle,
-  ArrowLeft
+  ArrowLeft,
+  AlertTriangle
 } from 'lucide-react';
-import { DocumentUploadCard } from './DocumentUploadCard';
 import { useTramiteById } from '@/modules/tramites/presentation/context/TramitesContext';
 import type { DocumentosMap } from '@/modules/tramites/domain/models/DocumentoAdjunto';
-import type { Tramite } from '@/modules/tramites/domain/models/Tramite';
 import './SolicitudNuevaPage.css';
-import { DynamicFormResolver } from '../components/forms/DynamicFormResolver';
-import { INITIAL_FORM_ACOMETIDA } from '../components/forms/FormAcometida';
-import { INITIAL_FORM_SUSPENSION } from '../components/forms/FormSuspension';
-
-/* ── Steps config — 3 steps only ── */
-const STEPS = [
-  { id: 1, label: 'Datos Personales', icon: <User size={18} /> },
-  { id: 2, label: 'Documentos', icon: <UploadCloud size={18} /> },
-  { id: 3, label: 'Confirmación', icon: <FileText size={18} /> }
-];
-
-/* ── Form types ── */
-interface SolicitudForm {
-  cedula: string;
-  nombres: string;
-  apellidos: string;
-  email: string;
-  telefono: string;
-  tipo_persona: 'natural' | 'juridica';
-  detalles: any; // Dynamic based on category
-}
-
-
-const INITIAL_FORM: SolicitudForm = {
-  cedula: '',
-  nombres: '',
-  apellidos: '',
-  email: '',
-  telefono: '',
-  tipo_persona: 'natural',
-  detalles: {} // We'll initialize this dynamically when we know the category
-};
-
-// ── Default tramite ID — can be overridden by URL param ──────
-const DEFAULT_TRAMITE_ID = 'nueva-acometida-natural';
-
-// ── Sub-component: Documents step ───────────────────────────
-interface DocumentsStepProps {
-  tramite: Tramite;
-  documentos: DocumentosMap;
-  onAttach: (id: string, file: File) => void;
-  onRemove: (id: string) => void;
-}
-
-const DocumentsStep: React.FC<DocumentsStepProps> = ({
-  tramite,
-  documentos,
-  onAttach,
-  onRemove
-}) => {
-  const obligatorios = tramite.requisitos.filter((r) => r.obligatorio);
-  const uploaded = Object.keys(documentos).length;
-  const total = obligatorios.length;
-  const progress = total > 0 ? Math.round((uploaded / total) * 100) : 0;
-  const allReady = uploaded >= total;
-
-  return (
-    <div className="solicitud-form-section solicitud-docs-step">
-      <div className="solicitud-form-section__header">
-        <UploadCloud size={20} />
-        <h3>Carga de Documentos — {tramite.nombre}</h3>
-      </div>
-
-      <p className="solicitud-docs-step__subtitle">
-        Adjunta cada documento de forma independiente. Los documentos de
-        terceros (Municipio, Registro de la Propiedad) deben obtenerse
-        previamente.
-      </p>
-
-      {/* Progress bar */}
-      <div className="doc-upload-progress">
-        <div className="doc-upload-progress__bar-track">
-          <div
-            className="doc-upload-progress__bar-fill"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="doc-upload-progress__meta">
-          <span>
-            <strong
-              style={{
-                color: allReady ? 'var(--success)' : 'var(--text-main)'
-              }}
-            >
-              {uploaded}
-            </strong>
-            &nbsp;de <strong>{total}</strong> documentos obligatorios adjuntados
-          </span>
-          {allReady && (
-            <span
-              style={{
-                color: 'var(--success)',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4
-              }}
-            >
-              <CheckCircle size={14} /> Listo para continuar
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Card grid — 2 columns, scrolls with card body */}
-      <div className="doc-upload-grid">
-        {tramite.requisitos.map((req, i) => (
-          <DocumentUploadCard
-            key={req.id}
-            requisito={req}
-            index={i}
-            adjunto={documentos[req.id]}
-            onAttach={onAttach}
-            onRemove={onRemove}
-          />
-        ))}
-      </div>
-
-      {!allReady && (
-        <div className="solicitud-docs-step__warning">
-          <AlertCircle size={14} style={{ flexShrink: 0 }} />
-          Faltan {total - uploaded} documento{total - uploaded !== 1 ? 's' : ''}{' '}
-          obligatorio{total - uploaded !== 1 ? 's' : ''}. Puedes continuar y
-          adjuntarlos después.
-        </div>
-      )}
-    </div>
-  );
-};
+import { useAuth } from '@/shared/presentation/context/AuthContext';
+import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
+import { DocumentsStep } from './solicitud-nueva/DocumentsStep';
+import { PersonalDataStep } from './solicitud-nueva/PersonalDataStep';
+import { SolicitudSuccess } from './solicitud-nueva/SolicitudSuccess';
+import { StepIndicator } from './solicitud-nueva/StepIndicator';
+import { SummaryStep } from './solicitud-nueva/SummaryStep';
+import { DEFAULT_TRAMITE_ID, INITIAL_FORM, STEPS } from './solicitud-nueva/constants';
+import { buildSolicitudFormData } from './solicitud-nueva/helpers';
+import type { SolicitudForm } from './solicitud-nueva/types';
+import { useSolicitudFormSetup } from './solicitud-nueva/useSolicitudFormSetup';
+import { ValidateSolicitudStepUseCase } from '@/modules/solicitudes/application/usecases/ValidateSolicitudStepUseCase';
+import { Modal } from '@/shared/presentation/components/Modal/Modal';
 
 // ── Main page ────────────────────────────────────────────────
 export const SolicitudNuevaPage: React.FC = () => {
@@ -181,27 +58,36 @@ export const SolicitudNuevaPage: React.FC = () => {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<SolicitudForm>(INITIAL_FORM);
   const [documentos, setDocumentos] = useState<DocumentosMap>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdSolicitudId, setCreatedSolicitudId] = useState<string | null>(
+    null
+  );
 
-  const update = (field: keyof SolicitudForm) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-      >
-    ) =>
-      setForm((p) => ({ ...p, [field]: e.target.value }));
+  const validateStepUseCase = React.useMemo(() => new ValidateSolicitudStepUseCase(), []);
 
-  // Initialize dynamic form data once tramite is loaded
-  React.useEffect(() => {
-    if (tramite && Object.keys(form.detalles).length === 0) {
-      if (tramite.categoria === 'nueva_acometida' || tramite.categoria === 'alcantarillado') {
-        setForm(prev => ({ ...prev, detalles: { ...INITIAL_FORM_ACOMETIDA } }));
-      } else if (tramite.categoria === 'suspension') {
-        setForm(prev => ({ ...prev, detalles: { ...INITIAL_FORM_SUSPENSION } }));
-      }
+  const { user: authUser } = useAuth();
+  useSolicitudFormSetup(form, setForm, authUser, tramite);
+
+  const handlePrevStep = useCallback(() => {
+    setErrors({});
+    setIsModalOpen(false);
+    setStep((s) => s - 1);
+  }, []);
+
+  const handleNextStep = useCallback(() => {
+    const res = validateStepUseCase.execute(step, form, tramite, documentos);
+    if (!res.valid) {
+      setErrors(res.errors);
+      setIsModalOpen(true);
+      return;
     }
-  }, [tramite]);
+    setErrors({});
+    setIsModalOpen(false);
+    setStep((s) => s + 1);
+  }, [step, form, tramite, documentos, validateStepUseCase]);
 
   // DIP: handlers only use DocumentoAdjunto domain type
   const handleAttach = useCallback((requisitoId: string, file: File) => {
@@ -209,6 +95,12 @@ export const SolicitudNuevaPage: React.FC = () => {
       ...prev,
       [requisitoId]: { requisitoId, file, estado: 'pendiente' }
     }));
+    setErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[requisitoId];
+      return copy;
+    });
+    setIsModalOpen(false);
   }, []);
 
   const handleRemove = useCallback((requisitoId: string) => {
@@ -217,13 +109,45 @@ export const SolicitudNuevaPage: React.FC = () => {
       delete n[requisitoId];
       return n;
     });
+    setIsModalOpen(false);
   }, []);
 
   const handleSubmit = async () => {
+    if (!tramite) return;
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1800));
-    setIsSubmitting(false);
-    setSubmitted(true);
+    try {
+      const formData = buildSolicitudFormData({
+        form,
+        tramite,
+        userId: authUser?.userId,
+        documentos
+      });
+
+      // Send the request using apiClient
+      const response = await apiClient.post<any>(
+        '/requests/submit-with-documents',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      // response.data contains the ApiResponse structure from client-gateway
+      const apiResponse = response.data as any;
+      if (apiResponse && apiResponse.data) {
+        const solicitudId = apiResponse.data.solicitudId;
+        setCreatedSolicitudId(solicitudId);
+      }
+
+      setSubmitted(true);
+    } catch (error: any) {
+      console.error('Error al enviar la solicitud:', error);
+      alert(error.message || 'Error al enviar la solicitud. Intente de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const docsSubidos = Object.keys(documentos).length;
@@ -252,64 +176,21 @@ export const SolicitudNuevaPage: React.FC = () => {
     );
   }
 
-  // ── Success screen ──
   if (submitted) {
-    const solNum = `SOL-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     return (
-      <PageLayout
-        header={
-          <h2
-            style={{
-              margin: 0,
-              fontSize: '1.25rem',
-              color: 'var(--text-main)'
-            }}
-          >
-            Nueva Solicitud
-          </h2>
-        }
-      >
-        <div className="solicitud-success">
-          <div className="solicitud-success__icon">
-            <Check size={48} />
-          </div>
-          <h2>¡Solicitud Enviada!</h2>
-          <p>
-            Tu solicitud de <strong>{tramite?.nombre}</strong> ha sido
-            registrada con&nbsp;
-            <strong>
-              {docsSubidos} documento{docsSubidos !== 1 ? 's' : ''}
-            </strong>{' '}
-            adjuntos.
-          </p>
-          <div className="solicitud-success__info">
-            <strong>Número de Solicitud:</strong> {solNum}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              gap: '0.75rem',
-              flexWrap: 'wrap',
-              justifyContent: 'center'
-            }}
-          >
-            <Button variant="outline" onClick={() => navigate('/tramites')}>
-              Ver Trámites
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setSubmitted(false);
-                setStep(1);
-                setForm(INITIAL_FORM);
-                setDocumentos({});
-              }}
-            >
-              Nueva Solicitud
-            </Button>
-          </div>
-        </div>
-      </PageLayout>
+      <SolicitudSuccess
+        tramite={tramite}
+        docsSubidos={docsSubidos}
+        createdSolicitudId={createdSolicitudId}
+        onGoToTramites={() => navigate('/tramites')}
+        onCreateAnother={() => {
+          setSubmitted(false);
+          setStep(1);
+          setForm(INITIAL_FORM);
+          setDocumentos({});
+          setCreatedSolicitudId(null);
+        }}
+      />
     );
   }
 
@@ -339,149 +220,22 @@ export const SolicitudNuevaPage: React.FC = () => {
         </div>
       }
     >
-      {/* ── Step indicator (outside Card so it doesn't scroll) ── */}
-      <div className="solicitud-steps">
-        {STEPS.map((s, i) => (
-          <React.Fragment key={s.id}>
-            <div
-              className={`solicitud-step ${step >= s.id ? 'solicitud-step--active' : ''} ${step > s.id ? 'solicitud-step--done' : ''}`}
-            >
-              <div className="solicitud-step__dot">
-                {step > s.id ? <Check size={14} /> : s.icon}
-              </div>
-              <span className="solicitud-step__label">{s.label}</span>
-            </div>
-            {i < STEPS.length - 1 && (
-              <div
-                className={`solicitud-steps__line ${step > s.id ? 'solicitud-steps__line--done' : ''}`}
-              />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
+      <StepIndicator step={step} steps={STEPS} />
 
-      {/* ── Main Card — scrolls internally ── */}
       <Card className="solicitud-card">
-        {/* ═══ Step 1 — Datos Personales + Predio + Servicio ═══ */}
         {step === 1 && (
-          <div className="solicitud-form-section">
-            {/* Titular */}
-            <div className="solicitud-form-section__header">
-              <User size={20} />
-              <h3>Datos del Titular</h3>
-            </div>
-            <div className="solicitud-grid-2">
-              <Input
-                id="sol-cedula"
-                label="Cédula de Identidad"
-                placeholder="Ej: 1234567890"
-                value={form.cedula}
-                onChange={update('cedula')}
-                required
-                maxLength={10}
-                inputMode="numeric"
-              />
-              <Input
-                id="sol-telefono"
-                label="Teléfono"
-                placeholder="Ej: 0999999999"
-                value={form.telefono}
-                onChange={update('telefono')}
-                required
-              />
-              <Input
-                id="sol-nombres"
-                label="Nombres"
-                placeholder="Ej: Juan Carlos"
-                value={form.nombres}
-                onChange={update('nombres')}
-                required
-              />
-              <Input
-                id="sol-apellidos"
-                label="Apellidos"
-                placeholder="Ej: Pérez Gómez"
-                value={form.apellidos}
-                onChange={update('apellidos')}
-                required
-              />
-              <Input
-                id="sol-email"
-                label="Correo Electrónico"
-                type="email"
-                placeholder="Ej: juan@correo.com"
-                value={form.email}
-                onChange={update('email')}
-                required
-                className="solicitud-grid-2__full"
-              />
-            </div>
-
-            {/* Tipo Persona */}
-            <div
-              className="solicitud-form-section__header"
-              style={{ marginTop: 'var(--spacing-lg)' }}
-            >
-              <Droplets size={20} />
-              <h3>Detalles Generales</h3>
-            </div>
-            <div className="solicitud-grid-2">
-              <div className="input-component solicitud-grid-2__full">
-                <label className="input__label">Tipo de Persona</label>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '0.75rem',
-                    marginTop: '0.25rem'
-                  }}
-                >
-                  {(['natural', 'juridica'] as const).map((tp) => (
-                    <div
-                      key={tp}
-                      onClick={() =>
-                        setForm((p) => ({ ...p, tipo_persona: tp }))
-                      }
-                      style={{
-                        padding: '0.75rem',
-                        border: `2px solid ${form.tipo_persona === tp ? 'var(--accent)' : 'var(--border-color)'}`,
-                        borderRadius: 'var(--radius-md)',
-                        cursor: 'pointer',
-                        background:
-                          form.tipo_persona === tp
-                            ? 'color-mix(in srgb, var(--accent), transparent 92%)'
-                            : 'var(--surface)',
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                        textAlign: 'center',
-                        color:
-                          form.tipo_persona === tp
-                            ? 'var(--accent)'
-                            : 'var(--text-secondary)',
-                        transition: 'all 0.18s'
-                      }}
-                    >
-                      {tp === 'natural'
-                        ? '👤 Persona Natural'
-                        : '🏢 Persona Jurídica'}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic Details based on tramite */}
-            {tramite && (
-              <DynamicFormResolver 
-                categoria={tramite.categoria} 
-                data={form.detalles} 
-                onChange={(newDetalles) => setForm(p => ({ ...p, detalles: newDetalles }))} 
-              />
-            )}
-          </div>
+          <PersonalDataStep
+            form={form}
+            tramite={tramite}
+            onDetallesChange={(newDetalles) => {
+              setForm((prev) => ({ ...prev, detalles: newDetalles }));
+              setErrors({});
+              setIsModalOpen(false);
+            }}
+            errors={errors}
+          />
         )}
 
-        {/* ═══ Step 2 — Documentos ═══ */}
         {step === 2 && tramite && (
           <DocumentsStep
             tramite={tramite}
@@ -491,96 +245,15 @@ export const SolicitudNuevaPage: React.FC = () => {
           />
         )}
 
-        {/* ═══ Step 3 — Confirmación ═══ */}
         {step === 3 && (
-          <div className="solicitud-form-section">
-            <div className="solicitud-form-section__header">
-              <FileText size={20} />
-              <h3>Resumen de la Solicitud</h3>
-            </div>
-            <div className="solicitud-summary">
-              <div className="solicitud-summary__group">
-                <h4>Datos Personales</h4>
-                <div className="solicitud-summary__row">
-                  <span>Cédula:</span>
-                  <strong>{form.cedula}</strong>
-                </div>
-                <div className="solicitud-summary__row">
-                  <span>Nombres:</span>
-                  <strong>
-                    {form.nombres} {form.apellidos}
-                  </strong>
-                </div>
-                <div className="solicitud-summary__row">
-                  <span>Correo:</span>
-                  <strong>{form.email}</strong>
-                </div>
-                <div className="solicitud-summary__row">
-                  <span>Teléfono:</span>
-                  <strong>{form.telefono}</strong>
-                </div>
-              </div>
-              <div className="solicitud-summary__group">
-                <h4>Servicio General</h4>
-                <div className="solicitud-summary__row">
-                  <span>Tipo Persona:</span>
-                  <strong style={{ textTransform: 'capitalize' }}>
-                    {form.tipo_persona}
-                  </strong>
-                </div>
-              </div>
-              {Object.keys(form.detalles).length > 0 && (
-                <div className="solicitud-summary__group">
-                  <h4>Detalles Específicos</h4>
-                  {Object.entries(form.detalles).map(([key, value]) => {
-                    if (!value) return null;
-                    return (
-                      <div className="solicitud-summary__row" key={key}>
-                        <span style={{ textTransform: 'capitalize' }}>{key.replace(/_/g, ' ')}:</span>
-                        <strong>{String(value)}</strong>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              <div className="solicitud-summary__group">
-                <h4>Documentos — {tramite?.nombre}</h4>
-                <div className="solicitud-summary__row">
-                  <span>Adjuntados:</span>
-                  <strong
-                    style={{
-                      color: allDocsReady ? 'var(--success)' : 'var(--error)'
-                    }}
-                  >
-                    {docsSubidos}/{docsTotal}{' '}
-                    {allDocsReady ? '✓ Completo' : '⚠ Incompleto'}
-                  </strong>
-                </div>
-                {Object.values(documentos).map((doc) => {
-                  const req = tramite?.requisitos.find(
-                    (r) => r.id === doc.requisitoId
-                  );
-                  return (
-                    <div
-                      key={doc.requisitoId}
-                      className="solicitud-summary__row"
-                    >
-                      <span style={{ fontSize: '0.75rem' }}>
-                        {(req?.descripcion ?? '').length > 38
-                          ? (req?.descripcion ?? '').slice(0, 38) + '…'
-                          : (req?.descripcion ?? '')}
-                      </span>
-                      <strong
-                        style={{ color: 'var(--success)', fontSize: '0.75rem' }}
-                      >
-                        ✓ {doc.file.name.slice(0, 18)}
-                      </strong>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+          <SummaryStep
+            form={form}
+            tramite={tramite ?? undefined}
+            documentos={documentos}
+            allDocsReady={allDocsReady}
+            docsSubidos={docsSubidos}
+            docsTotal={docsTotal}
+          />
         )}
 
         {/* ── Navigation ── */}
@@ -589,7 +262,7 @@ export const SolicitudNuevaPage: React.FC = () => {
             <Button
               id="btn-prev-step"
               variant="ghost"
-              onClick={() => setStep((s) => s - 1)}
+              onClick={handlePrevStep}
               leftIcon={<ChevronLeft size={18} />}
             >
               Anterior
@@ -600,7 +273,7 @@ export const SolicitudNuevaPage: React.FC = () => {
             <Button
               id="btn-next-step"
               variant="primary"
-              onClick={() => setStep((s) => s + 1)}
+              onClick={handleNextStep}
               rightIcon={<ChevronRight size={18} />}
             >
               Continuar
@@ -618,6 +291,39 @@ export const SolicitudNuevaPage: React.FC = () => {
           )}
         </div>
       </Card>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Campos Requeridos Incompletos"
+        size="sm"
+        footer={
+          <Button variant="primary" onClick={() => setIsModalOpen(false)}>
+            Entendido
+          </Button>
+        }
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '0.5rem 0' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', color: 'var(--error)' }}>
+            <AlertTriangle size={32} style={{ flexShrink: 0, color: 'var(--error)' }} />
+            <div>
+              <p style={{ margin: 0, fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-main)' }}>
+                No se puede avanzar al siguiente paso
+              </p>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                Por favor complete la siguiente información obligatoria:
+              </p>
+            </div>
+          </div>
+          <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {Object.values(errors).map((err, idx) => (
+              <li key={idx} style={{ color: 'var(--text-main)' }}>
+                {err}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Modal>
     </PageLayout>
   );
 };

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Search, User, Filter, Activity } from 'lucide-react';
-import { DatePicker } from '@/shared/presentation/components/DatePicker/DatePicker';
+import { Search, Filter, Activity, RefreshCw } from 'lucide-react';
 import { Button } from '@/shared/presentation/components/Button/Button';
 import { Input } from '@/shared/presentation/components/Input/Input';
 import { Select } from '@/shared/presentation/components/Input/Select';
@@ -28,6 +27,7 @@ interface SolicitudesGlobalFiltersProps {
   filters: SolicitudesFilterState;
   onChange: (newFilters: Partial<SolicitudesFilterState>) => void;
   onConsultar?: () => void;
+  onRefresh?: () => void;
   eventOptions?: { value: string; label: string }[];
 }
 
@@ -36,7 +36,7 @@ export const SolicitudesGlobalFilters: React.FC<
 > = ({
   filters,
   onChange,
-  onConsultar,
+  onRefresh,
   eventOptions = [
     { value: 'solicitud', label: 'Solicitud' },
     { value: 'validacion', label: 'Validación' },
@@ -48,55 +48,7 @@ export const SolicitudesGlobalFilters: React.FC<
   ]
 }) => {
   return (
-    <div className="layout-filters">
-      {/* ── LEFT: fetch inputs + Consultar ── */}
-      <div className="layout-filter-section-left">
-        <div className="filter-group">
-          <label className="filter-label">USUARIO ID / USERNAME</label>
-          <div className="filter-input-wrapper">
-            <Input
-              value={filters.userId}
-              onChange={(e) => onChange({ userId: e.target.value })}
-              placeholder="Ej: 15..."
-              size="compact"
-              leftIcon={<User size={18} />}
-            />
-          </div>
-        </div>
-
-        <div className="filter-group">
-          <label className="filter-label">DESDE</label>
-          <div className="filter-input-wrapper">
-            <DatePicker 
-              value={filters.initDate} 
-              onChange={(v) => onChange({ initDate: v })} 
-              size="compact" 
-            />
-          </div>
-        </div>
-
-        <div className="filter-group">
-          <label className="filter-label">HASTA</label>
-          <div className="filter-input-wrapper">
-            <DatePicker 
-              value={filters.endDate} 
-              onChange={(v) => onChange({ endDate: v })} 
-              size="compact" 
-            />
-          </div>
-        </div>
-
-        <div className="filter-group" style={{ paddingBottom: '2px' }}>
-          <Button
-            onClick={onConsultar}
-            size="compact"
-            leftIcon={<Search size={18} />}
-          >
-            Consultar
-          </Button>
-        </div>
-      </div>
-
+    <div className="layout-filters" style={{ justifyContent: 'flex-end' }}>
       {/* ── RIGHT: Local search + filters ── */}
       <div className="layout-filter-section-right">
         <div className="filter-group">
@@ -145,6 +97,17 @@ export const SolicitudesGlobalFilters: React.FC<
             </Select>
           </div>
         </div>
+
+        {onRefresh && (
+          <Button
+            variant="outline"
+            leftIcon={<RefreshCw size={15} />}
+            onClick={onRefresh}
+            id="btn-refrescar-solicitudes"
+          >
+            Actualizar
+          </Button>
+        )}
       </div>
     </div>
   );

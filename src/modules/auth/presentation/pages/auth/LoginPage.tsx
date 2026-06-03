@@ -4,7 +4,7 @@ import { Input } from '@/shared/presentation/components/Input/Input';
 import { PasswordInput } from '@/shared/presentation/components/Input/PasswordInput';
 import { Button } from '@/shared/presentation/components/Button/Button';
 import { Card } from '@/shared/presentation/components/Card/Card';
-import '@/shared/presentation/styles/LoginPage.css';
+import './LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/shared/presentation/context/ThemeContext';

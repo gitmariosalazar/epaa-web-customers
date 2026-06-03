@@ -1,29 +1,137 @@
-export type EstadoSolicitud = 'aprobada' | 'rechazada' | 'en_proceso' | 'completada';
-
-export interface SolicitudBase {
+export interface DocumentoAdjuntoResponse {
   id: string;
-  tramiteId: string;
-  categoria: string;
-  fechaCreacion: string;
-  estado: EstadoSolicitud;
-  titular: string;
-  cedula: string;
+  tipodocumento: string;
+  url: string;
+  estadoValidacion: string;
+  observacion: string | null;
 }
 
-export interface SolicitudAcometida extends SolicitudBase {
-  categoria: 'nueva_acometida' | 'alcantarillado';
-  detalles: {
-    parroquia: string;
-    barrio: string;
-    direccion: string;
-    tipoUso: string;
-    diametro: string;
-  };
+export interface ExpedienteResponse {
+  // Solicitud
+  solicitudId: string;
+  estado: string;
+  tipoPersona: string;
+  tipoAcometida: string;
+  usoPredio: string;
+  direccion: string;
+  claveCatastral: string;
+  coordenadas: string | null;
+  datosAdicionales: Record<string, any>;
+  fechaSolicitud: Date | string;
+  updatedAt: Date | string;
+  diasEnProceso: number;
+  // Cliente y analista
+  clienteId: string;
+  analistaUsername: string | null;
+  // Documentos
+  documentos: DocumentoAdjuntoResponse[];
+  // Factura
+  facturaId: string | null;
+  numeroFactura: string | null;
+  montofactura: number | null;
+  estadoPago: string | null;
+  fechaVencimiento: Date | string | null;
+  fechaPago: Date | string | null;
+  metodoPago: string | null;
+  // Informe técnico
+  informeId: string | null;
+  resultadoInforme: string | null;
+  costoMateriales: number | null;
+  costoManoObra: number | null;
+  costoTotal: number | null;
+  informeAprobado: boolean | null;
+  motivoRechazo: string | null;
+  // Contrato
+  contratoId: string | null;
+  numeroContrato: string | null;
+  estadoFirma: string | null;
+  valorTotal: number | null;
+  urlContratoFirmado: string | null;
+  // Registro catastral
+  numeroCuenta: string | null;
+  numeroMedidor: string | null;
+  servicioActivo: boolean | null;
+  fechaActivacion: Date | string | null;
+  solicitudNumero: string;
 }
 
-export interface SolicitudGenerica extends SolicitudBase {
-  categoria: 'cambio_titular' | 'suspension' | 'rehabilitacion' | 'medidor' | 'certificado' | 'beneficio';
-  detalles: Record<string, string>;
+export type Solicitud = ExpedienteResponse;
+
+
+
+export interface TrackingSolicitudResponse {
+  // ── Identificación
+  id: string;                          // UUID de la solicitud
+  codigo: string;                      // SOL-EPAA-2026-XXXXXXX
+  tipoAcometida: string;
+  usoPredio: string;
+  direccion: string;
+  claveCatastral: string | null;
+
+  // ── Fecha formateada en español
+  fechaCreacion: string;               // "07 de febrero, 2026"
+
+  // ── Estado actual
+  estadoCodigo: string;                // "INSTALACION_EN_PROCESO"
+  estadoActualLabel: string;           // "Instalación en Proceso"
+
+  // ── Paso en el wizard (7 fases del BPMN)
+  currentStep: string;                 // solicitud | documentos | pago | inspeccion | contrato | instalacion | catastro | completado | anulada | rechazada
+  stepIndex: number;                   // 0-6 (progreso), -1 (terminal negativo)
+
+  // ── Métricas
+  diasEnProceso: number;
+  ultimoMovimiento: Date | null;
+  ultimoComentario: string | null;
+
+  // ── Documentos
+  docsTotal: number;
+  docsAprobados: number;
+  docsRechazados: number;
+
+  // ── Pago de inspección
+  numeroFactura: string | null;
+  montoInspeccion: number | null;
+  estadoPago: string | null;
+  vencimientoPago: Date | null;
+  fechaPago: Date | null;
+  metodoPago: string | null;
+
+  // ── Inspección
+  resultadoInspeccion: string | null;
+  distanciaRedM: number | null;
+  costoEstimado: number | null;
+  informeAprobado: boolean | null;
+  obsInspeccion: string | null;
+
+  // ── Contrato
+  numeroContrato: string | null;
+  valorContrato: number | null;
+  estadoFirma: string | null;
+  fechaFirmaUsuario: Date | null;
+  fechaFirmaEpaa: Date | null;
+
+  // ── Instalación / Catastro
+  numeroMedidor: string | null;
+  numeroCuenta: string | null;
+  servicioActivo: boolean | null;
+  fechaActivacion: Date | null;
+
+  // ── Analista asignado
+  analista: string | null;
+
+  // ── Timeline completo (ordenado cronológicamente)
+  historial: HistorialTrackingEntry[];
+
+  // ── Auditoría
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type Solicitud = SolicitudAcometida | SolicitudGenerica;
+export interface HistorialTrackingEntry {
+  estado: string;
+  estadoLabel: string;
+  estadoAnterior: string | null;
+  fecha: Date;
+  comentario: string | null;
+}

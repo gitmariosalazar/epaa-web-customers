@@ -47,6 +47,24 @@ export const DashboardHome: React.FC = () => {
     ? `${user.firstName} ${user.lastName ?? ''}`.trim()
     : user?.username ?? 'Usuario';
 
+  /** Maps each tramite catalog ID → the actual route in App.tsx */
+  const tramiteRouteMap: Record<string, string> = {
+    'nueva-acometida-natural':         '/procedures/acometidas',
+    'nueva-acometida-juridica':        '/procedures/acometidas',
+    'acometida-alcantarillado-natural':'/procedures/acometidas',
+    'acometida-alcantarillado-juridica':'/procedures/acometidas',
+    'cambio-titular':                  '/procedures/cambio-titular',
+    'suspension-servicio':             '/procedures/suspension',
+    'rehabilitacion-servicio':         '/procedures/suspension',   // misma sección por ahora
+    'cambio-medidor':                  '/procedures/cambio-titular', // próximamente
+    'certificado-no-adeudar':          '/procedures/cambio-titular', // próximamente
+    'beneficio-tercera-edad':          '/procedures/tercera-edad',
+    'beneficio-discapacidad':          '/procedures/discapacidad',
+  };
+
+  const getRoute = (id: string) => tramiteRouteMap[id] ?? '/procedures/acometidas';
+
+
   const stats = [
     { icon: <Droplets size={24} />, label: 'Total Solicitudes', value: 0, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.12)', to: '/solicitudes/lista' },
     { icon: <Clock size={24} />,    label: 'En Proceso',        value: 0, color: '#f59e0b', bgColor: 'rgba(245,158,11,0.12)',  to: '/solicitudes/en-proceso' },
@@ -91,10 +109,11 @@ export const DashboardHome: React.FC = () => {
         </span>
       </div>
 
-      {/* Grid of tramite cards */}
+      {/* Grid of tramite cards — centered */}
       <div className="tramites-grid">
         {activeTramites.map((tramite) => (
-          <div key={tramite.id} className="tramite-dashboard-card-wrapper" onClick={() => navigate(`/procedures/${tramite.id}`)}>
+          <div key={tramite.id} className="tramite-dashboard-card-wrapper" onClick={() => navigate(getRoute(tramite.id))}>
+
              <div 
                className="card tramite-dashboard-card" 
                style={{ '--tramite-color': tramite.color } as React.CSSProperties}

@@ -137,9 +137,11 @@ export const SearchableSelect = forwardRef<SearchableSelectRef, SearchableSelect
       if (!isOpen && !isClearingRef.current) handleOpen();
     };
 
-    const filteredOptions = options.filter(opt => 
-      opt.label.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const isShowingCurrentSelection = selectedOption && searchTerm === selectedOption.label;
+    const filteredOptions = options.filter(opt => {
+      if (isShowingCurrentSelection || !searchTerm) return true;
+      return opt.label.toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
     const handleClear = (e: React.PointerEvent) => {
       e.stopPropagation();

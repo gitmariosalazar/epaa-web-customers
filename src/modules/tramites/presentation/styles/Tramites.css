@@ -81,7 +81,11 @@
 .tramite-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
-  border-color: color-mix(in srgb, var(--tramite-color, var(--accent)), transparent 60%);
+  border-color: color-mix(
+    in srgb,
+    var(--tramite-color, var(--accent)),
+    transparent 60%
+  );
 }
 
 .tramite-card:hover::before {
@@ -102,7 +106,11 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--tramite-color, var(--accent)), transparent 85%);
+  background: color-mix(
+    in srgb,
+    var(--tramite-color, var(--accent)),
+    transparent 85%
+  );
   color: var(--tramite-color, var(--accent));
 }
 
@@ -173,30 +181,17 @@
   transform: translateX(0);
 }
 
-/* ── Detail Page — 2-column: left scrolls, right is sticky ── */
+/* ── Detail Page Layout ── */
 .tramite-detail {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: var(--spacing-lg);
-  align-items: start;   /* crucial: columns size to their own content */
-  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xl);
+  padding-bottom: var(--spacing-2xl);
 }
 
 /* Left column: main content, scrolls with the page */
 .tramite-detail__main {
   min-height: 0;
-}
-
-/* Right column wrapper: sticky inside the scrolling body */
-.tramite-detail__sidebar {
-  position: sticky;
-  top: 0;                              /* stick to top of the scroll container */
-  align-self: flex-start;             /* don't stretch to grid row height */
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  max-height: calc(100vh - 80px);     /* never taller than viewport */
-  overflow-y: auto;
 }
 
 @media (max-width: 900px) {
@@ -226,7 +221,11 @@
   width: 64px;
   height: 64px;
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--tramite-color, var(--accent)), transparent 80%);
+  background: color-mix(
+    in srgb,
+    var(--tramite-color, var(--accent)),
+    transparent 80%
+  );
   color: var(--tramite-color, var(--accent));
   display: flex;
   align-items: center;
@@ -407,7 +406,6 @@
   margin-top: 4px;
 }
 
-
 /* ── Cost Summary Card ── */
 .tramite-cost-card {
   background: var(--surface);
@@ -417,7 +415,11 @@
 }
 
 .tramite-cost-card__header {
-  background: linear-gradient(135deg, var(--tramite-color, var(--accent)), color-mix(in srgb, var(--tramite-color, var(--accent)), black 15%));
+  background: linear-gradient(
+    135deg,
+    var(--tramite-color, var(--accent)),
+    color-mix(in srgb, var(--tramite-color, var(--accent)), black 15%)
+  );
   color: white;
   padding: var(--spacing-lg);
 }
@@ -451,12 +453,6 @@
   gap: 1rem;
 }
 
-.tramite-detail {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-xl);
-}
-
 .tramite-detail__left-col {
   flex: 1;
   display: flex;
@@ -470,9 +466,10 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   position: sticky;
-  top: calc(var(--header-height, 60px) + var(--spacing-md));
+  top: var(--spacing-sm);
+  align-self: flex-start;
 }
 
 @media (max-width: 900px) {
@@ -494,8 +491,13 @@
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-xl) var(--spacing-lg);
-  background: color-mix(in srgb, var(--tramite-color, var(--accent)) 8%, transparent);
-  border-bottom: 2px solid color-mix(in srgb, var(--tramite-color, var(--accent)) 20%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--tramite-color, var(--accent)) 8%,
+    transparent
+  );
+  border-bottom: 2px solid
+    color-mix(in srgb, var(--tramite-color, var(--accent)) 20%, transparent);
 }
 
 .tramite-detail__icon {
@@ -507,7 +509,7 @@
   justify-content: center;
   background: white;
   color: var(--tramite-color, var(--accent));
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 }
 
@@ -572,8 +574,8 @@
 .tramite-detail__notice {
   margin: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
   padding: var(--spacing-md);
-  background: rgba(59,130,246,0.06);
-  border: 1px solid rgba(59,130,246,0.2);
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: var(--radius-md);
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -626,7 +628,7 @@
 .tramite-detail__summary-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
 }
 
 .tramite-detail__summary-item {
@@ -658,10 +660,18 @@
 }
 
 .tramite-detail__summary-value {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.3;
+}
+
+.tramite-detail__summary-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  margin-bottom: calc(-1 * var(--spacing-md));
 }
 
 .tramite-detail__summary-btn {
@@ -813,7 +823,9 @@
 }
 
 @media (max-width: 600px) {
-  .tramite-submit-form__grid { grid-template-columns: 1fr; }
+  .tramite-submit-form__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── Type Selector ── */
@@ -999,7 +1011,11 @@
 .tramites-catalog-section-icon {
   padding: 0.5rem;
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--section-color, var(--accent)) 15%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--section-color, var(--accent)) 15%,
+    transparent
+  );
   color: var(--section-color, var(--accent));
   display: flex;
 }

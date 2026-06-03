@@ -18,6 +18,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
   const location = useLocation();
 
   const toggleSubMenu = () => {
+    // Only toggle manually when the sidebar is NOT collapsed
     if (isCollapsed) return;
     setIsExpanded((prev) => !prev);
   };
@@ -45,11 +46,10 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                 ? 'sidebar__link--active-parent'
                 : ''
             }`}
-            style={{ paddingLeft: level > 0 ? `${level * 1.5 + 1}rem` : undefined }}
             onClick={toggleSubMenu}
           >
             <span className="sidebar__icon">{renderIcon(item.icon)}</span>
-            {!isCollapsed && (
+            {(!isCollapsed || level > 0) && (
               <>
                 <span className="sidebar__label">{item.label}</span>
                 <span className="sidebar__chevron">
@@ -84,7 +84,6 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                       isActive ? 'sidebar__link--active' : ''
                     }`
                   }
-                  style={{ paddingLeft: `${(level + 1) * 1.5 + 1}rem` }}
                 >
                   <span className="sidebar__icon">
                     {renderIcon(subItem.icon)}
@@ -103,10 +102,9 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
             className={({ isActive }) =>
               `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
             }
-            style={{ paddingLeft: level > 0 ? `${level * 1.5 + 1}rem` : undefined }}
           >
             <span className="sidebar__icon">{renderIcon(item.icon)}</span>
-            {!isCollapsed && (
+            {(!isCollapsed || level > 0) && (
               <span className="sidebar__label">{item.label}</span>
             )}
           </NavLink>

@@ -10,15 +10,24 @@ import { PageLayout } from '@/shared/presentation/components/Layout/PageLayout';
 import { Button } from '@/shared/presentation/components/Button/Button';
 import {
   Droplets,
-  ArrowLeft, DollarSign, Clock, ClipboardList,
-  AlertCircle, ArrowRight,
-  CheckCircle2, CircleDot
+  DollarSign,
+  Clock,
+  ClipboardList,
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  CircleDot
 } from 'lucide-react';
 import { useTramiteById } from '../context/TramitesContext';
 import { RequisitoItem } from '../components/RequisitoItem';
+import { SupportContactCard } from '../components/SupportContactCard';
 import '../styles/Tramites.css';
 
-import { ICONS, PASOS_POR_CATEGORIA, NOTICE_POR_CATEGORIA } from '../constants/TramiteUI';
+import {
+  ICONS,
+  PASOS_POR_CATEGORIA,
+  NOTICE_POR_CATEGORIA
+} from '../constants/TramiteUI';
 
 export const TramiteDetailPage: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -55,41 +64,20 @@ export const TramiteDetailPage: React.FC = () => {
     .reduce((sum, r) => sum + (r.costo ?? 0), 0);
 
   const tipoLabel =
-    tramite.tipoPersona === 'natural'  ? 'Persona Natural'
-    : tramite.tipoPersona === 'juridica' ? 'Persona Jurídica'
-    : 'Persona Natural y Jurídica';
+    tramite.tipoPersona === 'natural'
+      ? 'Persona Natural'
+      : tramite.tipoPersona === 'juridica'
+        ? 'Persona Jurídica'
+        : 'Persona Natural y Jurídica';
 
   const pasos = PASOS_POR_CATEGORIA[tramite.categoria] ?? [];
   const notice = NOTICE_POR_CATEGORIA[tramite.categoria];
 
   return (
-    <PageLayout
-      header={
-        <div className="tramite-detail-header-actions">
-          <Button
-            variant="ghost" size="sm"
-            leftIcon={<ArrowLeft size={16} />}
-            onClick={() => navigate('/tramites')}
-            id="btn-back-catalog"
-          >
-            Trámites
-          </Button>
-          <Button
-            variant="primary"
-            rightIcon={<ArrowRight size={16} />}
-            onClick={() => navigate(`/solicitudes/nueva/${tramite.id}`)}
-            id="btn-iniciar-tramite"
-          >
-            Iniciar Solicitud
-          </Button>
-        </div>
-      }
-    >
+    <PageLayout>
       <div className="tramite-detail">
-
         {/* ── Left: Requirements + Steps ── */}
         <div className="tramite-detail__left-col">
-
           {/* Main requirements card */}
           <div
             className="card tramite-detail__main"
@@ -98,7 +86,9 @@ export const TramiteDetailPage: React.FC = () => {
             {/* Header banner */}
             <div
               className="tramite-detail__header"
-              style={{ '--tramite-color': tramite.color } as React.CSSProperties}
+              style={
+                { '--tramite-color': tramite.color } as React.CSSProperties
+              }
             >
               <div className="tramite-detail__icon">
                 {ICONS[tramite.icono] ?? <Droplets size={32} />}
@@ -120,13 +110,22 @@ export const TramiteDetailPage: React.FC = () => {
                 </h2>
                 {/* Legend */}
                 <div className="tramite-detail__req-legend">
-                  {([
-                    { color: '#3b82f6', label: 'Documento' },
-                    { color: '#f59e0b', label: 'Pago' },
-                    { color: '#8b5cf6', label: 'Formulario' }
-                  ] as const).map((l) => (
-                    <span key={l.label} className="tramite-detail__req-legend-item" style={{ color: l.color }}>
-                      <span className="tramite-detail__req-legend-dot" style={{ background: l.color }} />
+                  {(
+                    [
+                      { color: '#3b82f6', label: 'Documento' },
+                      { color: '#f59e0b', label: 'Pago' },
+                      { color: '#8b5cf6', label: 'Formulario' }
+                    ] as const
+                  ).map((l) => (
+                    <span
+                      key={l.label}
+                      className="tramite-detail__req-legend-item"
+                      style={{ color: l.color }}
+                    >
+                      <span
+                        className="tramite-detail__req-legend-dot"
+                        style={{ background: l.color }}
+                      />
                       {l.label}
                     </span>
                   ))}
@@ -160,9 +159,7 @@ export const TramiteDetailPage: React.FC = () => {
               <div className="process-timeline">
                 {pasos.map((paso, idx) => (
                   <div key={idx} className="process-step">
-                    <div className="process-step__number">
-                      {paso.numero}
-                    </div>
+                    <div className="process-step__number">{paso.numero}</div>
                     <div className="process-step__content">
                       <h4 className="process-step__title">{paso.titulo}</h4>
                       <p className="process-step__desc">{paso.descripcion}</p>
@@ -180,26 +177,38 @@ export const TramiteDetailPage: React.FC = () => {
             <h3 className="tramite-detail__summary-title">
               Resumen del Trámite
             </h3>
-            
+
             <div className="tramite-detail__summary-list">
               <div className="tramite-detail__summary-item">
                 <div className="tramite-detail__summary-icon">
                   <Clock size={16} />
                 </div>
                 <div>
-                  <span className="tramite-detail__summary-label">Tiempo Estimado</span>
+                  <span className="tramite-detail__summary-label">
+                    Tiempo Estimado
+                  </span>
                   <div className="tramite-detail__summary-value">
-                    {tramite.tiempoEstimadoDias ? `${tramite.tiempoEstimadoDias} días laborables` : 'Variable'}
+                    {tramite.tiempoEstimadoDias
+                      ? `${tramite.tiempoEstimadoDias} días laborables`
+                      : 'Variable'}
                   </div>
                 </div>
               </div>
 
               <div className="tramite-detail__summary-item">
-                <div className="tramite-detail__summary-icon" style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.1)' }}>
+                <div
+                  className="tramite-detail__summary-icon"
+                  style={{
+                    color: '#f59e0b',
+                    background: 'rgba(245,158,11,0.1)'
+                  }}
+                >
                   <DollarSign size={16} />
                 </div>
                 <div>
-                  <span className="tramite-detail__summary-label">Costo Inicial (Tasas)</span>
+                  <span className="tramite-detail__summary-label">
+                    Costo Inicial (Tasas)
+                  </span>
                   <div className="tramite-detail__summary-value">
                     {totalCosto > 0 ? `$${totalCosto.toFixed(2)}` : 'Gratuito'}
                   </div>
@@ -207,11 +216,19 @@ export const TramiteDetailPage: React.FC = () => {
               </div>
 
               <div className="tramite-detail__summary-item">
-                <div className="tramite-detail__summary-icon" style={{ color: '#10b981', background: 'rgba(16,185,129,0.1)' }}>
+                <div
+                  className="tramite-detail__summary-icon"
+                  style={{
+                    color: '#10b981',
+                    background: 'rgba(16,185,129,0.1)'
+                  }}
+                >
                   <CheckCircle2 size={16} />
                 </div>
                 <div>
-                  <span className="tramite-detail__summary-label">Tipo de Persona</span>
+                  <span className="tramite-detail__summary-label">
+                    Tipo de Persona
+                  </span>
                   <div className="tramite-detail__summary-value">
                     {tipoLabel}
                   </div>
@@ -219,21 +236,28 @@ export const TramiteDetailPage: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              variant="primary"
-              fullWidth
-              rightIcon={<ArrowRight size={18} />}
-              onClick={() => navigate(`/solicitudes/nueva/${tramite.id}`)}
-            >
-              Iniciar Solicitud
-            </Button>
-            <Button
-              variant="ghost" size="sm" fullWidth
-              onClick={() => navigate('/tramites')}
-            >
-              Ver otros trámites
-            </Button>
+            <div className="tramite-detail__summary-buttons">
+              <Button
+                variant="primary"
+                fullWidth
+                size="sm"
+                rightIcon={<ArrowRight size={18} />}
+                onClick={() => navigate(`/solicitudes/nueva/${tramite.id}`)}
+              >
+                Iniciar Solicitud
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                fullWidth
+                onClick={() => navigate('/tramites')}
+              >
+                Ver otros trámites
+              </Button>
+            </div>
           </div>
+
+          <SupportContactCard />
         </div>
       </div>
     </PageLayout>

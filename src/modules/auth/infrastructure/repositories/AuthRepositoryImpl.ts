@@ -17,8 +17,9 @@ export class AuthRepositoryImpl implements AuthRepository {
 
   async signIn(credentials: LoginCredentials): Promise<AuthSession> {
     const response = await this.client.post<ApiResponse<AuthSession>>(
-      '/auth/signin',
-      credentials
+      '/auth/client/signin',
+      credentials,
+      { skipAuth: true }
     );
     return response.data.data;
   }
@@ -36,7 +37,8 @@ export class AuthRepositoryImpl implements AuthRepository {
 
     const response = await this.client.post<ApiResponse<AuthSession>>(
       '/auth/refresh',
-      { refreshToken }
+      { refreshToken },
+      { skipAuth: true }
     );
     return response.data.data;
   }
@@ -44,7 +46,26 @@ export class AuthRepositoryImpl implements AuthRepository {
   async register(credentials: RegisterCredentials): Promise<AuthSession> {
     const response = await this.client.post<ApiResponse<AuthSession>>(
       '/auth/register',
-      credentials
+      credentials,
+      { skipAuth: true }
+    );
+    return response.data.data;
+  }
+
+  async registerNatural(payload: any): Promise<any> {
+    const response = await this.client.post<ApiResponse<any>>(
+      '/customer-gateway/register-natural',
+      payload,
+      { skipAuth: true }
+    );
+    return response.data.data;
+  }
+
+  async registerCompany(payload: any): Promise<any> {
+    const response = await this.client.post<ApiResponse<any>>(
+      '/customer-gateway/register-company',
+      payload,
+      { skipAuth: true }
     );
     return response.data.data;
   }

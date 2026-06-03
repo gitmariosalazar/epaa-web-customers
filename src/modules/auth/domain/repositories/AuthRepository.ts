@@ -5,4 +5,6 @@ export interface AuthRepository {
   signOut(): Promise<void>;
   register(credentials: RegisterCredentials): Promise<AuthSession>;
   refreshToken(): Promise<AuthSession>;
+  registerNatural(payload: any): Promise<any>;
+  registerCompany(payload: any): Promise<any>;
 }

@@ -1,5 +1,5 @@
 import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios';
-import type { HttpClientInterface } from '../../interfaces/HttpClientInterface';
+import type { HttpClientInterface, HttpRequestOptions } from '../../interfaces/HttpClientInterface';
 import type { ApiResponse } from '../../response/ApiResponse';
 import { environments } from '@/settings/environments/environments';
 import { localStorageService } from '@/shared/infrastructure/storage/LocalStorageService';
@@ -18,7 +18,6 @@ export class AxiosHttpClient implements HttpClientInterface {
 
   constructor() {
     console.log(`AxiosHttpClient initialized with API URL: ${environments.API_URL}`);
-    this.setupRequestInterceptor();
     this.setupResponseInterceptor();
   }
 
@@ -33,35 +32,26 @@ export class AxiosHttpClient implements HttpClientInterface {
     this.failedQueue = [];
   }
 
-  private setupRequestInterceptor() {
-    this.axiosInstance.interceptors.request.use(
-      (config) => {
-        const token = localStorageService.getItem('token');
-        const isPublicEndpoint =
-          config.url?.includes('/auth/signin') ||
-          config.url?.includes('/auth/refresh');
-
-        if (token && !isPublicEndpoint) {
-          config.headers['Authorization'] = `Bearer ${token}`;
-        } else if (!token && !isPublicEndpoint) {
-          const error: any = new Error('No token found');
-          error.response = { status: 401 };
-          return Promise.reject(error);
-        }
-
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-  }
-
   private setupResponseInterceptor() {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        if (!originalRequest) {
+          return Promise.reject(error);
+        }
+        const url = originalRequest.url || '';
+        const isAuthRequest =
+          url.includes('/auth/client/signin') ||
+          url.includes('/auth/register') ||
+          url.includes('/auth/signin') ||
+          url.includes('/auth/login');
 
-        if (error.response?.status !== 401 || originalRequest._retry) {
+        if (
+          error.response?.status !== 401 ||
+          originalRequest._retry ||
+          isAuthRequest
+        ) {
           return Promise.reject(error);
         }
 
@@ -112,16 +102,13 @@ export class AxiosHttpClient implements HttpClientInterface {
 
           if (!newAccessToken) throw new Error('No access token in refresh response');
 
-          // Persist new tokens
           localStorageService.setItem('token', newAccessToken);
           if (newRefreshToken) {
             localStorageService.setItem('refreshToken', newRefreshToken);
           }
 
-          // Retry queued requests with new token
           this.processQueue(null, newAccessToken);
 
-          // Retry original request
           originalRequest.headers = {
             ...originalRequest.headers,
             Authorization: `Bearer ${newAccessToken}`
@@ -152,18 +139,36 @@ export class AxiosHttpClient implements HttpClientInterface {
     method: string,
     url: string,
     body?: unknown,
-    options: Record<string, any> = {}
+    options: HttpRequestOptions = {}
   ): Promise<ApiResponse<T>> {
-    const headers: HeadersInit = {
+    const { skipAuth = false, params, headers: extraHeaders, ...axiosOptions } = options;
+
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...((options.headers as Record<string, any>) || {})
+      ...(extraHeaders || {})
     };
+
+    const token = localStorageService.getItem('token');
+
+    if (token) {
+      // Always attach token if present — it never hurts public endpoints
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (!skipAuth) {
+      // No token and the repository did not mark this as public → abort
+      const error: any = new Error('No token found');
+      error.response = { status: 401 };
+      if (this.unauthorizedHandler) {
+        await this.unauthorizedHandler(error);
+      }
+      throw error;
+    }
 
     try {
       const response: AxiosResponse<T> = await this.axiosInstance.request({
-        ...options,
+        ...axiosOptions,
         method: method.toUpperCase(),
         url: `${environments.API_URL}${url}`,
+        params,
         headers,
         data: body,
         withCredentials: true
@@ -182,23 +187,23 @@ export class AxiosHttpClient implements HttpClientInterface {
     }
   }
 
-  async get<T>(url: string, options: Record<string, any> = {}): Promise<ApiResponse<T>> {
+  async get<T>(url: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('GET', url, undefined, options);
   }
 
-  async post<T>(url: string, body?: unknown, options: Record<string, any> = {}): Promise<ApiResponse<T>> {
+  async post<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('POST', url, body, options);
   }
 
-  async put<T>(url: string, body?: unknown, options: Record<string, any> = {}): Promise<ApiResponse<T>> {
+  async put<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('PUT', url, body, options);
   }
 
-  async delete<T>(url: string, options: Record<string, any> = {}): Promise<ApiResponse<T>> {
+  async delete<T>(url: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('DELETE', url, undefined, options);
   }
 
-  async patch<T>(url: string, body?: unknown, options: Record<string, any> = {}): Promise<ApiResponse<T>> {
+  async patch<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
     return this.request<T>('PATCH', url, body, options);
   }
 }

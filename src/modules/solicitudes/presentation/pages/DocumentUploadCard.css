@@ -2,15 +2,12 @@
    DocumentUploadCard — Premium per-document upload card
    ════════════════════════════════════════════════════════════ */
 
-/* Grid container — scrolls vertically with the card body */
+/* Grid container — flows naturally with the card body scroll */
 .doc-upload-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-md);
 }
 
 @media (max-width: 1024px) {

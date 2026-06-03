@@ -1,9 +1,22 @@
-import type { User } from '@/modules/users/domain/models/User';
+/** Minimal auth user — subset of the full profile returned on login */
+export interface AuthUser {
+  userId: string;
+  username: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  roles: string[];
+  permissions: string[];
+  isActive: boolean;
+  registeredAt: Date;
+  lastLogin?: Date | null;
+  twoFactorEnabled?: boolean;
+}
 
 export interface AuthSession {
   accessToken: string;
   refreshToken: string;
-  user: User;
+  user: AuthUser;
 }
 
 export interface LoginCredentials {

@@ -20,9 +20,15 @@ import { SolicitudesTrackingPage } from '@/modules/solicitudes/presentation/page
 import { TramitesCatalogPage } from '@/modules/tramites/presentation/pages/TramitesCatalogPage';
 import { TramiteDetailPage } from '@/modules/tramites/presentation/pages/TramiteDetailPage';
 import { TramitesProvider } from '@/modules/tramites/presentation/context/TramitesContext';
-import { ProfilePage } from '@/modules/users/presentation/pages/profile/ProfilePage';
-import { UsersPage } from '@/modules/users/presentation/pages/users/UsersPage';
-import { UserDetailPage } from '@/modules/users/presentation/pages/users/UserDetailPage';
+// ── Independent tramite module pages ──
+import { AcometidasPage } from '@/modules/acometidas/presentation/pages/AcometidasPage';
+import { CambioTitularPage } from '@/modules/cambio-titular/presentation/pages/CambioTitularPage';
+import { SuspensionPage } from '@/modules/suspension/presentation/pages/SuspensionPage';
+import { BeneficioTerceraEdadPage } from '@/modules/beneficio-tercera-edad/presentation/pages/BeneficioTerceraEdadPage';
+import { BeneficioDiscapacidadPage } from '@/modules/beneficio-discapacidad/presentation/pages/BeneficioDiscapacidadPage';
+import { SolicitudesProvider } from '@/modules/solicitudes/presentation/context/SolicitudesContext';
+import { ProfilePage } from '@/modules/settings/presentation/pages/profile/ProfilePage';
+import { NotificationsPage } from '@/modules/notifications/presentation/pages/NotificationsPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
@@ -66,18 +72,27 @@ function App() {
               <Route
                 element={
                   <TramitesProvider>
-                    <DashboardLayout />
+                    <SolicitudesProvider>
+                      <DashboardLayout />
+                    </SolicitudesProvider>
                   </TramitesProvider>
                 }
               >
                 {/* Dashboard */}
                 <Route path="/" element={<DashboardHome />} />
 
-                {/* ── Trámites y Requisitos ── */}
+                {/* ── Trámites — Catálogo general ── */}
                 <Route path="/procedures" element={<Outlet />}>
                   <Route index element={<TramitesCatalogPage />} />
                   <Route path=":id" element={<TramiteDetailPage />} />
                 </Route>
+
+                {/* ── Módulos independientes por trámite ── */}
+                <Route path="/procedures/acometidas" element={<AcometidasPage />} />
+                <Route path="/procedures/cambio-titular" element={<CambioTitularPage />} />
+                <Route path="/procedures/suspension" element={<SuspensionPage />} />
+                <Route path="/procedures/tercera-edad" element={<BeneficioTerceraEdadPage />} />
+                <Route path="/procedures/discapacidad" element={<BeneficioDiscapacidadPage />} />
 
                 {/* ── Solicitudes ── */}
                 <Route path="/requests/new" element={<SolicitudNuevaPage />} />
@@ -98,11 +113,12 @@ function App() {
                 <Route path="/requests/:categoria/approved" element={<SolicitudesListPage filter="aprobada" />} />
                 <Route path="/requests/:categoria/rejected" element={<SolicitudesListPage filter="rechazada" />} />
 
-                {/* ── Usuarios ── */}
+                {/* ── Perfil & Configuración ── */}
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/users/:id" element={<UserDetailPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+
+                {/* ── Notificaciones ── */}
+                <Route path="/notifications" element={<NotificationsPage />} />
 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />

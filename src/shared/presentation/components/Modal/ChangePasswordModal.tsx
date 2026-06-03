@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ChangePasswordRequest } from '@/modules/users/domain/models/ChangePasswordRequest';
+import type { ChangePasswordRequest } from '@/modules/settings/domain/models/ChangePasswordRequest';
 import { Modal } from './Modal';
 import { PasswordInput } from '../Input/PasswordInput';
 import { Button } from '../Button/Button';

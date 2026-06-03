@@ -13,8 +13,10 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { NotificationBellWrapper } from '@/modules/notifications/presentation/components/NotificationBell/NotificationBellWrapper';
 import '@/shared/presentation/styles/Header.css';
 import { Tooltip } from '../common/Tooltip/Tooltip';
+
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -81,7 +83,10 @@ export const Header: React.FC = () => {
             </button>
           </Tooltip>
 
+          <NotificationBellWrapper />
+
           <Tooltip content={t('header.switchTheme')} themeColor="info">
+
             <button
               onClick={toggleTheme}
               className="header__nav-btn header__nav-btn--theme"

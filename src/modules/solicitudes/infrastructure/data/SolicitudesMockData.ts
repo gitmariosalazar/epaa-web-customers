@@ -1,6 +1,5 @@
-import type { Solicitud } from '../../domain/models/Solicitud';
 
-export const MOCK_SOLICITUDES: Solicitud[] = [
+export const MOCK_SOLICITUDES: any[] = [
   {
     id: 'SOL-2026-001',
     tramiteId: 'alcantarillado',

@@ -39,3 +39,11 @@
   background: transparent;
   width: 100%;
 }
+
+.epaa-page-layout__footer {
+  flex-shrink: 0;          /* Never compresses — always fully visible */
+  z-index: 40;             /* Above body content */
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}

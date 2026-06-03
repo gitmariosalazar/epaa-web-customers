@@ -24,7 +24,7 @@ export const TRAMITES_CATALOG: Tramite[] = [
 
   {
     id: 'nueva-acometida-natural',
-    nombre: 'Nueva Acometida Natural',
+    nombre: 'Nueva Acometida',
     descripcion:
       'Solicitud de conexión nueva de agua potable para propiedades de personas naturales.',
     categoria: 'nueva_acometida',
@@ -37,64 +37,75 @@ export const TRAMITES_CATALOG: Tramite[] = [
     requisitos: [
       {
         id: 'nan-01',
-        descripcion: 'Solicitud del servicio varios',
-        tipo: 'pago',
-        costo: 3.0,
-        nota: 'Pago en Ventanillas EPAA-AA',
-        obligatorio: true
+        descripcion: 'Cédula o pasaporte del beneficiario (copia)',
+        tipo: 'documento',
+        nota: 'Copia legible del titular',
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'nan-02',
-        descripcion: 'Inspección técnica del predio',
-        tipo: 'pago',
-        costo: 10.0,
-        nota: 'Pago en Ventanillas EPAA-AA',
-        obligatorio: true
+        descripcion: 'Cédula o pasaporte del cónyuge (copia)',
+        tipo: 'documento',
+        nota: 'Opcional, copia legible del cónyuge',
+        obligatorio: false,
+        documentTypeId: 1
       },
       {
         id: 'nan-03',
-        descripcion:
-          'Copia de cédula, certificado de votación o pasaporte del beneficiario y cónyuge',
+        descripcion: 'Papeleta de votación del beneficiario',
         tipo: 'documento',
-        nota: 'Documento vigente',
-        obligatorio: true
+        nota: 'Copia legible del titular',
+        obligatorio: true,
+        documentTypeId: 3
       },
       {
         id: 'nan-04',
-        descripcion: 'Copia simple de la Escritura inscrita en el Registro de la Propiedad',
+        descripcion: 'Papeleta de votación del cónyuge',
         tipo: 'documento',
-        nota: 'No requiere notariado',
-        obligatorio: true
+        nota: 'Opcional, copia legible del cónyuge',
+        obligatorio: false,
+        documentTypeId: 3
       },
       {
         id: 'nan-05',
-        descripcion: 'Copia del pago del impuesto predial del año vigente',
+        descripcion: 'Escritura del predio (copia)',
         tipo: 'documento',
-        nota: 'Año en curso',
-        obligatorio: true
+        nota: 'Copia simple inscrita en el Registro de la Propiedad',
+        obligatorio: true,
+        documentTypeId: 4
       },
       {
         id: 'nan-06',
-        descripcion: 'Certificado de no adeudar al G.A.D.M.A.A',
-        tipo: 'pago',
-        costo: 6.0,
-        nota: 'Solicitar en el Municipio de Antonio Ante',
-        obligatorio: true
+        descripcion: 'Pago de impuesto predial (copia)',
+        tipo: 'documento',
+        nota: 'Copia del pago del año vigente',
+        obligatorio: true,
+        documentTypeId: 5
       },
       {
         id: 'nan-07',
-        descripcion: 'Certificado de no adeudar a la EPAA-AA',
-        tipo: 'pago',
-        costo: 6.0,
-        nota: 'Solicitar en Ventanillas EPAA-AA',
-        obligatorio: true
+        descripcion: 'Certificado de no adeudar del municipio (GADM-AA)',
+        tipo: 'documento',
+        nota: 'Certificado vigente',
+        obligatorio: true,
+        documentTypeId: 6
       },
       {
         id: 'nan-08',
-        descripcion: 'Correo electrónico activo',
+        descripcion: 'Certificado de no adeudar a la EPAA-AA beneficiario',
         tipo: 'documento',
-        nota: 'Para notificaciones del trámite',
-        obligatorio: true
+        nota: 'Certificado vigente del titular',
+        obligatorio: true,
+        documentTypeId: 6
+      },
+      {
+        id: 'nan-09',
+        descripcion: 'Certificado de no adeudar a la EPAA-AA cónyuge',
+        tipo: 'documento',
+        nota: 'Opcional, certificado vigente del cónyuge',
+        obligatorio: false,
+        documentTypeId: 6
       }
     ]
   },
@@ -118,28 +129,32 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'pago',
         costo: 13.0,
         nota: 'Pago conjunto en Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'naj-02',
         descripcion: 'Copias simples de RUC y nombramiento del representante legal',
         tipo: 'documento',
         nota: 'Vigentes y en buen estado',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 2
       },
       {
         id: 'naj-03',
         descripcion: 'Cédula y certificado de votación del representante legal',
         tipo: 'documento',
         nota: 'Documentos personales del representante',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 7
       },
       {
         id: 'naj-04',
         descripcion: 'Escritura inscrita y pago de impuesto predial vigente',
         tipo: 'documento',
         nota: 'Copia simple, año en curso',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 4
       }
     ]
   },
@@ -166,28 +181,32 @@ export const TRAMITES_CATALOG: Tramite[] = [
         descripcion: 'Copia de cédula y papeleta de votación del nuevo titular',
         tipo: 'documento',
         nota: 'Documentos vigentes',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'ct-02',
         descripcion: 'Última factura de consumo cancelada',
         tipo: 'documento',
         nota: 'La más reciente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'ct-03',
         descripcion: 'Escrituras públicas inscritas en el Registro de la Propiedad',
         tipo: 'documento',
         nota: 'Copia notariada o simple según el caso',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 4
       },
       {
         id: 'ct-04',
         descripcion: 'Pago del impuesto predial del año en curso',
         tipo: 'documento',
         nota: 'Año vigente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 5
       },
       {
         id: 'ct-05',
@@ -195,7 +214,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 3.0,
         nota: 'Disponible en Ventanillas EPAA-AA ($3.00)',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'ct-06',
@@ -203,7 +223,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 5.0,
         nota: 'Solo aplica para personas jurídicas ($5.00)',
-        obligatorio: false
+        obligatorio: false,
+        documentTypeId: 7
       }
     ]
   },
@@ -231,14 +252,16 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 1.0,
         nota: 'Redactar en papel o solicitar formulario en EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'ss-02',
         descripcion: 'Copia de cédula y papeleta de votación actualizada del titular',
         tipo: 'documento',
         nota: 'Del titular de la cuenta',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'ss-03',
@@ -246,14 +269,16 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'pago',
         costo: 25.0,
         nota: 'Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'ss-04',
         descripcion: 'Copia de la última factura cancelada',
         tipo: 'documento',
         nota: 'Factura más reciente pagada',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       }
     ]
   },
@@ -281,21 +306,24 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 1.0,
         nota: 'Disponible en Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'rs-02',
         descripcion: 'Copia de cédula y papeleta de votación del titular',
         tipo: 'documento',
         nota: 'Documento vigente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'rs-03',
         descripcion: 'Pago total de la deuda pendiente (facturas atrasadas)',
         tipo: 'pago',
         nota: 'Cancelar en Ventanillas EPAA-AA o puntos autorizados',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'rs-04',
@@ -303,7 +331,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'pago',
         costo: 25.0,
         nota: 'Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       }
     ]
   },
@@ -327,64 +356,75 @@ export const TRAMITES_CATALOG: Tramite[] = [
     requisitos: [
       {
         id: 'aca-n-01',
-        descripcion: 'Solicitud del servicio varios',
-        tipo: 'pago',
-        costo: 3.0,
-        nota: 'Pago en Ventanillas EPAA-AA',
-        obligatorio: true
+        descripcion: 'Cédula o pasaporte del beneficiario (copia)',
+        tipo: 'documento',
+        nota: 'Copia legible del titular',
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'aca-n-02',
-        descripcion: 'Inspección técnica del predio',
-        tipo: 'pago',
-        costo: 10.0,
-        nota: 'Pago en Ventanillas EPAA-AA',
-        obligatorio: true
+        descripcion: 'Cédula o pasaporte del cónyuge (copia)',
+        tipo: 'documento',
+        nota: 'Opcional, copia legible del cónyuge',
+        obligatorio: false,
+        documentTypeId: 1
       },
       {
         id: 'aca-n-03',
-        descripcion:
-          'Copia de cédula, certificado de votación o pasaporte del beneficiario y cónyuge',
+        descripcion: 'Papeleta de votación del beneficiario',
         tipo: 'documento',
-        nota: 'Documento vigente',
-        obligatorio: true
+        nota: 'Copia legible del titular',
+        obligatorio: true,
+        documentTypeId: 3
       },
       {
         id: 'aca-n-04',
-        descripcion: 'Copia simple de la Escritura inscrita en el Registro de la Propiedad',
+        descripcion: 'Papeleta de votación del cónyuge',
         tipo: 'documento',
-        nota: 'No requiere notariado',
-        obligatorio: true
+        nota: 'Opcional, copia legible del cónyuge',
+        obligatorio: false,
+        documentTypeId: 3
       },
       {
         id: 'aca-n-05',
-        descripcion: 'Copia del pago del impuesto predial del año vigente',
+        descripcion: 'Escritura del predio (copia)',
         tipo: 'documento',
-        nota: 'Año en curso',
-        obligatorio: true
+        nota: 'Copia simple inscrita en el Registro de la Propiedad',
+        obligatorio: true,
+        documentTypeId: 4
       },
       {
         id: 'aca-n-06',
-        descripcion: 'Certificado de no adeudar al G.A.D.M.A.A',
-        tipo: 'pago',
-        costo: 6.0,
-        nota: 'Solicitar en el Municipio de Antonio Ante',
-        obligatorio: true
+        descripcion: 'Pago de impuesto predial (copia)',
+        tipo: 'documento',
+        nota: 'Copia del pago del año vigente',
+        obligatorio: true,
+        documentTypeId: 5
       },
       {
         id: 'aca-n-07',
-        descripcion: 'Certificado de no adeudar a la EPAA-AA',
-        tipo: 'pago',
-        costo: 6.0,
-        nota: 'Solicitar en Ventanillas EPAA-AA',
-        obligatorio: true
+        descripcion: 'Certificado de no adeudar del municipio (GADM-AA)',
+        tipo: 'documento',
+        nota: 'Certificado vigente',
+        obligatorio: true,
+        documentTypeId: 6
       },
       {
         id: 'aca-n-08',
-        descripcion: 'Correo electrónico activo',
+        descripcion: 'Certificado de no adeudar a la EPAA-AA beneficiario',
         tipo: 'documento',
-        nota: 'Para notificaciones del trámite',
-        obligatorio: true
+        nota: 'Certificado vigente del titular',
+        obligatorio: true,
+        documentTypeId: 6
+      },
+      {
+        id: 'aca-n-09',
+        descripcion: 'Certificado de no adeudar a la EPAA-AA cónyuge',
+        tipo: 'documento',
+        nota: 'Opcional, certificado vigente del cónyuge',
+        obligatorio: false,
+        documentTypeId: 6
       }
     ]
   },
@@ -408,35 +448,40 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'pago',
         costo: 13.0,
         nota: 'Pago conjunto en Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'aca-j-02',
         descripcion: 'Copias simples de RUC y nombramiento del representante legal',
         tipo: 'documento',
         nota: 'Vigentes y en buen estado',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 2
       },
       {
         id: 'aca-j-03',
         descripcion: 'Cédula y certificado de votación del representante legal',
         tipo: 'documento',
         nota: 'Documentos personales del representante',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 7
       },
       {
         id: 'aca-j-04',
         descripcion: 'Escritura inscrita en el Registro de la Propiedad',
         tipo: 'documento',
         nota: 'Copia simple',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 4
       },
       {
         id: 'aca-j-05',
         descripcion: 'Pago del impuesto predial vigente',
         tipo: 'documento',
         nota: 'Año en curso',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 5
       }
     ]
   },
@@ -464,21 +509,24 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 1.0,
         nota: 'Disponible en Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'cm-02',
         descripcion: 'Copia de cédula y papeleta de votación del titular',
         tipo: 'documento',
         nota: 'Documento vigente del propietario de la cuenta',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'cm-03',
         descripcion: 'Denuncia (en caso de robo o pérdida del medidor)',
         tipo: 'documento',
         nota: 'Emitida por la UPC o Policía Nacional',
-        obligatorio: false
+        obligatorio: false,
+        documentTypeId: 1
       },
       {
         id: 'cm-04',
@@ -486,7 +534,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'pago',
         costo: 3.0,
         nota: 'Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       }
     ]
   },
@@ -513,14 +562,16 @@ export const TRAMITES_CATALOG: Tramite[] = [
         descripcion: 'Copia de cédula del titular de la cuenta',
         tipo: 'documento',
         nota: 'Documento vigente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'cna-02',
         descripcion: 'Número de cuenta de agua potable o dirección del predio',
         tipo: 'documento',
         nota: 'Para ubicar la cuenta en el sistema',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'cna-03',
@@ -528,7 +579,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'pago',
         costo: 6.0,
         nota: 'Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 6
       }
     ]
   },
@@ -555,14 +607,16 @@ export const TRAMITES_CATALOG: Tramite[] = [
         descripcion: 'Copia de cédula que acredite ser adulto mayor (65 años o más)',
         tipo: 'documento',
         nota: 'Cédula de identidad vigente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'bte-02',
         descripcion: 'Última factura de consumo de agua cancelada',
         tipo: 'documento',
         nota: 'La más reciente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'bte-03',
@@ -570,7 +624,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 1.0,
         nota: 'Disponible en Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       }
     ]
   },
@@ -593,21 +648,24 @@ export const TRAMITES_CATALOG: Tramite[] = [
         descripcion: 'Copia de cédula del beneficiario',
         tipo: 'documento',
         nota: 'Cédula de identidad vigente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'bd-02',
         descripcion: 'Carnet de CONADIS o certificado del Ministerio de Salud',
         tipo: 'documento',
         nota: 'Documento que acredite la condición de discapacidad. Vigente.',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'bd-03',
         descripcion: 'Última factura de consumo de agua cancelada',
         tipo: 'documento',
         nota: 'La más reciente',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       },
       {
         id: 'bd-04',
@@ -615,7 +673,8 @@ export const TRAMITES_CATALOG: Tramite[] = [
         tipo: 'formulario',
         costo: 1.0,
         nota: 'Disponible en Ventanillas EPAA-AA',
-        obligatorio: true
+        obligatorio: true,
+        documentTypeId: 1
       }
     ]
   }

@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import type { User } from '@/modules/users/domain/models/User';
-import type { UpdateUserRequest } from '@/modules/users/domain/models/UpdateUserRequest';
 import { User as UserIcon, Mail, Type } from 'lucide-react';
 import { Modal } from './Modal';
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
 
+interface UpdateProfileData {
+  username?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: UpdateUserRequest) => Promise<void>;
-  user: User;
+  onSave: (data: UpdateProfileData) => Promise<void>;
+  user: { username: string; email: string; firstName?: string; lastName?: string };
 }
 
 export const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -19,7 +24,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onSave,
   user
 }) => {
-  const [formData, setFormData] = useState<UpdateUserRequest>({
+  const [formData, setFormData] = useState<UpdateProfileData>({
     username: user.username,
     email: user.email,
     firstName: user.firstName,
@@ -30,7 +35,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: UpdateProfileData) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

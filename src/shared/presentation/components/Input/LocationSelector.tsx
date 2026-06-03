@@ -66,9 +66,15 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     const fetchCountries = async () => {
       try {
         const data = await countriesUseCase.getAllCountries();
-        setCountries(data);
+        const mappedData = data.map((c) => {
+          if (c.countryName.toUpperCase() === 'NO ASIGNADO') {
+            return { ...c, countryId: 'NO_ASIGNADO' };
+          }
+          return c;
+        });
+        setCountries(mappedData);
         // Default to Ecuador if available (common use case)
-        const ecuador = data.find(
+        const ecuador = mappedData.find(
           (c) => c.countryName.toLowerCase() === 'ecuador'
         );
         if (ecuador && !countryId) {
@@ -92,6 +98,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
       parishId &&
       parishId !== 'ECU' &&
       parishId !== '' &&
+      parishId !== 'NO_ASIGNADO' &&
+      parishId !== 'no_asignado' &&
+      parishId !== 'no asignado' &&
       (!countryId || !provinceId || !cantonId)
     ) {
       const resolveHierarchy = async () => {
@@ -105,11 +114,15 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 canton.provinceId
               );
               if (province) {
+                const mappedProvinceId = province.provinceName.toUpperCase() === 'NO ASIGNADO' ? 'NO_ASIGNADO' : province.provinceId;
+                const mappedCantonId = canton.cantonName.toUpperCase() === 'NO ASIGNADO' ? 'NO_ASIGNADO' : canton.cantonId;
+                const mappedParishId = parish.parishName.toUpperCase() === 'NO ASIGNADO' ? 'NO_ASIGNADO' : parish.parishId;
+
                 onLocationChange({
                   countryId: province.countryId,
-                  provinceId: province.provinceId,
-                  cantonId: canton.cantonId,
-                  parishId: parish.parishId
+                  provinceId: mappedProvinceId,
+                  cantonId: mappedCantonId,
+                  parishId: mappedParishId
                 });
               }
             }
@@ -126,12 +139,29 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   // Fetch Provinces when Country changes
   useEffect(() => {
-    if (countryId) {
+    if (countryId && countryId !== 'NO_ASIGNADO' && countryId !== 'no_asignado' && countryId !== 'no asignado') {
       const fetchProvinces = async () => {
         try {
           const data =
             await provincesUseCase.getProvincesByCountryId(countryId);
-          setProvinces(data);
+          const mappedData = data.map((p) => {
+            if (p.provinceName.toUpperCase() === 'NO ASIGNADO') {
+              return { ...p, provinceId: 'NO_ASIGNADO' };
+            }
+            return p;
+          });
+          setProvinces(mappedData);
+          if (mappedData.length > 0) {
+            const hasCurrent = mappedData.some((p) => p.provinceId === provinceId);
+            if (!hasCurrent) {
+              onLocationChange({
+                countryId,
+                provinceId: mappedData[0].provinceId,
+                cantonId: '',
+                parishId: ''
+              });
+            }
+          }
         } catch (error) {
           console.error('Error fetching provinces:', error);
         }
@@ -144,11 +174,28 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   // Fetch Cantons when Province changes
   useEffect(() => {
-    if (provinceId) {
+    if (provinceId && provinceId !== 'NO_ASIGNADO' && provinceId !== 'no_asignado' && provinceId !== 'no asignado') {
       const fetchCantons = async () => {
         try {
           const data = await cantonUseCase.getCantonsByProvinceId(provinceId);
-          setCantons(data);
+          const mappedData = data.map((c) => {
+            if (c.cantonName.toUpperCase() === 'NO ASIGNADO') {
+              return { ...c, cantonId: 'NO_ASIGNADO' };
+            }
+            return c;
+          });
+          setCantons(mappedData);
+          if (mappedData.length > 0) {
+            const hasCurrent = mappedData.some((c) => c.cantonId === cantonId);
+            if (!hasCurrent) {
+              onLocationChange({
+                countryId,
+                provinceId,
+                cantonId: mappedData[0].cantonId,
+                parishId: ''
+              });
+            }
+          }
         } catch (error) {
           console.error('Error fetching cantons:', error);
         }
@@ -161,11 +208,28 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   // Fetch Parishes when Canton changes
   useEffect(() => {
-    if (cantonId) {
+    if (cantonId && cantonId !== 'NO_ASIGNADO' && cantonId !== 'no_asignado' && cantonId !== 'no asignado') {
       const fetchParishes = async () => {
         try {
           const data = await parishUseCase.getParishesByCantonId(cantonId);
-          setParishes(data);
+          const mappedData = data.map((p) => {
+            if (p.parishName.toUpperCase() === 'NO ASIGNADO') {
+              return { ...p, parishId: 'NO_ASIGNADO' };
+            }
+            return p;
+          });
+          setParishes(mappedData);
+          if (mappedData.length > 0) {
+            const hasCurrent = mappedData.some((p) => p.parishId === parishId);
+            if (!hasCurrent) {
+              onLocationChange({
+                countryId,
+                provinceId,
+                cantonId,
+                parishId: mappedData[0].parishId
+              });
+            }
+          }
         } catch (error) {
           console.error('Error fetching parishes:', error);
         }
