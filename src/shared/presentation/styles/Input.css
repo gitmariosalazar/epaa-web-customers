@@ -205,3 +205,25 @@ select.input__field {
   background-position: right 0.75rem center;
   padding-right: 2rem;
 }
+
+/* Read-only / disabled style overrides */
+.input__field[readonly],
+.input__field:read-only {
+  background-color: color-mix(in srgb, var(--surface) 60%, var(--background-page, #1a202c)) !important;
+  color: var(--text-muted) !important;
+  border-color: color-mix(in srgb, var(--border-color) 60%, transparent) !important;
+  cursor: not-allowed !important;
+  caret-color: transparent !important; /* Hide blinking cursor */
+}
+
+.input__field[readonly]:hover,
+.input__field:read-only:hover {
+  border-color: color-mix(in srgb, var(--border-color) 60%, transparent) !important;
+}
+
+.input__field[readonly]:focus,
+.input__field:read-only:focus {
+  border-color: color-mix(in srgb, var(--border-color) 60%, transparent) !important;
+  box-shadow: none !important;
+}
+

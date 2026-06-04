@@ -35,6 +35,7 @@ interface CustomerFormProps {
   showLocationOnly?: boolean;
   hideDeceased?: boolean;
   onIdentityKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  errors?: any;
 }
 
 export const CustomerForm: React.FC<CustomerFormProps> = ({
@@ -46,7 +47,8 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
   hideLocation = false,
   showLocationOnly = false,
   hideDeceased = false,
-  onIdentityKeyDown
+  onIdentityKeyDown,
+  errors
 }) => {
   const { t } = useTranslation();
 
@@ -86,144 +88,149 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
       {!showLocationOnly && (
         <>
           <div className="customer-form__row-2">
-             <Select
-          label={t('customers.form.identificationType')}
-          name="identificationType"
-          value={formData.identificationType}
-          onChange={onChange}
-          size="small"
-          disabled={isEditMode || isViewOnly}
-          leftIcon={<Users size={14} />}
-        >
-          <option value="CED">{t('customers.form.idTypeCED')}</option>
-          <option value="RUC">{t('customers.form.idTypeRUC')}</option>
-          <option value="PAS">{t('customers.form.idTypePAS')}</option>
-        </Select>
-        <Input
-          label={t('customers.form.identityId')}
-          name="customerId"
-          value={formData.customerId === 0 ? '' : formData.customerId}
-          onChange={onChange}
-          onKeyDown={onIdentityKeyDown}
-          required
-          type="text"
-          size="small"
-          disabled={isEditMode || isViewOnly}
-          leftIcon={<CreditCard size={14} />}
-        />
-       
-      </div>
+            <Select
+              label={t('customers.form.identificationType')}
+              name="identificationType"
+              value={formData.identificationType}
+              onChange={onChange}
+              size="small"
+              disabled={isEditMode || isViewOnly}
+              leftIcon={<Users size={14} />}
+            >
+              <option value="CED">{t('customers.form.idTypeCED')}</option>
+              <option value="RUC">{t('customers.form.idTypeRUC')}</option>
+              <option value="PAS">{t('customers.form.idTypePAS')}</option>
+            </Select>
+            <Input
+              label={t('customers.form.identityId')}
+              name="customerId"
+              value={formData.customerId === 0 ? '' : formData.customerId}
+              onChange={onChange}
+              onKeyDown={onIdentityKeyDown}
+              required
+              type="text"
+              size="small"
+              disabled={isEditMode || isViewOnly}
+              leftIcon={<CreditCard size={14} />}
+              error={errors?.customerId}
+            />
+
+          </div>
           <div className="customer-form__row-2">
-        <Input
-          label={t('customers.form.firstName')}
-          name="firstName"
-          value={formData.firstName}
-          onChange={onChange}
-          required
-          size="small"
-          disabled={isViewOnly}
-          leftIcon={<User size={14} />}
-        />
-        <Input
-          label={t('customers.form.lastName')}
-          name="lastName"
-          value={formData.lastName}
-          onChange={onChange}
-          required
-          size="small"
-          disabled={isViewOnly}
-          leftIcon={<User size={14} />}
-        />
-      </div>
+            <Input
+              label={t('customers.form.firstName')}
+              name="firstName"
+              value={formData.firstName}
+              onChange={onChange}
+              required
+              size="small"
+              disabled={isViewOnly}
+              leftIcon={<User size={14} />}
+              error={errors?.firstName}
+            />
+            <Input
+              label={t('customers.form.lastName')}
+              name="lastName"
+              value={formData.lastName}
+              onChange={onChange}
+              required
+              size="small"
+              disabled={isViewOnly}
+              leftIcon={<User size={14} />}
+              error={errors?.lastName}
+            />
+          </div>
 
 
 
-      <div className="customer-form__row-2">
-        <div className="customer-form__dynamic-section">
-          <label className="customer-form__label">
-            {t('customers.form.emails')}
-          </label>
-          {formData.emails.map((email: any, index: any) => (
-            <div key={`email-${index}`} className="customer-form__dynamic-row">
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) =>
-                  handleArrayChange('emails', index, e.target.value)
-                }
-                size="small"
-                disabled={isViewOnly}
-                leftIcon={<Mail size={14} />}
-                className="customer-form__dynamic-input"
-              />
+          <div className="customer-form__row-2">
+            <div className="customer-form__dynamic-section">
+              <label className="customer-form__label">
+                {t('customers.form.emails')}
+              </label>
+              {formData.emails.map((email: any, index: any) => (
+                <div key={`email-${index}`} className="customer-form__dynamic-row">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) =>
+                      handleArrayChange('emails', index, e.target.value)
+                    }
+                    size="small"
+                    disabled={isViewOnly}
+                    leftIcon={<Mail size={14} />}
+                    className="customer-form__dynamic-input"
+                    error={index === 0 ? errors?.emails : undefined}
+                  />
+                  {!isViewOnly && (
+                    <Button
+                      size="xs"
+                      variant="action"
+                      onClick={() => handleRemoveField('emails', index)}
+                      circle
+                      className="customer-form__remove-btn"
+                    >
+                      <Trash2 size={14} color="var(--error)" />
+                    </Button>
+                  )}
+                </div>
+              ))}
               {!isViewOnly && (
                 <Button
                   size="xs"
-                  variant="action"
-                  onClick={() => handleRemoveField('emails', index)}
-                  circle
-                  className="customer-form__remove-btn"
+                  variant="outline"
+                  onClick={() => handleAddField('emails')}
+                  className="customer-form__add-btn"
+                  leftIcon={<Plus size={14} />}
                 >
-                  <Trash2 size={14} color="var(--error)" />
+                  {t('common.add', 'Add')}
                 </Button>
               )}
             </div>
-          ))}
-          {!isViewOnly && (
-            <Button
-              size="xs"
-              variant="outline"
-              onClick={() => handleAddField('emails')}
-              className="customer-form__add-btn"
-              leftIcon={<Plus size={14} />}
-            >
-              {t('common.add', 'Add')}
-            </Button>
-          )}
-        </div>
 
-        <div className="customer-form__dynamic-section">
-          <label className="customer-form__label">
-            {t('customers.form.phones')}
-          </label>
-          {formData.phoneNumbers.map((phone: any, index: any) => (
-            <div key={`phone-${index}`} className="customer-form__dynamic-row">
-              <Input
-                value={phone}
-                onChange={(e) =>
-                  handleArrayChange('phoneNumbers', index, e.target.value)
-                }
-                size="small"
-                disabled={isViewOnly}
-                leftIcon={<Phone size={14} />}
-                className="customer-form__dynamic-input"
-              />
+            <div className="customer-form__dynamic-section">
+              <label className="customer-form__label">
+                {t('customers.form.phones')}
+              </label>
+              {formData.phoneNumbers.map((phone: any, index: any) => (
+                <div key={`phone-${index}`} className="customer-form__dynamic-row">
+                  <Input
+                    value={phone}
+                    onChange={(e) =>
+                      handleArrayChange('phoneNumbers', index, e.target.value)
+                    }
+                    size="small"
+                    disabled={isViewOnly}
+                    leftIcon={<Phone size={14} />}
+                    className="customer-form__dynamic-input"
+                    error={index === 0 ? errors?.phoneNumbers : undefined}
+                  />
+                  {!isViewOnly && (
+                    <Button
+                      size="xs"
+                      variant="action"
+                      onClick={() => handleRemoveField('phoneNumbers', index)}
+                      circle
+                      className="customer-form__remove-btn"
+                    >
+                      <Trash2 size={14} color="var(--error)" />
+                    </Button>
+                  )}
+                </div>
+              ))}
               {!isViewOnly && (
                 <Button
                   size="xs"
-                  variant="action"
-                  onClick={() => handleRemoveField('phoneNumbers', index)}
-                  circle
-                  className="customer-form__remove-btn"
+                  variant="outline"
+                  onClick={() => handleAddField('phoneNumbers')}
+                  className="customer-form__add-btn"
+                  leftIcon={<Plus size={14} />}
                 >
-                  <Trash2 size={14} color="var(--error)" />
+                  {t('common.add', 'Add')}
                 </Button>
               )}
             </div>
-          ))}
-          {!isViewOnly && (
-            <Button
-              size="xs"
-              variant="outline"
-              onClick={() => handleAddField('phoneNumbers')}
-              className="customer-form__add-btn"
-              leftIcon={<Plus size={14} />}
-            >
-              {t('common.add', 'Add')}
-            </Button>
-          )}
-        </div>
-      </div>
+          </div>
         </>
       )}
 
@@ -231,148 +238,151 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
         <>
           <div
             className="customer-form__row-2"
-          style={{ gridTemplateColumns: '1fr' }}
-      >
-        <Input
-          label={t('customers.form.address')}
-          name="address"
-          value={formData.address || ''}
-          onChange={onChange}
-          size="small"
-          disabled={isViewOnly}
-          leftIcon={<MapPin size={14} />}
-        />
-      </div>
-
-      <div className="customer-form__location-section">
-        <label
-          className="customer-form__label"
-          style={{
-            marginBottom: '8px',
-            display: 'block',
-            color: 'var(--text-secondary)',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: 'var(--blue)' }}>📍</span>{' '}
-            {t('customers.form.location', 'Location (Parish)')}
+            style={{ gridTemplateColumns: '1fr' }}
+          >
+            <Input
+              label={t('customers.form.address')}
+              name="address"
+              value={formData.address || ''}
+              onChange={onChange}
+              size="small"
+              disabled={isViewOnly}
+              leftIcon={<MapPin size={14} />}
+            />
           </div>
-        </label>
-        <LocationSelector
-          countryId={formData.countryId || 'ECU'}
-          provinceId={formData.provinceId || '10'}
-          cantonId={formData.cantonId || '1001'}
-          parishId={formData.parishId || ''}
-          size="small"
-          onLocationChange={(location) => {
-            Object.entries(location).forEach(([key, value]) => {
-              // Ensure we don't dispatch unnecessary events if value hasn't changed
-              if (formData[key] !== value) {
-                onChange({
-                  target: { name: key, value, type: 'text' }
-                } as any);
-              }
-            });
-          }}
-          disabled={isViewOnly}
-        />
-      </div>
+
+          <div className="customer-form__location-section">
+            <label
+              className="customer-form__label"
+              style={{
+                marginBottom: '8px',
+                display: 'block',
+                color: 'var(--text-secondary)',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--blue)' }}>📍</span>{' '}
+                {t('customers.form.location', 'Location (Parish)')}
+              </div>
+            </label>
+            <LocationSelector
+              countryId={formData.countryId || 'ECU'}
+              provinceId={formData.provinceId || '10'}
+              cantonId={formData.cantonId || '1001'}
+              parishId={formData.parishId || ''}
+              size="small"
+              onLocationChange={(location) => {
+                Object.entries(location).forEach(([key, value]) => {
+                  // Ensure we don't dispatch unnecessary events if value hasn't changed
+                  if (formData[key] !== value) {
+                    onChange({
+                      target: { name: key, value, type: 'text' }
+                    } as any);
+                  }
+                });
+              }}
+              disabled={isViewOnly}
+            />
+          </div>
         </>
       )}
 
       {!showLocationOnly && (
         <>
           <div className="customer-form__row-3">
-        <div className="input-component input--small">
-          <label className="input__label">{t('customers.form.dateOfBirth')}</label>
-          <DatePicker
-            size="small"
-            value={
-              formData.dateOfBirth
-                ? new Date(formData.dateOfBirth).toISOString().split('T')[0]
-                : ''
-            }
-            onChange={(date) => onChange({ target: { name: 'dateOfBirth', value: date } } as any)}
-          />
-        </div>
-        <Select
-          label={t('customers.form.sex')}
-          name="sexId"
-          value={formData.sexId}
-          onChange={onChange}
-          size="small"
-          disabled={isViewOnly}
-          leftIcon={<Users size={14} />}
-        >
-          <option value={1}>{t('customers.form.male')}</option>
-          <option value={2}>{t('customers.form.female')}</option>
-        </Select>
-        <Select
-          label={t('customers.form.civilStatus')}
-          name="civilStatus"
-          value={formData.civilStatus}
-          onChange={onChange}
-          size="small"
-          disabled={isViewOnly}
-          leftIcon={<Activity size={14} />}
-        >
-          <option value={1}>{t('customers.form.single')}</option>
-          <option value={2}>{t('customers.form.married')}</option>
-          <option value={3}>{t('customers.form.divorced')}</option>
-          <option value={4}>{t('customers.form.widowed')}</option>
-          <option value={5}>{t('customers.form.freeUnion')}</option>
-        </Select>
-      </div>
-
-      <div className="customer-form__row-2" style={{ alignItems: 'flex-end', gridTemplateColumns: hideDeceased ? '1fr' : '1fr 1fr' }}>
-        <Input
-          label={t('customers.form.professionId')}
-          type="number"
-          name="professionId"
-          value={formData.professionId}
-          onChange={onChange}
-          size="small"
-          disabled={isViewOnly}
-          leftIcon={<Briefcase size={14} />}
-        />
-        {!hideDeceased && (
-          <div className="customer-form__group">
-            <label className="customer-form__label" style={{ opacity: 0, userSelect: 'none' }}>
-              &nbsp;
-            </label>
-            <div 
-              className={`customer-form__deceased-wrapper ${formData.deceased ? 'customer-form__deceased-wrapper--checked' : ''}`}
-              onClick={() => {
-                if (!isViewOnly) {
-                  onChange({
-                    target: { name: 'deceased', value: !formData.deceased, type: 'checkbox', checked: !formData.deceased }
-                  } as any);
+            <div className="input-component input--small">
+              <label className="input__label">{t('customers.form.dateOfBirth')}</label>
+              <DatePicker
+                size="small"
+                value={
+                  formData.dateOfBirth
+                    ? new Date(formData.dateOfBirth).toISOString().split('T')[0]
+                    : ''
                 }
-              }}
-            >
-              <label className="customer-form__deceased-label" onClick={(e) => e.stopPropagation()}>
-                <span className="customer-form__deceased-text">
-                  💀 {t('customers.form.deceased')}
-                </span>
-                <div className="customer-form__switch">
-                  <input
-                    type="checkbox"
-                    name="deceased"
-                    checked={formData.deceased}
-                    onChange={onChange}
-                    disabled={isViewOnly}
-                  />
-                  <span className="customer-form__slider"></span>
-                </div>
-              </label>
+                onChange={(date) => onChange({ target: { name: 'dateOfBirth', value: date } } as any)}
+              />
+              {errors?.dateOfBirth && (
+                <span className="input__error">{errors.dateOfBirth}</span>
+              )}
             </div>
+            <Select
+              label={t('customers.form.sex')}
+              name="sexId"
+              value={formData.sexId}
+              onChange={onChange}
+              size="small"
+              disabled={isViewOnly}
+              leftIcon={<Users size={14} />}
+            >
+              <option value={1}>{t('customers.form.male')}</option>
+              <option value={2}>{t('customers.form.female')}</option>
+            </Select>
+            <Select
+              label={t('customers.form.civilStatus')}
+              name="civilStatus"
+              value={formData.civilStatus}
+              onChange={onChange}
+              size="small"
+              disabled={isViewOnly}
+              leftIcon={<Activity size={14} />}
+            >
+              <option value={1}>{t('customers.form.single')}</option>
+              <option value={2}>{t('customers.form.married')}</option>
+              <option value={3}>{t('customers.form.divorced')}</option>
+              <option value={4}>{t('customers.form.widowed')}</option>
+              <option value={5}>{t('customers.form.freeUnion')}</option>
+            </Select>
           </div>
-        )}
-      </div>
+
+          <div className="customer-form__row-2" style={{ alignItems: 'flex-end', gridTemplateColumns: hideDeceased ? '1fr' : '1fr 1fr' }}>
+            <Input
+              label={t('customers.form.professionId')}
+              type="number"
+              name="professionId"
+              value={formData.professionId}
+              onChange={onChange}
+              size="small"
+              disabled={isViewOnly}
+              leftIcon={<Briefcase size={14} />}
+            />
+            {!hideDeceased && (
+              <div className="customer-form__group">
+                <label className="customer-form__label" style={{ opacity: 0, userSelect: 'none' }}>
+                  &nbsp;
+                </label>
+                <div
+                  className={`customer-form__deceased-wrapper ${formData.deceased ? 'customer-form__deceased-wrapper--checked' : ''}`}
+                  onClick={() => {
+                    if (!isViewOnly) {
+                      onChange({
+                        target: { name: 'deceased', value: !formData.deceased, type: 'checkbox', checked: !formData.deceased }
+                      } as any);
+                    }
+                  }}
+                >
+                  <label className="customer-form__deceased-label" onClick={(e) => e.stopPropagation()}>
+                    <span className="customer-form__deceased-text">
+                      💀 {t('customers.form.deceased')}
+                    </span>
+                    <div className="customer-form__switch">
+                      <input
+                        type="checkbox"
+                        name="deceased"
+                        checked={formData.deceased}
+                        onChange={onChange}
+                        disabled={isViewOnly}
+                      />
+                      <span className="customer-form__slider"></span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>

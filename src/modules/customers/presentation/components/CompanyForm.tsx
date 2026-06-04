@@ -36,6 +36,7 @@ interface CompanyFormProps {
    * and autofill the rest of the form — same pattern as CustomerForm.
    */
   onIdentityKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  errors?: any;
 }
 
 export const CompanyForm: React.FC<CompanyFormProps> = ({
@@ -46,7 +47,8 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
   isViewOnly = false,
   hideLocation = false,
   showLocationOnly = false,
-  onIdentityKeyDown
+  onIdentityKeyDown,
+  errors
 }) => {
   const { t } = useTranslation();
 
@@ -110,6 +112,7 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
               disabled={isEditMode || isViewOnly}
               leftIcon={<Hash size={14} />}
               info={onIdentityKeyDown ? 'Escribe el RUC y presiona Enter para buscar' : undefined}
+              error={errors?.companyRuc}
             />
           </div>
 
@@ -124,6 +127,7 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
               size="small"
               disabled={isViewOnly}
               leftIcon={<Building2 size={14} />}
+              error={errors?.companyName}
             />
             <Input
               label={t('customers.form.socialReason')}
@@ -154,6 +158,7 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
                     disabled={isViewOnly}
                     leftIcon={<Mail size={14} />}
                     className="customer-form__dynamic-input"
+                    error={index === 0 ? errors?.companyEmails : undefined}
                   />
                   {!isViewOnly && (
                     <Button
@@ -196,6 +201,7 @@ export const CompanyForm: React.FC<CompanyFormProps> = ({
                     disabled={isViewOnly}
                     leftIcon={<Phone size={14} />}
                     className="customer-form__dynamic-input"
+                    error={index === 0 ? errors?.companyPhones : undefined}
                   />
                   {!isViewOnly && (
                     <Button

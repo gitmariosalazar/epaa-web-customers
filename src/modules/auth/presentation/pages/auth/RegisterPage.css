@@ -260,6 +260,7 @@
 .register-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  padding: var(--spacing-sm) !important;
   gap: var(--spacing-sm);
 }
 
@@ -409,3 +410,56 @@
 .register-form__scroll-container::-webkit-scrollbar-thumb:hover {
   background-color: var(--accent);
 }
+
+/* Security Info Box */
+.register-info-box {
+  display: flex;
+  gap: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) var(--spacing-sm);
+}
+
+.register-info-box__icon {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+.register-info-box__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.register-info-box__content h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.register-info-box__content ul {
+  margin: 0;
+  padding-left: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register-info-box__content li {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  text-align: left;
+}
+
+.register-info-box__content li strong {
+  color: var(--text-main);
+}
+

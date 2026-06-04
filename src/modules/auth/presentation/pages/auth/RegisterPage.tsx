@@ -33,6 +33,12 @@ import { CustomerRepositoryImpl } from '@/modules/customers/infrastructure/repos
 import { CompanyRepositoryImpl } from '@/modules/customers/infrastructure/repositories/CompanyRepositoryImpl';
 import { VerificationCodeStep } from '@/modules/auth/presentation/components/VerificationCodeStep';
 
+const getEighteenYearsAgo = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 18);
+  return d;
+};
+
 // Initial states for forms
 const initialCustomerState = {
   customerId: '',   // string para preservar ceros iniciales (ej: 0400000000)
@@ -40,7 +46,7 @@ const initialCustomerState = {
   lastName: '',
   emails: [''],
   phoneNumbers: [''],
-  dateOfBirth: new Date(),
+  dateOfBirth: getEighteenYearsAgo(),
   sexId: 1,
   civilStatus: 1,
   address: '',
@@ -155,14 +161,14 @@ export const RegisterPage: React.FC = () => {
           const emails =
             company.companyEmails && company.companyEmails.length > 0
               ? company.companyEmails.map((e: any) =>
-                  typeof e === 'string' ? e : e.correo ?? ''
-                ).filter(Boolean)
+                typeof e === 'string' ? e : e.correo ?? ''
+              ).filter(Boolean)
               : [''];
           const phones =
             company.companyPhones && company.companyPhones.length > 0
               ? company.companyPhones.map((p: any) =>
-                  typeof p === 'string' ? p : p.numero ?? ''
-                ).filter(Boolean)
+                typeof p === 'string' ? p : p.numero ?? ''
+              ).filter(Boolean)
               : [''];
           setCompanyData((prev: any) => ({
             ...prev,
@@ -243,14 +249,14 @@ export const RegisterPage: React.FC = () => {
             const emails =
               company.companyEmails && company.companyEmails.length > 0
                 ? company.companyEmails.map((e: any) =>
-                    typeof e === 'string' ? e : e.correo ?? ''
-                  ).filter(Boolean)
+                  typeof e === 'string' ? e : e.correo ?? ''
+                ).filter(Boolean)
                 : [''];
             const phones =
               company.companyPhones && company.companyPhones.length > 0
                 ? company.companyPhones.map((p: any) =>
-                    typeof p === 'string' ? p : p.numero ?? ''
-                  ).filter(Boolean)
+                  typeof p === 'string' ? p : p.numero ?? ''
+                ).filter(Boolean)
                 : [''];
             setCompanyData((prev: any) => ({
               ...prev,
@@ -346,11 +352,46 @@ export const RegisterPage: React.FC = () => {
 
   const handleAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setAccountData((prev) => ({ ...prev, [name]: value }));
+    setAccountData((prev: any) => ({ ...prev, [name]: value }));
     if (accountErrors[name as keyof AccountErrors]) {
       setAccountErrors((prev) => ({ ...prev, [name]: undefined }));
     }
+
+    if (name === 'email') {
+      if (isNatural) {
+        setCustomerData((prev: any) => {
+          const emails = [...prev.emails];
+          const identity = customerData.customerId;
+          emails[0] = value;
+          return { ...prev, emails, identity };
+        });
+      } else {
+        setCompanyData((prev: any) => {
+          const emails = [...prev.companyEmails];
+          const identity = companyData.companyRuc;
+          emails[0] = value;
+          return { ...prev, companyEmails: emails, identity };
+        });
+      }
+    }
   };
+
+  React.useEffect(() => {
+    const profileEmail = isNatural ? customerData.emails[0] : companyData.companyEmails[0];
+    const identity = isNatural ? customerData.customerId : companyData.companyRuc;
+
+    if (profileEmail) {
+      setAccountErrors((prev) => ({ ...prev, email: undefined }));
+    }
+    if (identity) {
+      setAccountErrors((prev) => ({ ...prev, username: undefined }));
+    }
+  }, [customerData.emails,
+  companyData.companyEmails,
+  customerData.customerId,
+  companyData.companyRuc,
+    isNatural]);
+
 
   // Validation helpers
   const validateStep1 = (): boolean => {
@@ -358,21 +399,61 @@ export const RegisterPage: React.FC = () => {
     if (isNatural) {
       if (!customerData.firstName.trim()) errs.firstName = 'El nombre es requerido';
       if (!customerData.lastName.trim()) errs.lastName = 'El apellido es requerido';
-      
+
       const cid = String(customerData.customerId).trim();
       if (!cid) {
         errs.customerId = 'La cédula es requerida';
       } else if (!/^\d{10}$/.test(cid)) {
         errs.customerId = 'Debe tener exactamente 10 dígitos';
       }
+
+      // Validar al menos un teléfono
+      const phone = customerData.phoneNumbers[0]?.trim();
+      if (!phone) {
+        errs.phoneNumbers = 'El teléfono es requerido';
+      }
+
+      // Validar al menos un correo y que sea válido
+      const email = customerData.emails[0]?.trim();
+      if (!email) {
+        errs.emails = 'El correo es requerido';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errs.emails = 'Correo electrónico inválido';
+      }
+
+      // Validar fecha de nacimiento (mínimo 18 años)
+      if (!customerData.dateOfBirth) {
+        errs.dateOfBirth = 'La fecha de nacimiento es requerida';
+      } else {
+        const dob = new Date(customerData.dateOfBirth);
+        const limitDate = new Date();
+        limitDate.setFullYear(limitDate.getFullYear() - 18);
+        if (dob > limitDate) {
+          errs.dateOfBirth = 'Debe ser mayor de 18 años';
+        }
+      }
     } else {
       if (!companyData.companyName.trim()) errs.companyName = 'El nombre comercial es requerido';
-      
+
       const ruc = companyData.companyRuc.trim();
       if (!ruc) {
         errs.companyRuc = 'El RUC es requerido';
       } else if (!/^\d{13}$/.test(ruc)) {
         errs.companyRuc = 'Debe tener exactamente 13 dígitos';
+      }
+
+      // Validar al menos un teléfono de la empresa
+      const companyPhone = companyData.companyPhones[0]?.trim();
+      if (!companyPhone) {
+        errs.companyPhones = 'El teléfono es requerido';
+      }
+
+      // Validar al menos un correo de la empresa y que sea válido
+      const companyEmail = companyData.companyEmails[0]?.trim();
+      if (!companyEmail) {
+        errs.companyEmails = 'El correo es requerido';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(companyEmail)) {
+        errs.companyEmails = 'Correo electrónico inválido';
       }
     }
     setStep1Errors(errs);
@@ -402,11 +483,14 @@ export const RegisterPage: React.FC = () => {
 
   const validateStep3 = (): boolean => {
     const errs: AccountErrors = {};
-    if (!accountData.username.trim()) errs.username = 'El usuario es requerido';
-    else if (accountData.username.length < 4) errs.username = 'Mínimo 4 caracteres';
+    const email = isNatural ? customerData.emails[0] : companyData.companyEmails[0];
+    const identity = isNatural ? customerData.customerId : companyData.companyRuc;
 
-    if (!accountData.email.trim()) errs.email = 'El correo es requerido';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(accountData.email)) {
+    if (!identity || !identity.trim()) errs.username = 'El usuario es requerido';
+    else if (identity.length < 4) errs.username = 'Mínimo 4 caracteres';
+
+    if (!email || !email.trim()) errs.email = 'El correo es requerido';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errs.email = 'Correo electrónico inválido';
     }
 
@@ -429,11 +513,13 @@ export const RegisterPage: React.FC = () => {
 
   const handleNextStep2 = () => {
     if (validateStep2()) {
-      // Pre-fill email from Step 1 if user hasn't typed anything yet
       const profileEmail = isNatural ? customerData.emails[0] : companyData.companyEmails[0];
-      if (profileEmail && !accountData.email) {
-        setAccountData((prev) => ({ ...prev, email: profileEmail }));
-      }
+      const identity = isNatural ? customerData.customerId : companyData.companyRuc;
+      setAccountErrors((prev) => ({
+        ...prev,
+        email: profileEmail ? undefined : prev.email,
+        username: identity ? undefined : prev.username,
+      }));
       setStep(3);
     }
   };
@@ -451,12 +537,13 @@ export const RegisterPage: React.FC = () => {
 
       if (isNatural) {
         const cleanPhones = customerData.phoneNumbers.filter(Boolean);
-        const cleanEmails = [accountData.email, ...customerData.emails.slice(1)].filter(Boolean);
+        const primaryEmail = customerData.emails[0];
+        const cleanEmails = [primaryEmail, ...customerData.emails.slice(1)].filter(Boolean);
 
         const unifiedNaturalPayload = {
           password: accountData.password,
           clientId: String(customerData.customerId).trim(),
-          email: accountData.email,
+          email: primaryEmail,
           emails: cleanEmails,
           firstName: customerData.firstName,
           lastName: customerData.lastName,
@@ -476,12 +563,13 @@ export const RegisterPage: React.FC = () => {
         responseData = await registerNaturalUseCase.execute(unifiedNaturalPayload);
       } else {
         const cleanPhones = companyData.companyPhones.filter(Boolean);
-        const cleanEmails = [accountData.email, ...companyData.companyEmails.slice(1)].filter(Boolean);
+        const primaryEmail = companyData.companyEmails[0];
+        const cleanEmails = [primaryEmail, ...companyData.companyEmails.slice(1)].filter(Boolean);
 
         const unifiedCompanyPayload = {
           password: accountData.password,
           companyRuc: String(companyData.companyRuc).trim(),
-          email: accountData.email,
+          email: primaryEmail,
           companyEmails: cleanEmails,
           companyName: companyData.companyName,
           socialReason: companyData.socialReason,
@@ -665,10 +753,11 @@ export const RegisterPage: React.FC = () => {
                       hideLocation={true}
                       hideDeceased={true}
                       onIdentityKeyDown={handleIdentityKeyDown}
+                      errors={step1Errors}
                     />
                     {Object.keys(step1Errors).length > 0 && (
                       <div className="register-error" style={{ marginTop: '15px' }}>
-                        Por favor, completa los campos requeridos marcados (Nombre, Apellido, Cédula de 10 dígitos).
+                        Por favor, completa los campos obligatorios (Nombre, Apellido, Cédula de 10 dígitos, teléfono, correo).
                       </div>
                     )}
                   </>
@@ -682,10 +771,11 @@ export const RegisterPage: React.FC = () => {
                       isEditMode={false}
                       hideLocation={true}
                       onIdentityKeyDown={handleIdentityKeyDown}
+                      errors={step1Errors}
                     />
                     {Object.keys(step1Errors).length > 0 && (
                       <div className="register-error" style={{ marginTop: '15px' }}>
-                        Por favor, completa los campos requeridos marcados (Nombre de la empresa, RUC de 13 dígitos).
+                        Por favor, completa los campos obligatorios (Nombre de la empresa, RUC de 13 dígitos, teléfono y correo).
                       </div>
                     )}
                   </>
@@ -776,13 +866,14 @@ export const RegisterPage: React.FC = () => {
                     id="reg-username"
                     name="username"
                     label="Nombre de Usuario"
-                    placeholder="Ej: juanperez"
-                    value={accountData.username}
+                    placeholder="Cédula o RUC"
+                    value={isNatural ? customerData.customerId : companyData.companyRuc}
                     onChange={handleAccountChange}
                     required
                     leftIcon={<User size={18} />}
                     error={accountErrors.username}
                     autoComplete="username"
+                    readOnly
                   />
                   <Input
                     id="reg-email"
@@ -790,12 +881,13 @@ export const RegisterPage: React.FC = () => {
                     label="Correo Electrónico"
                     type="email"
                     placeholder="Ej: juan@correo.com"
-                    value={accountData.email}
+                    value={isNatural ? customerData.emails[0] : companyData.companyEmails[0]}
                     onChange={handleAccountChange}
                     required
                     leftIcon={<Mail size={18} />}
                     error={accountErrors.email}
                     autoComplete="email"
+                    readOnly
                   />
                 </div>
                 <div className="register-grid">
@@ -823,6 +915,20 @@ export const RegisterPage: React.FC = () => {
                     error={accountErrors.confirmPassword}
                     autoComplete="new-password"
                   />
+                </div>
+
+                <div className="register-info-box">
+                  <div className="register-info-box__icon">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <div className="register-info-box__content">
+                    <h4>Información de Seguridad y Acceso</h4>
+                    <ul>
+                      <li><strong>Identificación como Usuario:</strong> Su número de cédula/RUC o correo electrónico es su nombre de usuario permanente e intransferible para el ingreso seguro al portal.</li>
+                      <li><strong>Verificación de Correo:</strong> Al finalizar, enviaremos un código de validación de 6 dígitos a su correo electrónico <strong>{(isNatural ? customerData.emails[0] : companyData.companyEmails[0]) || 'registrado'}</strong> para activar su cuenta.</li>
+                      <li><strong>Políticas de Seguridad:</strong> Utilice una contraseña robusta. La EPAA nunca le solicitará sus credenciales de acceso por ningún medio de comunicación externo.</li>
+                    </ul>
+                  </div>
                 </div>
 
                 {apiError && (
@@ -858,7 +964,7 @@ export const RegisterPage: React.FC = () => {
           )}
           {step === 4 && (
             <VerificationCodeStep
-              email={accountData.email}
+              email={isNatural ? customerData.emails[0] : companyData.companyEmails[0]}
               isLoading={isLoading}
               apiError={apiError}
               onVerify={handleVerifyCode}
