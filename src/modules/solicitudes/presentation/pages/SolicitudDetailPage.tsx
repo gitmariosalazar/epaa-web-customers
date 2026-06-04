@@ -6,7 +6,10 @@ import { Card } from '@/shared/presentation/components/Card/Card';
 import { ColorChip } from '@/shared/presentation/components/chip/ColorChip';
 import { GetRequestDetailByRequestIdOrNumberUseCase } from '../../application/usecases/GetRequestDetailByRequestIdOrNumberUseCase';
 import { SolicitudRepositoryImpl } from '../../infrastructure/repositories/SolicitudRepositoryImpl';
-import type { RequestDetailByClientResponse, TrackingSolicitudResponse } from '../../domain/models/Solicitud';
+import type {
+  RequestDetailByClientResponse,
+  TrackingSolicitudResponse
+} from '../../domain/models/Solicitud';
 import { SolicitudDocumentPreviewModal } from '../components/SolicitudDocumentPreviewModal';
 import {
   getEstadoConfig,
@@ -69,8 +72,10 @@ const TIPO_DOC_LABEL: Record<number | string, string> = {
 export const SolicitudDetailPage: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [solicitud, setSolicitud] = useState<RequestDetailByClientResponse | null>(null);
-  const [matchedTracking, setMatchedTracking] = useState<TrackingSolicitudResponse | null>(null);
+  const [solicitud, setSolicitud] =
+    useState<RequestDetailByClientResponse | null>(null);
+  const [matchedTracking, setMatchedTracking] =
+    useState<TrackingSolicitudResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [docsOpen, setDocsOpen] = useState(false);
@@ -82,7 +87,10 @@ export const SolicitudDetailPage: React.FC = () => {
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false);
 
   const requestDetailUseCase = React.useMemo(
-    () => new GetRequestDetailByRequestIdOrNumberUseCase(new SolicitudRepositoryImpl()),
+    () =>
+      new GetRequestDetailByRequestIdOrNumberUseCase(
+        new SolicitudRepositoryImpl()
+      ),
     []
   );
   const trackingUseCase = React.useMemo(
@@ -94,7 +102,8 @@ export const SolicitudDetailPage: React.FC = () => {
     []
   );
   const uploadReceiptUseCase = React.useMemo(
-    () => new UploadInspectionInvoiceReceiptUseCase(new SolicitudRepositoryImpl()),
+    () =>
+      new UploadInspectionInvoiceReceiptUseCase(new SolicitudRepositoryImpl()),
     []
   );
 
@@ -110,7 +119,10 @@ export const SolicitudDetailPage: React.FC = () => {
 
     setIsUploadingReceipt(true);
     try {
-      const success = await uploadReceiptUseCase.execute(solicitud.facturaId, file);
+      const success = await uploadReceiptUseCase.execute(
+        solicitud.facturaId,
+        file
+      );
 
       if (success) {
         MessageToastCustom(
@@ -131,14 +143,19 @@ export const SolicitudDetailPage: React.FC = () => {
       MessageToastCustom(
         'error',
         'Error al Subir',
-        err.message || 'Ocurrió un error inesperado al subir el comprobante de pago.'
+        err.message ||
+        'Ocurrió un error inesperado al subir el comprobante de pago.'
       );
     } finally {
       setIsUploadingReceipt(false);
     }
   };
 
-  const handleFileReplace = async (docId: string, file: File, documentTypeId: number) => {
+  const handleFileReplace = async (
+    docId: string,
+    file: File,
+    documentTypeId: number
+  ) => {
     if (!user?.userId) {
       MessageToastCustom(
         'error',
@@ -213,7 +230,9 @@ export const SolicitudDetailPage: React.FC = () => {
         const error = err as Error;
         console.error('Error al cargar detalle de solicitud:', error);
         if (isMounted) {
-          setError(error.message || 'Error al cargar los detalles del expediente.');
+          setError(
+            error.message || 'Error al cargar los detalles del expediente.'
+          );
         }
       } finally {
         if (isMounted) {
@@ -285,48 +304,58 @@ export const SolicitudDetailPage: React.FC = () => {
   ];
   const isPaymentConfirmed = paymentConfirmedStates.includes(solicitud.estado);
 
-
   const fechaStr = solicitud.fechaSolicitud
     ? new Date(solicitud.fechaSolicitud).toLocaleDateString('es-EC', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
     : '—';
 
   const updatedStr = solicitud.updatedAt
     ? new Date(solicitud.updatedAt).toLocaleDateString('es-EC', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
     : '—';
 
   const isJuridica = solicitud.tipoPersona === 'JURIDICA';
 
   const titular = isJuridica
-    ? (solicitud.company?.businessName || solicitud.datosAdicionales?.nombres || solicitud.clienteId)
-    : (solicitud.person
-        ? `${solicitud.person.firstName} ${solicitud.person.lastName}`
-        : (solicitud.datosAdicionales?.nombres && solicitud.datosAdicionales?.apellidos
-            ? `${solicitud.datosAdicionales.nombres} ${solicitud.datosAdicionales.apellidos}`
-            : solicitud.clienteId));
+    ? solicitud.company?.businessName ||
+    solicitud.datosAdicionales?.nombres ||
+    solicitud.clienteId
+    : solicitud.person
+      ? `${solicitud.person.firstName} ${solicitud.person.lastName}`
+      : solicitud.datosAdicionales?.nombres &&
+        solicitud.datosAdicionales?.apellidos
+        ? `${solicitud.datosAdicionales.nombres} ${solicitud.datosAdicionales.apellidos}`
+        : solicitud.clienteId;
 
   const identificationVal = isJuridica
-    ? (solicitud.company?.ruc || solicitud.clienteId)
-    : (solicitud.person?.personId || solicitud.clienteId);
+    ? solicitud.company?.ruc || solicitud.clienteId
+    : solicitud.person?.personId || solicitud.clienteId;
 
   const emailVal = isJuridica
-    ? (solicitud.company?.emails?.[0]?.correo || solicitud.datosAdicionales?.email || '')
-    : (solicitud.person?.emails?.[0]?.correo || solicitud.datosAdicionales?.email || '');
+    ? solicitud.company?.emails?.[0]?.correo ||
+    solicitud.datosAdicionales?.email ||
+    ''
+    : solicitud.person?.emails?.[0]?.correo ||
+    solicitud.datosAdicionales?.email ||
+    '';
 
   const phoneVal = isJuridica
-    ? (solicitud.company?.phones?.[0]?.numero || solicitud.datosAdicionales?.telefono || '')
-    : (solicitud.person?.phones?.[0]?.numero || solicitud.datosAdicionales?.telefono || '');
+    ? solicitud.company?.phones?.[0]?.numero ||
+    solicitud.datosAdicionales?.telefono ||
+    ''
+    : solicitud.person?.phones?.[0]?.numero ||
+    solicitud.datosAdicionales?.telefono ||
+    '';
 
   return (
     <PageLayout
@@ -373,7 +402,7 @@ export const SolicitudDetailPage: React.FC = () => {
                   }}
                 >
                   {solicitud.estado === 'aprobada' ||
-                  solicitud.estado === 'completada' ? (
+                    solicitud.estado === 'completada' ? (
                     <CheckCircle size={24} />
                   ) : solicitud.estado === 'rechazada' ? (
                     <XCircle size={24} />
@@ -429,18 +458,26 @@ export const SolicitudDetailPage: React.FC = () => {
           {solicitud.estado === 'FACTURA_INSPECCION_EMITIDA' && (
             <div className="sol-detail-payment-card">
               <div className="sol-detail-payment-card__header">
-                <CreditCard size={20} className="sol-detail-payment-card__header-icon" />
+                <CreditCard
+                  size={20}
+                  className="sol-detail-payment-card__header-icon"
+                />
                 <div>
-                  <h3 className="sol-detail-payment-card__title">Pago de Tasa de Inspección</h3>
+                  <h3 className="sol-detail-payment-card__title">
+                    Pago de Tasa de Inspección
+                  </h3>
                   <p className="sol-detail-payment-card__subtitle">
-                    Realice el pago de la inspección técnica del predio para continuar.
+                    Realice el pago de la inspección técnica del predio para
+                    continuar.
                   </p>
                 </div>
               </div>
               <div className="sol-detail-payment-card__body">
                 <div className="sol-detail-payment-summary">
                   <div className="sol-detail-payment-summary__label">
-                    <span className="sol-detail-payment-summary__title">Tasa de Inspección</span>
+                    <span className="sol-detail-payment-summary__title">
+                      Tasa de Inspección
+                    </span>
                     {solicitud.numeroFactura && (
                       <span className="sol-detail-payment-summary__meta">
                         Factura: {solicitud.numeroFactura}
@@ -448,15 +485,22 @@ export const SolicitudDetailPage: React.FC = () => {
                     )}
                   </div>
                   <span className="sol-detail-payment-summary__amount">
-                    ${solicitud.montofactura ? solicitud.montofactura.toFixed(2) : '0.00'}
+                    $
+                    {solicitud.montofactura
+                      ? solicitud.montofactura.toFixed(2)
+                      : '0.00'}
                   </span>
                 </div>
 
                 <div className="sol-detail-payment-bank-details">
-                  <h4 className="sol-detail-payment-bank-details__title">Cuentas de Depósito / Transferencia</h4>
+                  <h4 className="sol-detail-payment-bank-details__title">
+                    Cuentas de Depósito / Transferencia
+                  </h4>
                   <div className="sol-detail-payment-bank-grid">
                     <div className="sol-detail-bank-account-card">
-                      <span className="sol-detail-bank-account-card__bank">Banco del Austro</span>
+                      <span className="sol-detail-bank-account-card__bank">
+                        Banco del Austro
+                      </span>
                       <span className="sol-detail-bank-account-card__item">
                         <strong>N° Cuenta:</strong> Corriente - 10203040
                       </span>
@@ -469,7 +513,9 @@ export const SolicitudDetailPage: React.FC = () => {
                     </div>
 
                     <div className="sol-detail-bank-account-card">
-                      <span className="sol-detail-bank-account-card__bank">Banco Pichincha</span>
+                      <span className="sol-detail-bank-account-card__bank">
+                        Banco Pichincha
+                      </span>
                       <span className="sol-detail-bank-account-card__item">
                         <strong>N° Cuenta:</strong> Corriente - 2100123456
                       </span>
@@ -503,15 +549,30 @@ export const SolicitudDetailPage: React.FC = () => {
                     />
                     {isUploadingReceipt ? (
                       <>
-                        <Clock size={32} className="sol-detail-payment-upload-zone__icon sol-detail-loading__spinner" />
-                        <p className="sol-detail-payment-upload-zone__text">Subiendo Comprobante...</p>
-                        <p className="sol-detail-payment-upload-zone__subtext">Por favor espere mientras procesamos su archivo.</p>
+                        <Clock
+                          size={32}
+                          className="sol-detail-payment-upload-zone__icon sol-detail-loading__spinner"
+                        />
+                        <p className="sol-detail-payment-upload-zone__text">
+                          Subiendo Comprobante...
+                        </p>
+                        <p className="sol-detail-payment-upload-zone__subtext">
+                          Por favor espere mientras procesamos su archivo.
+                        </p>
                       </>
                     ) : (
                       <>
-                        <Upload size={32} className="sol-detail-payment-upload-zone__icon" />
-                        <p className="sol-detail-payment-upload-zone__text">Cargar Comprobante de Pago</p>
-                        <p className="sol-detail-payment-upload-zone__subtext">Haga clic aquí para seleccionar una imagen o PDF legible de su comprobante.</p>
+                        <Upload
+                          size={32}
+                          className="sol-detail-payment-upload-zone__icon"
+                        />
+                        <p className="sol-detail-payment-upload-zone__text">
+                          Cargar Comprobante de Pago
+                        </p>
+                        <p className="sol-detail-payment-upload-zone__subtext">
+                          Haga clic aquí para seleccionar una imagen o PDF
+                          legible de su comprobante.
+                        </p>
                       </>
                     )}
                   </label>
@@ -522,11 +583,17 @@ export const SolicitudDetailPage: React.FC = () => {
 
           {solicitud.estado === 'PAGO_PENDIENTE' && (
             <div className="sol-detail-payment-status-card sol-detail-payment-status-card--pending">
-              <Clock size={20} className="sol-detail-payment-status-card__icon" />
+              <Clock
+                size={20}
+                className="sol-detail-payment-status-card__icon"
+              />
               <div className="sol-detail-payment-status-card__body">
-                <h4 className="sol-detail-payment-status-card__title">Pago en Proceso de Verificación</h4>
+                <h4 className="sol-detail-payment-status-card__title">
+                  Pago en Proceso de Verificación
+                </h4>
                 <p className="sol-detail-payment-status-card__description">
-                  Comprobante en revisión. Nuestro personal de tesorería confirmará el pago en las próximas horas.
+                  Comprobante en revisión. Nuestro personal de tesorería
+                  confirmará el pago en las próximas horas.
                 </p>
               </div>
             </div>
@@ -534,11 +601,18 @@ export const SolicitudDetailPage: React.FC = () => {
 
           {isPaymentConfirmed && (
             <div className="sol-detail-payment-status-card sol-detail-payment-status-card--confirmed">
-              <CheckCircle size={20} className="sol-detail-payment-status-card__icon" />
+              <CheckCircle
+                size={20}
+                className="sol-detail-payment-status-card__icon"
+              />
               <div className="sol-detail-payment-status-card__body">
-                <h4 className="sol-detail-payment-status-card__title">Pago Confirmado y Validado</h4>
+                <h4 className="sol-detail-payment-status-card__title">
+                  Pago Confirmado y Validado
+                </h4>
                 <p className="sol-detail-payment-status-card__description">
-                  Su pago de tasa de inspección ha sido verificado con éxito por el departamento de tesorería. El trámite continúa con normalidad.
+                  Su pago de tasa de inspección ha sido verificado con éxito por
+                  el departamento de tesorería. El trámite continúa con
+                  normalidad.
                 </p>
               </div>
             </div>
@@ -581,9 +655,7 @@ export const SolicitudDetailPage: React.FC = () => {
                     />{' '}
                     Correo Electrónico
                   </span>
-                  <span className="sol-detail-item__value">
-                    {emailVal}
-                  </span>
+                  <span className="sol-detail-item__value">{emailVal}</span>
                 </div>
               )}
               {/* Teléfono */}
@@ -596,9 +668,7 @@ export const SolicitudDetailPage: React.FC = () => {
                     />{' '}
                     Teléfono
                   </span>
-                  <span className="sol-detail-item__value">
-                    {phoneVal}
-                  </span>
+                  <span className="sol-detail-item__value">{phoneVal}</span>
                 </div>
               )}
               {/* Persona */}
@@ -722,7 +792,8 @@ export const SolicitudDetailPage: React.FC = () => {
                     TIPO_DOC_LABEL[Number(doc.tipodocumento)] ??
                     `Documento ${doc.tipodocumento}`;
                   const isRejected =
-                    (doc.estadoValidacion || '').toUpperCase() === 'RECHAZADO' ||
+                    (doc.estadoValidacion || '').toUpperCase() ===
+                    'RECHAZADO' ||
                     (doc.estadoValidacion || '').toUpperCase() === 'INVALIDO';
                   return (
                     <div key={doc.id} className="sol-detail-doc-row">
@@ -734,7 +805,7 @@ export const SolicitudDetailPage: React.FC = () => {
                           {docLabel}
                         </h4>
                         <span className="sol-detail-doc-row__filename">
-                          {doc.url.split('/').pop()}
+                          {`${docLabel} (${doc.id.slice(0, 8)})`}
                         </span>
                         {doc.observacion && (
                           <p className="sol-detail-doc-row__feedback">
@@ -743,7 +814,15 @@ export const SolicitudDetailPage: React.FC = () => {
                           </p>
                         )}
                       </div>
-                      <div className="sol-detail-doc-row__badge" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
+                      <div
+                        className="sol-detail-doc-row__badge"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-end',
+                          gap: '0.35rem'
+                        }}
+                      >
                         <ColorChip
                           color={docState.color}
                           label={doc.estadoValidacion}
@@ -757,7 +836,9 @@ export const SolicitudDetailPage: React.FC = () => {
                               className="sol-detail-doc-row__upload-btn"
                               disabled={uploadingDocId === doc.id}
                               onClick={() => {
-                                const input = document.getElementById(`file-input-${doc.id}`);
+                                const input = document.getElementById(
+                                  `file-input-${doc.id}`
+                                );
                                 if (input) input.click();
                               }}
                               style={{
@@ -772,15 +853,20 @@ export const SolicitudDetailPage: React.FC = () => {
                                 fontSize: '0.7rem',
                                 fontWeight: 600,
                                 cursor: 'pointer',
-                                transition: 'all 0.2s',
+                                transition: 'all 0.2s'
                               }}
                             >
                               {uploadingDocId === doc.id ? (
-                                <Clock size={10} className="sol-detail-loading__spinner" />
+                                <Clock
+                                  size={10}
+                                  className="sol-detail-loading__spinner"
+                                />
                               ) : (
                                 <Upload size={10} />
                               )}
-                              {uploadingDocId === doc.id ? 'Subiendo...' : 'Subir Corrección'}
+                              {uploadingDocId === doc.id
+                                ? 'Subiendo...'
+                                : 'Subir Corrección'}
                             </button>
                             <input
                               type="file"
@@ -790,7 +876,11 @@ export const SolicitudDetailPage: React.FC = () => {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  handleFileReplace(doc.id, file, Number(doc.tipodocumento));
+                                  handleFileReplace(
+                                    doc.id,
+                                    file,
+                                    Number(doc.tipodocumento)
+                                  );
                                 }
                               }}
                             />
@@ -811,105 +901,105 @@ export const SolicitudDetailPage: React.FC = () => {
           {(solicitud.numeroFactura ||
             solicitud.numeroContrato ||
             solicitud.numeroMedidor) && (
-            <Card className="sol-detail-card sol-detail-card--metrics">
-              <div className="sol-detail-card__title-row">
-                <Info size={16} className="sol-detail-card__title-icon" />
-                <h3
-                  className="sol-detail-card__title"
-                  style={{ fontSize: '0.875rem' }}
-                >
-                  Detalles del Servicio
-                </h3>
-              </div>
+              <Card className="sol-detail-card sol-detail-card--metrics">
+                <div className="sol-detail-card__title-row">
+                  <Info size={16} className="sol-detail-card__title-icon" />
+                  <h3
+                    className="sol-detail-card__title"
+                    style={{ fontSize: '0.875rem' }}
+                  >
+                    Detalles del Servicio
+                  </h3>
+                </div>
 
-              <div className="sol-detail-metrics-list">
-                {/* Factura */}
-                {solicitud.numeroFactura && (
-                  <div className="sol-detail-metric-item">
-                    <div
-                      className="sol-detail-metric-item__icon"
-                      style={{
-                        color: '#f59e0b',
-                        background: 'rgba(245,158,11,0.1)'
-                      }}
-                    >
-                      <CreditCard size={15} />
-                    </div>
-                    <div className="sol-detail-metric-item__body">
-                      <span className="sol-detail-metric-item__label">
-                        Inspección & Pago
-                      </span>
-                      <span className="sol-detail-metric-item__value">
-                        Factura: {solicitud.numeroFactura}
-                      </span>
-                      {solicitud.montofactura && (
-                        <span className="sol-detail-metric-item__meta">
-                          Monto: ${solicitud.montofactura.toFixed(2)} (
-                          {solicitud.estadoPago ?? 'Pendiente'})
+                <div className="sol-detail-metrics-list">
+                  {/* Factura */}
+                  {solicitud.numeroFactura && (
+                    <div className="sol-detail-metric-item">
+                      <div
+                        className="sol-detail-metric-item__icon"
+                        style={{
+                          color: '#f59e0b',
+                          background: 'rgba(245,158,11,0.1)'
+                        }}
+                      >
+                        <CreditCard size={15} />
+                      </div>
+                      <div className="sol-detail-metric-item__body">
+                        <span className="sol-detail-metric-item__label">
+                          Inspección & Pago
                         </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {/* Contrato */}
-                {solicitud.numeroContrato && (
-                  <div className="sol-detail-metric-item">
-                    <div
-                      className="sol-detail-metric-item__icon"
-                      style={{
-                        color: '#8b5cf6',
-                        background: 'rgba(139,92,246,0.1)'
-                      }}
-                    >
-                      <FileCheck size={15} />
-                    </div>
-                    <div className="sol-detail-metric-item__body">
-                      <span className="sol-detail-metric-item__label">
-                        Contrato Registrado
-                      </span>
-                      <span className="sol-detail-metric-item__value">
-                        Contrato N°: {solicitud.numeroContrato}
-                      </span>
-                      {solicitud.estadoFirma && (
-                        <span className="sol-detail-metric-item__meta">
-                          Firma: {solicitud.estadoFirma}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {/* Cuenta y Medidor */}
-                {(solicitud.numeroCuenta || solicitud.numeroMedidor) && (
-                  <div className="sol-detail-metric-item">
-                    <div
-                      className="sol-detail-metric-item__icon"
-                      style={{
-                        color: '#10b981',
-                        background: 'rgba(16,185,129,0.1)'
-                      }}
-                    >
-                      <Gauge size={15} />
-                    </div>
-                    <div className="sol-detail-metric-item__body">
-                      <span className="sol-detail-metric-item__label">
-                        Medidor e Instalación
-                      </span>
-                      {solicitud.numeroMedidor && (
                         <span className="sol-detail-metric-item__value">
-                          Medidor N°: {solicitud.numeroMedidor}
+                          Factura: {solicitud.numeroFactura}
                         </span>
-                      )}
-                      {solicitud.numeroCuenta && (
-                        <span className="sol-detail-metric-item__meta">
-                          Cuenta N°: {solicitud.numeroCuenta}
-                        </span>
-                      )}
+                        {solicitud.montofactura && (
+                          <span className="sol-detail-metric-item__meta">
+                            Monto: ${solicitud.montofactura.toFixed(2)} (
+                            {solicitud.estadoPago ?? 'Pendiente'})
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
+                  )}
+                  {/* Contrato */}
+                  {solicitud.numeroContrato && (
+                    <div className="sol-detail-metric-item">
+                      <div
+                        className="sol-detail-metric-item__icon"
+                        style={{
+                          color: '#8b5cf6',
+                          background: 'rgba(139,92,246,0.1)'
+                        }}
+                      >
+                        <FileCheck size={15} />
+                      </div>
+                      <div className="sol-detail-metric-item__body">
+                        <span className="sol-detail-metric-item__label">
+                          Contrato Registrado
+                        </span>
+                        <span className="sol-detail-metric-item__value">
+                          Contrato N°: {solicitud.numeroContrato}
+                        </span>
+                        {solicitud.estadoFirma && (
+                          <span className="sol-detail-metric-item__meta">
+                            Firma: {solicitud.estadoFirma}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {/* Cuenta y Medidor */}
+                  {(solicitud.numeroCuenta || solicitud.numeroMedidor) && (
+                    <div className="sol-detail-metric-item">
+                      <div
+                        className="sol-detail-metric-item__icon"
+                        style={{
+                          color: '#10b981',
+                          background: 'rgba(16,185,129,0.1)'
+                        }}
+                      >
+                        <Gauge size={15} />
+                      </div>
+                      <div className="sol-detail-metric-item__body">
+                        <span className="sol-detail-metric-item__label">
+                          Medidor e Instalación
+                        </span>
+                        {solicitud.numeroMedidor && (
+                          <span className="sol-detail-metric-item__value">
+                            Medidor N°: {solicitud.numeroMedidor}
+                          </span>
+                        )}
+                        {solicitud.numeroCuenta && (
+                          <span className="sol-detail-metric-item__meta">
+                            Cuenta N°: {solicitud.numeroCuenta}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            )}
 
           {/* Card 5: Timeline de Tracking */}
           <Card className="sol-detail-card sol-detail-card--timeline">

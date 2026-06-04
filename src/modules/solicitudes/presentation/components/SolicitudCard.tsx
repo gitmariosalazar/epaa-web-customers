@@ -44,28 +44,28 @@ import {
 
 // ── Icon per tipo acometida ────────────────────────────────────────────────
 const TIPO_ICON: Record<string, React.ReactNode> = {
-  AGUA_POTABLE:               <Droplets size={20} />,
-  ALCANTARILLADO:             <Droplets size={20} />,
-  NUEVA_ACOMETIDA:            <Droplets size={20} />,
-  CAMBIO_TITULAR:             <User size={20} />,
-  SUSPENSION_SERVICIO:        <XCircle size={20} />,
+  AGUA_POTABLE: <Droplets size={20} />,
+  ALCANTARILLADO: <Droplets size={20} />,
+  NUEVA_ACOMETIDA: <Droplets size={20} />,
+  CAMBIO_TITULAR: <User size={20} />,
+  SUSPENSION_SERVICIO: <XCircle size={20} />,
   SUSPENSION_SERVICIO_POTABLE: <XCircle size={20} />,
-  BENEFICIO_TERCERA_EDAD:     <CheckCircle size={20} />,
-  BENEFICIO_DISCAPACIDAD:     <CheckCircle size={20} />
+  BENEFICIO_TERCERA_EDAD: <CheckCircle size={20} />,
+  BENEFICIO_DISCAPACIDAD: <CheckCircle size={20} />
 };
 
 const ESTADO_ICON: Record<string, React.ReactNode> = {
-  en_proceso:  <Clock size={11} />,
-  aprobada:    <CheckCircle size={11} />,
-  rechazada:   <XCircle size={11} />,
-  completada:  <CheckCircle size={11} />,
-  pendiente:   <Timer size={11} />
+  en_proceso: <Clock size={11} />,
+  aprobada: <CheckCircle size={11} />,
+  rechazada: <XCircle size={11} />,
+  completada: <CheckCircle size={11} />,
+  pendiente: <Timer size={11} />
 };
 
 const DOC_ESTADO_COLOR: Record<string, { color: string; bg: string }> = {
-  PENDIENTE:  { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  APROBADO:   { color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-  RECHAZADO:  { color: '#ef4444', bg: 'rgba(239,68,68,0.12)' }
+  PENDIENTE: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+  APROBADO: { color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
+  RECHAZADO: { color: '#ef4444', bg: 'rgba(239,68,68,0.12)' }
 };
 
 const TIPO_DOC_SHORT: Record<number | string, string> = {
@@ -91,27 +91,37 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
   const [docsOpen, setDocsOpen] = useState(false);
 
   const estado = getEstadoConfig(solicitud.estado);
-  const tipoLabel   = TIPO_ACOMETIDA_LABELS[solicitud.tipoAcometida] ?? solicitud.tipoAcometida;
-  const personaLabel = TIPO_PERSONA_LABELS[solicitud.tipoPersona] ?? solicitud.tipoPersona;
-  const usoLabel    = USO_PREDIO_LABELS[solicitud.usoPredio] ?? solicitud.usoPredio;
-  const tipoIcon    = TIPO_ICON[solicitud.tipoAcometida] ?? <FileText size={20} />;
-  const estadoIcon  = ESTADO_ICON[solicitud.estado] ?? <Clock size={11} />;
+  const tipoLabel =
+    TIPO_ACOMETIDA_LABELS[solicitud.tipoAcometida] ?? solicitud.tipoAcometida;
+  const personaLabel =
+    TIPO_PERSONA_LABELS[solicitud.tipoPersona] ?? solicitud.tipoPersona;
+  const usoLabel =
+    USO_PREDIO_LABELS[solicitud.usoPredio] ?? solicitud.usoPredio;
+  const tipoIcon = TIPO_ICON[solicitud.tipoAcometida] ?? <FileText size={20} />;
+  const estadoIcon = ESTADO_ICON[solicitud.estado] ?? <Clock size={11} />;
 
   const fechaStr = solicitud.fechaSolicitud
     ? new Date(solicitud.fechaSolicitud).toLocaleDateString('es-EC', {
-        day: '2-digit', month: 'short', year: 'numeric'
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
       })
     : '—';
 
   const updatedStr = solicitud.updatedAt
     ? new Date(solicitud.updatedAt).toLocaleDateString('es-EC', {
-        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       })
     : '—';
 
-  const titular = solicitud.datosAdicionales?.nombres && solicitud.datosAdicionales?.apellidos
-    ? `${solicitud.datosAdicionales.nombres} ${solicitud.datosAdicionales.apellidos}`
-    : solicitud.clienteId;
+  const titular =
+    solicitud.datosAdicionales?.nombres && solicitud.datosAdicionales?.apellidos
+      ? `${solicitud.datosAdicionales.nombres} ${solicitud.datosAdicionales.apellidos}`
+      : solicitud.clienteId;
 
   // datosAdicionales pills (only non-null, non-empty)
   const datosExtra = Object.entries(solicitud.datosAdicionales ?? {})
@@ -122,19 +132,21 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
 
   const toggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpanded(prev => !prev);
+    setExpanded((prev) => !prev);
   };
 
   return (
     <>
       <div
         className={`sol-card sol-card--expandable${expanded ? ' sol-card--open' : ''}`}
-        style={{
-          '--sol-accent':     estado.cardAccent,
-          '--sol-icon-bg':    estado.iconBg,
-          '--sol-icon-color': estado.iconColor,
-          ...style
-        } as React.CSSProperties}
+        style={
+          {
+            '--sol-accent': estado.cardAccent,
+            '--sol-icon-bg': estado.iconBg,
+            '--sol-icon-color': estado.iconColor,
+            ...style
+          } as React.CSSProperties
+        }
         role="article"
         aria-label={`Solicitud ${solicitud.solicitudNumero}`}
       >
@@ -170,7 +182,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
                 size="xs"
                 color="var(--text-secondary)"
                 borderRadius={5}
-                icon={<LucideClipboardType size={12} color='#0893b2ff' />}
+                icon={<LucideClipboardType size={12} color="#0893b2ff" />}
               />
 
               <ColorChip
@@ -185,7 +197,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
               {solicitud.diasEnProceso != null && (
                 <ColorChip
                   label={`${solicitud.diasEnProceso} ${solicitud.diasEnProceso === 1 ? 'día' : 'días'}`}
-                  icon={<Timer size={10} color='#0893b2ff' />}
+                  icon={<Timer size={10} color="#0893b2ff" />}
                   variant="soft"
                   size="xs"
                   color="var(--text-muted)"
@@ -198,7 +210,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
             <div className="sol-card__meta">
               <ColorChip
                 label={<strong>{titular}</strong>}
-                icon={<User size={12} color='#65a30d' />}
+                icon={<User size={12} color="#65a30d" />}
                 variant="ghost"
                 size="xs"
                 color="var(--text-main)"
@@ -207,7 +219,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
               {solicitud.direccion && (
                 <ColorChip
                   label={solicitud.direccion}
-                  icon={<MapPin size={12} color='#b23808ff' />}
+                  icon={<MapPin size={12} color="#b23808ff" />}
                   variant="ghost"
                   size="xs"
                   color="var(--text-secondary)"
@@ -217,7 +229,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
               {solicitud.claveCatastral && (
                 <ColorChip
                   label={solicitud.claveCatastral}
-                  icon={<FileText size={12} color='#0860b2ff' />}
+                  icon={<FileText size={12} color="#0860b2ff" />}
                   variant="ghost"
                   size="xs"
                   color="var(--text-secondary)"
@@ -226,7 +238,7 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
               )}
               <ColorChip
                 label={fechaStr}
-                icon={<Calendar size={12} color='#0891b2' />}
+                icon={<Calendar size={12} color="#0891b2" />}
                 variant="ghost"
                 size="xs"
                 color="var(--text-secondary)"
@@ -238,17 +250,24 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
                 size="xs"
                 color="var(--text-muted)"
                 borderRadius={5}
-                icon={<Hash size={12} color='#0891b2' />}
+                icon={<Hash size={12} color="#0891b2" />}
               />
             </div>
           </div>
 
           {/* Actions */}
-          <div className="sol-card__actions" onClick={e => e.stopPropagation()}>
+          <div
+            className="sol-card__actions"
+            onClick={(e) => e.stopPropagation()}
+          >
             {hasDocuments && (
               <button
                 className="sol-card__action-btn"
-                style={{ color: '#3b82f6', borderColor: 'rgba(59,130,246,0.35)', background: 'rgba(59,130,246,0.08)' }}
+                style={{
+                  color: '#3b82f6',
+                  borderColor: 'rgba(59,130,246,0.35)',
+                  background: 'rgba(59,130,246,0.08)'
+                }}
                 onClick={() => setDocsOpen(true)}
                 title={`Ver ${solicitud.documentos.length} documento(s)`}
                 id={`btn-docs-${solicitud.solicitudId}`}
@@ -288,26 +307,40 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
         </div>
 
         {/* ══ EXPAND PANEL ══ */}
-        <div className={`sol-card__expand-panel${expanded ? ' sol-card__expand-panel--open' : ''}`}>
+        <div
+          className={`sol-card__expand-panel${expanded ? ' sol-card__expand-panel--open' : ''}`}
+        >
           <div className="sol-card__expand-inner">
-
             {/* Col 1: Ubicación */}
             <div className="sol-expand__group">
               <span className="sol-expand__label">
-                <MapPin size={10} style={{ display: 'inline', marginRight: 3 }} />Ubicación
+                <MapPin
+                  size={10}
+                  style={{ display: 'inline', marginRight: 3 }}
+                />
+                Ubicación
               </span>
               {solicitud.direccion && (
                 <span className="sol-expand__value">{solicitud.direccion}</span>
               )}
               {solicitud.claveCatastral && (
                 <span className="sol-expand__value">
-                  <FileText size={10} style={{ display: 'inline', marginRight: 3 }} />
-                 Clave Catastral: <strong>{solicitud.claveCatastral}</strong>
+                  <FileText
+                    size={10}
+                    style={{ display: 'inline', marginRight: 3 }}
+                  />
+                  Clave Catastral: <strong>{solicitud.claveCatastral}</strong>
                 </span>
               )}
               {solicitud.coordenadas && (
-                <span className="sol-expand__value" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                  <Navigation size={10} style={{ display: 'inline', marginRight: 3 }} />
+                <span
+                  className="sol-expand__value"
+                  style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}
+                >
+                  <Navigation
+                    size={10}
+                    style={{ display: 'inline', marginRight: 3 }}
+                  />
                   {solicitud.coordenadas}
                 </span>
               )}
@@ -316,7 +349,8 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
             {/* Col 2: Trámite */}
             <div className="sol-expand__group">
               <span className="sol-expand__label">
-                <Info size={10} style={{ display: 'inline', marginRight: 3 }} />Trámite
+                <Info size={10} style={{ display: 'inline', marginRight: 3 }} />
+                Trámite
               </span>
               <span className="sol-expand__value">{tipoLabel}</span>
               <span className="sol-expand__value">
@@ -324,12 +358,18 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
                 Uso: <strong>{usoLabel}</strong>
               </span>
               <span className="sol-expand__value">
-                <Building size={10} style={{ display: 'inline', marginRight: 3 }} />
+                <Building
+                  size={10}
+                  style={{ display: 'inline', marginRight: 3 }}
+                />
                 Tipo persona: <strong>{personaLabel}</strong>
               </span>
               {solicitud.analistaUsername && (
                 <span className="sol-expand__value">
-                  <User size={10} style={{ display: 'inline', marginRight: 3 }} />
+                  <User
+                    size={10}
+                    style={{ display: 'inline', marginRight: 3 }}
+                  />
                   Analista: <strong>{solicitud.analistaUsername}</strong>
                 </span>
               )}
@@ -338,7 +378,11 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
             {/* Col 3: Fechas + datos adicionales */}
             <div className="sol-expand__group">
               <span className="sol-expand__label">
-                <Calendar size={10} style={{ display: 'inline', marginRight: 3 }} />Fechas
+                <Calendar
+                  size={10}
+                  style={{ display: 'inline', marginRight: 3 }}
+                />
+                Fechas
               </span>
               <span className="sol-expand__value">
                 Solicitud: <strong>{fechaStr}</strong>
@@ -349,18 +393,41 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
 
               {datosExtra.length > 0 && (
                 <>
-                  <span className="sol-expand__label" style={{ marginTop: '0.5rem' }}>
-                    <Layers size={10} style={{ display: 'inline', marginRight: 3 }} />Datos adicionales
+                  <span
+                    className="sol-expand__label"
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    <Layers
+                      size={10}
+                      style={{ display: 'inline', marginRight: 3 }}
+                    />
+                    Datos adicionales
                   </span>
                   <div className="sol-expand__pills">
-                    {datosExtra.map(d => (
+                    {datosExtra.map((d) => (
                       <ColorChip
                         label={d}
                         variant="soft"
                         size="xs"
-                        color={d.includes('email') ? '#3b82f6' : d.includes('telefono') ? 'teal' : d.includes('referencia') ? 'cyan' : 'var(--text-muted)'}
+                        color={
+                          d.includes('email')
+                            ? '#3b82f6'
+                            : d.includes('telefono')
+                              ? 'teal'
+                              : d.includes('referencia')
+                                ? 'cyan'
+                                : 'var(--text-muted)'
+                        }
                         borderRadius={5}
-                        icon={d.includes('email') ? <Mail size={12} /> : d.includes('telefono') ? <Phone size={12} /> : d.includes('referencia') ? <ListIcon size={12} /> : null} 
+                        icon={
+                          d.includes('email') ? (
+                            <Mail size={12} />
+                          ) : d.includes('telefono') ? (
+                            <Phone size={12} />
+                          ) : d.includes('referencia') ? (
+                            <ListIcon size={12} />
+                          ) : null
+                        }
                       />
                     ))}
                   </div>
@@ -370,21 +437,43 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
 
             {/* Col 4: Documentos mini-list (full width if 3 cols + spans) */}
             {hasDocuments && (
-              <div className="sol-expand__group" style={{ gridColumn: '1 / -1' }}>
+              <div
+                className="sol-expand__group"
+                style={{ gridColumn: '1 / -1' }}
+              >
                 <span className="sol-expand__label">
-                  <FileText size={10} style={{ display: 'inline', marginRight: 3 }} />
+                  <FileText
+                    size={10}
+                    style={{ display: 'inline', marginRight: 3 }}
+                  />
                   Documentos adjuntos ({solicitud.documentos.length})
                 </span>
                 <div className="sol-expand__docs">
                   {solicitud.documentos.map((doc) => {
-                    const docEstado = DOC_ESTADO_COLOR[doc.estadoValidacion] ?? DOC_ESTADO_COLOR['PENDIENTE'];
-                    const docLabel = TIPO_DOC_SHORT[Number(doc.tipodocumento)] ?? `Doc. ${doc.tipodocumento}`;
+                    const docEstado =
+                      DOC_ESTADO_COLOR[doc.estadoValidacion] ??
+                      DOC_ESTADO_COLOR['PENDIENTE'];
+                    const docLabel =
+                      TIPO_DOC_SHORT[Number(doc.tipodocumento)] ??
+                      `Doc. ${doc.tipodocumento}`;
                     return (
                       <div key={doc.id} className="sol-expand__doc-row">
-                        <FileText size={13} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                        <FileText
+                          size={13}
+                          style={{ color: 'var(--text-muted)', flexShrink: 0 }}
+                        />
                         <span style={{ fontWeight: 600 }}>{docLabel}</span>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {doc.url.split('/').pop()}
+                        <span
+                          style={{
+                            color: 'var(--text-muted)',
+                            fontSize: '0.7rem',
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {`${docLabel} (${doc.id.slice(0, 8)})`}
                         </span>
                         <ColorChip
                           color={docEstado.color}
@@ -409,13 +498,15 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
       </div>
 
       {/* ══ DOCUMENT PREVIEW MODAL ══ */}
-      <SolicitudDocumentPreviewModal
-        isOpen={docsOpen}
-        onClose={() => setDocsOpen(false)}
-        documentos={solicitud.documentos}
-        solicitudNumero={solicitud.solicitudNumero}
-        solicitudId={solicitud.solicitudId}
-      />
+      {docsOpen && (
+        <SolicitudDocumentPreviewModal
+          isOpen={docsOpen}
+          onClose={() => setDocsOpen(false)}
+          documentos={solicitud.documentos}
+          solicitudNumero={solicitud.solicitudNumero}
+          solicitudId={solicitud.solicitudId}
+        />
+      )}
     </>
   );
 };
