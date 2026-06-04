@@ -43,7 +43,7 @@
   min-width: 15px;
   height: 15px;
   padding: 0 4px;
-  border-radius: 50%;
+  border-radius: 9999px;
   background: #ef4444;
   color: #fff;
   font-size: 0.62rem;
