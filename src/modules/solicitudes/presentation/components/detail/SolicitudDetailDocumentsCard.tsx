@@ -30,7 +30,7 @@ interface SolicitudDetailDocumentsCardProps {
   documentos: DocumentoAdjuntoResponse[];
   uploadingDocId: string | null;
   onFileReplace: (docId: string, file: File, documentTypeId: number) => void;
-  onOpenViewer: () => void;
+  onOpenViewer: (docId?: string) => void;
 }
 
 export const SolicitudDetailDocumentsCard: React.FC<SolicitudDetailDocumentsCardProps> = ({
@@ -53,7 +53,7 @@ export const SolicitudDetailDocumentsCard: React.FC<SolicitudDetailDocumentsCard
             variant="outline"
             size="compact"
             leftIcon={<FolderOpen size={14} />}
-            onClick={onOpenViewer}
+            onClick={() => onOpenViewer()}
             style={{ marginLeft: 'auto' }}
           >
             Visor Completo
@@ -84,7 +84,12 @@ export const SolicitudDetailDocumentsCard: React.FC<SolicitudDetailDocumentsCard
               (doc.estadoValidacion || '').toUpperCase() === 'INVALIDO';
 
             return (
-              <div key={doc.id} className="sol-detail-doc-row">
+              <div
+                key={doc.id}
+                className="sol-detail-doc-row sol-detail-doc-row--interactive"
+                onClick={() => onOpenViewer(doc.id)}
+                title="Haz clic para abrir el visor en este documento"
+              >
                 <div className="sol-detail-doc-row__icon">
                   <FileText size={16} />
                 </div>
@@ -121,7 +126,8 @@ export const SolicitudDetailDocumentsCard: React.FC<SolicitudDetailDocumentsCard
                         type="button"
                         className="sol-detail-doc-row__upload-btn"
                         disabled={uploadingDocId === doc.id}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const input = document.getElementById(
                             `file-input-${doc.id}`
                           );
@@ -145,6 +151,7 @@ export const SolicitudDetailDocumentsCard: React.FC<SolicitudDetailDocumentsCard
                         id={`file-input-${doc.id}`}
                         style={{ display: 'none' }}
                         accept=".pdf,image/*"
+                        onClick={(e) => e.stopPropagation()}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {

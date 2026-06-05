@@ -39,6 +39,9 @@ export const SolicitudDetailPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [docsOpen, setDocsOpen] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState<string | undefined>(
+    undefined
+  );
 
   const [reloadTrigger, setReloadTrigger] = useState(0);
 
@@ -98,12 +101,13 @@ export const SolicitudDetailPage: React.FC = () => {
           'No se pudo subir el comprobante. Inténtelo de nuevo.'
         );
       }
-    } catch (err: any) {
-      console.error('Error al subir comprobante de pago:', err);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Error al subir comprobante de pago:', error);
       MessageToastCustom(
         'error',
         'Error al Subir',
-        err.message ||
+        error.message ||
         'Ocurrió un error inesperado al subir el comprobante de pago.'
       );
     } finally {
@@ -157,12 +161,13 @@ export const SolicitudDetailPage: React.FC = () => {
           'No se pudo actualizar el documento. Inténtelo de nuevo.'
         );
       }
-    } catch (err: any) {
-      console.error('Error al subir el documento:', err);
+    } catch (err) {
+      const error = err as Error;
+      console.error('Error al subir el documento:', error);
       MessageToastCustom(
         'error',
         'Error',
-        err.message || 'Ocurrió un error inesperado al subir el documento.'
+        error.message || 'Ocurrió un error inesperado al subir el documento.'
       );
     } finally {
       setUploadingDocId(null);
@@ -297,7 +302,10 @@ export const SolicitudDetailPage: React.FC = () => {
             documentos={solicitud.documentos}
             uploadingDocId={uploadingDocId}
             onFileReplace={handleFileReplace}
-            onOpenViewer={() => setDocsOpen(true)}
+            onOpenViewer={(docId) => {
+              setSelectedDocId(docId);
+              setDocsOpen(true);
+            }}
           />
         </div>
 
@@ -313,11 +321,15 @@ export const SolicitudDetailPage: React.FC = () => {
       {docsOpen && (
         <SolicitudDocumentPreviewModal
           isOpen={docsOpen}
-          onClose={() => setDocsOpen(false)}
+          onClose={() => {
+            setDocsOpen(false);
+            setSelectedDocId(undefined);
+          }}
           documentos={solicitud.documentos}
           solicitudNumero={solicitud.solicitudNumero}
           solicitudId={solicitud.solicitudId}
           onValidationSuccess={() => setReloadTrigger((prev) => prev + 1)}
+          initialActiveId={selectedDocId}
         />
       )}
     </PageLayout>

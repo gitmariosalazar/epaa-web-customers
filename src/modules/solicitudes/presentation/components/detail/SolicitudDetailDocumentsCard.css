@@ -28,12 +28,30 @@
   border: 1px solid var(--border-color);
   background: var(--bg);
   border-radius: 0.625rem;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sol-detail-doc-row:hover {
   background: var(--surface-hover);
   border-color: var(--accent);
+}
+
+.sol-detail-doc-row--interactive {
+  cursor: pointer;
+}
+
+.sol-detail-doc-row--interactive:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.sol-detail-doc-row--interactive:hover .sol-detail-doc-row__icon {
+  background: var(--surface, var(--bg));
+  color: var(--accent);
+}
+
+.sol-detail-doc-row--interactive:hover .sol-detail-doc-row__filename {
+  color: var(--text-secondary);
 }
 
 .sol-detail-doc-row__icon {

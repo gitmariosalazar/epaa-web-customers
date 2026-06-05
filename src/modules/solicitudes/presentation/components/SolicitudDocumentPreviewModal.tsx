@@ -98,6 +98,7 @@ interface SolicitudDocumentPreviewModalProps {
   solicitudNumero: string;
   solicitudId: string;
   onValidationSuccess?: () => void;
+  initialActiveId?: string;
 }
 
 export const SolicitudDocumentPreviewModal: React.FC<
@@ -108,9 +109,22 @@ export const SolicitudDocumentPreviewModal: React.FC<
   documentos,
   solicitudNumero,
   solicitudId,
-  onValidationSuccess
+  onValidationSuccess,
+  initialActiveId
 }) => {
   const [activeIdx, setActiveIdx] = useState(0);
+
+  // Sync active document when modal opens with a specific document selection
+  useEffect(() => {
+    if (isOpen && initialActiveId) {
+      const idx = documentos.findIndex((d) => d.id === initialActiveId);
+      if (idx !== -1) {
+        Promise.resolve().then(() => {
+          setActiveIdx(idx);
+        });
+      }
+    }
+  }, [isOpen, initialActiveId, documentos]);
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -127,13 +141,16 @@ export const SolicitudDocumentPreviewModal: React.FC<
     const doc = documentos[activeIdx];
     if (!doc?.id) return;
 
-    setLoadingPreview(true);
-    setPreviewError(null);
-    setPreviewBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
+    Promise.resolve().then(() => {
+      if (!active) return;
+      setLoadingPreview(true);
+      setPreviewError(null);
+      setPreviewBlobUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setPreviewMimeType(null);
     });
-    setPreviewMimeType(null);
 
     previewUseCase
       .execute(doc.id)
