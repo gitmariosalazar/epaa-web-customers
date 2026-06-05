@@ -10,6 +10,7 @@ import '../../styles/SolicitudTrackingCard.css';
 import type { TrackingSolicitudResponse, HistorialTrackingEntry } from '../../../domain/models/Solicitud';
 import { ProcessTimeline } from '@/shared/presentation/components/Timeline/ProcessTimeline';
 import type { TimelineStep } from '@/shared/presentation/components/Timeline/ProcessTimeline';
+import { ConnectionStateChip } from '@/shared/presentation/components/chip/ConnectionStateChip';
 import {
   FileText,
   Files,
@@ -379,12 +380,15 @@ export const SolicitudTrackingCard: React.FC<SolicitudTrackingCardProps> = ({
             <InfoRow icon={<Hash size={11} />} label="N° Cuenta" value={tracking.numeroCuenta} />
             {tracking.servicioActivo != null && (
               <InfoRow
-                icon={tracking.servicioActivo ? <Zap size={11} style={{ color: '#10b981' }} /> : <XCircle size={11} />}
+                icon={<Zap size={11} />}
                 label="Servicio"
                 value={
-                  <span style={{ color: tracking.servicioActivo ? '#10b981' : 'var(--text-muted)', fontWeight: 700 }}>
-                    {tracking.servicioActivo ? 'Activo ✓' : 'Inactivo'}
-                  </span>
+                  <ConnectionStateChip
+                    statusName={tracking.servicioActivo ? 'ACTIVA' : 'NUEVA_PENDIENTE'}
+                    size="xs"
+                    variant="soft"
+                    showTooltip={false}
+                  />
                 }
               />
             )}

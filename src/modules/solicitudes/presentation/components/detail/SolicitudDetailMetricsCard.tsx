@@ -2,6 +2,7 @@ import React from 'react';
 import { Info, CreditCard, FileCheck, Gauge } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import type { RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
+import { ConnectionStateChip } from '@/shared/presentation/components/chip/ConnectionStateChip';
 import '../../styles/SolicitudDetailMetricsCard.css';
 
 interface SolicitudDetailMetricsCardProps {
@@ -13,7 +14,11 @@ export const SolicitudDetailMetricsCard: React.FC<SolicitudDetailMetricsCardProp
 }) => {
   const hasInvoice = !!solicitud.numeroFactura;
   const hasContract = !!solicitud.numeroContrato;
-  const hasMeterOrAccount = !!(solicitud.numeroCuenta || solicitud.numeroMedidor);
+  const hasMeterOrAccount = !!(
+    solicitud.numeroCuenta ||
+    solicitud.numeroMedidor ||
+    solicitud.servicioActivo != null
+  );
 
   if (!hasInvoice && !hasContract && !hasMeterOrAccount) {
     return null;
@@ -112,6 +117,17 @@ export const SolicitudDetailMetricsCard: React.FC<SolicitudDetailMetricsCardProp
                 <span className="sol-detail-metric-item__meta">
                   Cuenta N°: {solicitud.numeroCuenta}
                 </span>
+              )}
+              {solicitud.servicioActivo != null && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem' }}>
+                  <span className="sol-detail-metric-item__meta" style={{ margin: 0 }}>Estado:</span>
+                  <ConnectionStateChip
+                    statusName={solicitud.servicioActivo ? 'ACTIVA' : 'NUEVA_PENDIENTE'}
+                    size="xs"
+                    variant="soft"
+                    showTooltip={false}
+                  />
+                </div>
               )}
             </div>
           </div>

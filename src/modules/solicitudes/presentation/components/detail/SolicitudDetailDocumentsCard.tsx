@@ -6,15 +6,7 @@ import { ColorChip } from '@/shared/presentation/components/chip/ColorChip';
 import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
 import type { DocumentoAdjuntoResponse } from '../../../domain/models/Solicitud';
 import '../../styles/SolicitudDetailDocumentsCard.css';
-
-const DOC_ESTADO_COLOR: Record<string, { color: string; bg: string }> = {
-  PENDIENTE: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  APROBADO: { color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-  VALIDO: { color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-  RECHAZADO: { color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
-  INVALIDO: { color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
-  CORREGIDO: { color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' }
-};
+import { DOC_ESTADO_COLOR } from '@/shared/presentation/utils/colors/docs.colors';
 
 const TIPO_DOC_LABEL: Record<number | string, string> = {
   1: 'Cédula de Identidad',
@@ -33,12 +25,9 @@ interface SolicitudDetailDocumentsCardProps {
   onOpenViewer: (docId?: string) => void;
 }
 
-export const SolicitudDetailDocumentsCard: React.FC<SolicitudDetailDocumentsCardProps> = ({
-  documentos,
-  uploadingDocId,
-  onFileReplace,
-  onOpenViewer
-}) => {
+export const SolicitudDetailDocumentsCard: React.FC<
+  SolicitudDetailDocumentsCardProps
+> = ({ documentos, uploadingDocId, onFileReplace, onOpenViewer }) => {
   const hasDocuments = documentos && documentos.length > 0;
 
   return (
