@@ -108,7 +108,7 @@ export const SolicitudDetailPage: React.FC = () => {
         'error',
         'Error al Subir',
         error.message ||
-        'Ocurrió un error inesperado al subir el comprobante de pago.'
+          'Ocurrió un error inesperado al subir el comprobante de pago.'
       );
     } finally {
       setIsUploadingReceipt(false);
@@ -301,6 +301,8 @@ export const SolicitudDetailPage: React.FC = () => {
           <SolicitudDetailDocumentsCard
             documentos={solicitud.documentos}
             uploadingDocId={uploadingDocId}
+            setSelectedDocId={setSelectedDocId}
+            setDocsOpen={setDocsOpen}
             onFileReplace={handleFileReplace}
             onOpenViewer={(docId) => {
               setSelectedDocId(docId);

@@ -2,32 +2,30 @@ import React from 'react';
 import { FolderOpen, FileText, Upload, Clock } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import { Button } from '@/shared/presentation/components/Button/Button';
-import { ColorChip } from '@/shared/presentation/components/chip/ColorChip';
 import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
 import type { DocumentoAdjuntoResponse } from '../../../domain/models/Solicitud';
 import '../../styles/SolicitudDetailDocumentsCard.css';
-import { DOC_ESTADO_COLOR } from '@/shared/presentation/utils/colors/docs.colors';
-
-const TIPO_DOC_LABEL: Record<number | string, string> = {
-  1: 'Cédula de Identidad',
-  2: 'Plano del Predio',
-  3: 'Escritura Pública',
-  4: 'Formulario de Solicitud',
-  5: 'Permiso Municipal',
-  6: 'Certificado de No Adeudar',
-  7: 'RUC / Nombramiento'
-};
+import { SolicitudDocRow } from './SolicitudDocRow';
 
 interface SolicitudDetailDocumentsCardProps {
   documentos: DocumentoAdjuntoResponse[];
   uploadingDocId: string | null;
   onFileReplace: (docId: string, file: File, documentTypeId: number) => void;
   onOpenViewer: (docId?: string) => void;
+  setSelectedDocId: (docId: string) => void;
+  setDocsOpen: (open: boolean) => void;
 }
 
 export const SolicitudDetailDocumentsCard: React.FC<
   SolicitudDetailDocumentsCardProps
-> = ({ documentos, uploadingDocId, onFileReplace, onOpenViewer }) => {
+> = ({
+  documentos,
+  uploadingDocId,
+  onFileReplace,
+  onOpenViewer,
+  setSelectedDocId,
+  setDocsOpen
+}) => {
   const hasDocuments = documentos && documentos.length > 0;
 
   return (
@@ -62,12 +60,6 @@ export const SolicitudDetailDocumentsCard: React.FC<
       ) : (
         <div className="sol-detail-docs-list">
           {documentos.map((doc) => {
-            const docState =
-              DOC_ESTADO_COLOR[doc.estadoValidacion] ??
-              DOC_ESTADO_COLOR['PENDIENTE'];
-            const docLabel =
-              TIPO_DOC_LABEL[Number(doc.tipodocumento)] ??
-              `Documento ${doc.tipodocumento}`;
             const isRejected =
               (doc.estadoValidacion || '').toUpperCase() === 'RECHAZADO' ||
               (doc.estadoValidacion || '').toUpperCase() === 'INVALIDO';
@@ -83,16 +75,11 @@ export const SolicitudDetailDocumentsCard: React.FC<
                   <FileText size={16} />
                 </div>
                 <div className="sol-detail-doc-row__info">
-                  <h4 className="sol-detail-doc-row__label">{docLabel}</h4>
-                  <span className="sol-detail-doc-row__filename">
-                    {`${docLabel} (${doc.id.slice(0, 8)})`}
-                  </span>
-                  {doc.observacion && (
-                    <p className="sol-detail-doc-row__feedback">
-                      <span style={{ fontWeight: 600 }}>Obs:</span>{' '}
-                      {doc.observacion}
-                    </p>
-                  )}
+                  <SolicitudDocRow
+                    key={doc.id}
+                    doc={doc}
+                    onClick={() => onOpenViewer(doc.id)}
+                  />
                 </div>
                 <div
                   className="sol-detail-doc-row__badge"
@@ -103,11 +90,13 @@ export const SolicitudDetailDocumentsCard: React.FC<
                     gap: '0.35rem'
                   }}
                 >
-                  <ColorChip
-                    color={docState.color}
-                    label={doc.estadoValidacion}
-                    variant="soft"
-                    size="xs"
+                  <SolicitudDocRow
+                    key={doc.id}
+                    doc={doc}
+                    onClick={() => {
+                      setSelectedDocId(doc.id);
+                      setDocsOpen(true);
+                    }}
                   />
                   {isRejected && (
                     <>
