@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard, Upload, Clock, CheckCircle } from 'lucide-react';
-import './SolicitudDetailPaymentCard.css';
+import '../../styles/SolicitudDetailPaymentCard.css';
 
 interface SolicitudDetailPaymentCardProps {
   estado: string;

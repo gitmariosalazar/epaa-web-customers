@@ -26,7 +26,7 @@ import { getEstadoConfig, TIPO_ACOMETIDA_LABELS } from '../components/SolicitudC
 import { SolicitudesToolbar } from '../components/SolicitudesToolbar';
 import { SolicitudCard } from '../components/SolicitudCard';
 import { SolicitudesPagination } from '../components/SolicitudesPagination';
-import '../components/SolicitudesList.css';
+import '../styles/SolicitudesList.css';
 
 import {
   AlertTriangle,

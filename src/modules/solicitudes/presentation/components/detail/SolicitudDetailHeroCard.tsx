@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import { getEstadoConfig, TIPO_ACOMETIDA_LABELS } from '../SolicitudConfig';
-import './SolicitudDetailHeroCard.css';
+import '../../styles/SolicitudDetailHeroCard.css';
 
 interface SolicitudDetailHeroCardProps {
   estado: string;

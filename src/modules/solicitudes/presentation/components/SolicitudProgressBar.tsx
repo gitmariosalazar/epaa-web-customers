@@ -17,7 +17,7 @@ import {
   Zap,
   XCircle
 } from 'lucide-react';
-import './SolicitudProgressBar.css';
+import '../styles/SolicitudProgressBar.css';
 
 interface BpmnStep {
   id: string;

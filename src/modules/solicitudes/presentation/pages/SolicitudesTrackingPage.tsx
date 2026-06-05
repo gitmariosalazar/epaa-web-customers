@@ -21,7 +21,7 @@ import {
   X
 } from 'lucide-react';
 import { CircularProgress } from '@/shared/presentation/components/CircularProgress';
-import './SolicitudesTrackingPage.css';
+import '../styles/SolicitudesTrackingPage.css';
 
 // ── Toolbar ───────────────────────────────────────────────────────────────────
 interface ToolbarProps {

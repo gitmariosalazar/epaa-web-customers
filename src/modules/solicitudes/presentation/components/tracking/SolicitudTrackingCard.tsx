@@ -6,7 +6,7 @@
  * OCP: add new step sections by extending the render, no parent changes needed.
  */
 import React, { useState } from 'react';
-import './SolicitudTrackingCard.css';
+import '../../styles/SolicitudTrackingCard.css';
 import type { TrackingSolicitudResponse, HistorialTrackingEntry } from '../../../domain/models/Solicitud';
 import { ProcessTimeline } from '@/shared/presentation/components/Timeline/ProcessTimeline';
 import type { TimelineStep } from '@/shared/presentation/components/Timeline/ProcessTimeline';

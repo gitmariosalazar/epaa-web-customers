@@ -2,7 +2,7 @@ import React from 'react';
 import { Info, CreditCard, FileCheck, Gauge } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import type { RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
-import './SolicitudDetailMetricsCard.css';
+import '../../styles/SolicitudDetailMetricsCard.css';
 
 interface SolicitudDetailMetricsCardProps {
   solicitud: RequestDetailByClientResponse;

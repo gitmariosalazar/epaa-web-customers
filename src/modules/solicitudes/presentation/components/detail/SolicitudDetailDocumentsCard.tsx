@@ -5,7 +5,7 @@ import { Button } from '@/shared/presentation/components/Button/Button';
 import { ColorChip } from '@/shared/presentation/components/chip/ColorChip';
 import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
 import type { DocumentoAdjuntoResponse } from '../../../domain/models/Solicitud';
-import './SolicitudDetailDocumentsCard.css';
+import '../../styles/SolicitudDetailDocumentsCard.css';
 
 const DOC_ESTADO_COLOR: Record<string, { color: string; bg: string }> = {
   PENDIENTE: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },

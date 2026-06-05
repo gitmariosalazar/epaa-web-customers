@@ -27,7 +27,7 @@ import { SolicitudDetailDocumentsCard } from '../components/detail/SolicitudDeta
 import { SolicitudDetailMetricsCard } from '../components/detail/SolicitudDetailMetricsCard';
 import { SolicitudDetailTimelineCard } from '../components/detail/SolicitudDetailTimelineCard';
 
-import './SolicitudDetailPage.css';
+import '../styles/SolicitudDetailPage.css';
 
 export const SolicitudDetailPage: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>();

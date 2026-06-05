@@ -3,7 +3,7 @@ import { Activity, MessageSquare, Clock } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
 import type { HistorialTrackingEntry } from '../../../domain/models/Solicitud';
-import './SolicitudDetailTimelineCard.css';
+import '../../styles/SolicitudDetailTimelineCard.css';
 
 interface SolicitudDetailTimelineCardProps {
   historial?: HistorialTrackingEntry[];

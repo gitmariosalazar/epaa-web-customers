@@ -24,7 +24,7 @@ import {
   AlertTriangle,
   Calendar
 } from 'lucide-react';
-import './SolicitudPhasePanel.css';
+import '../styles/SolicitudPhasePanel.css';
 
 interface PhasePanelProps {
   solicitud: RequestDetailByClientResponse;

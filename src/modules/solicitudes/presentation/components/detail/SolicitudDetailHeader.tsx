@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/shared/presentation/components/Button/Button';
-import './SolicitudDetailHeader.css';
+import '../../styles/SolicitudDetailHeader.css';
 
 interface SolicitudDetailHeaderProps {
   solicitudNumero: string;

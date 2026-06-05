@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { useTramiteById } from '@/modules/tramites/presentation/context/TramitesContext';
 import type { DocumentosMap } from '@/modules/tramites/domain/models/DocumentoAdjunto';
-import './SolicitudNuevaPage.css';
+import '../styles/SolicitudNuevaPage.css';
 import { useAuth } from '@/shared/presentation/context/AuthContext';
 import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
 import { DocumentsStep } from './solicitud-nueva/DocumentsStep';

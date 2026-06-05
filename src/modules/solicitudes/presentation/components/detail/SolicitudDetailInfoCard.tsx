@@ -3,7 +3,7 @@ import { User, MapPin, FileText, Navigation, Home, Building, Mail, Phone } from 
 import { Card } from '@/shared/presentation/components/Card/Card';
 import type { RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
 import { TIPO_PERSONA_LABELS, USO_PREDIO_LABELS } from '../SolicitudConfig';
-import './SolicitudDetailInfoCard.css';
+import '../../styles/SolicitudDetailInfoCard.css';
 
 interface SolicitudDetailInfoCardProps {
   solicitud: RequestDetailByClientResponse;
