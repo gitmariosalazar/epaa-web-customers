@@ -169,6 +169,15 @@ export interface ClientResponse {
   emails: EmailResponse[];
 }
 
+export interface DashboardKpisResponse {
+  totalSolicitudes: number;
+  enBorrador: number;
+  enProceso: number;
+  completadas: number;
+  rechazadas: number;
+  promedioDiasProceso: number | null;
+}
+
 export interface CompanyResponse {
   ruc: string;
   address: string;

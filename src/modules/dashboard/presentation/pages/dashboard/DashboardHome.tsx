@@ -13,9 +13,10 @@ import { useTramites } from '@/modules/tramites/presentation/context/TramitesCon
 import { useNavigate } from 'react-router-dom';
 import '@/shared/presentation/styles/dashboard.css';
 import './DashboardHome.css';
-import { 
-  Droplets, XCircle, ArrowRight, Activity, Building2, Users, Heart 
+import {
+  Droplets, XCircle, ArrowRight, Activity, Building2, Users, Heart
 } from 'lucide-react';
+import { useDashboardKpi } from '@/modules/solicitudes/presentation/hooks/useDashboardKpi';
 
 
 
@@ -42,6 +43,7 @@ export const DashboardHome: React.FC = () => {
   const { user } = useAuth();
   const { tramites } = useTramites();
   const navigate = useNavigate();
+  const { kpis, isLoading, error } = useDashboardKpi();
 
   const displayName = user?.firstName
     ? `${user.firstName} ${user.lastName ?? ''}`.trim()
@@ -49,27 +51,27 @@ export const DashboardHome: React.FC = () => {
 
   /** Maps each tramite catalog ID → the actual route in App.tsx */
   const tramiteRouteMap: Record<string, string> = {
-    'nueva-acometida-natural':         '/procedures/acometidas',
-    'nueva-acometida-juridica':        '/procedures/acometidas',
-    'acometida-alcantarillado-natural':'/procedures/acometidas',
-    'acometida-alcantarillado-juridica':'/procedures/acometidas',
-    'cambio-titular':                  '/procedures/cambio-titular',
-    'suspension-servicio':             '/procedures/suspension',
-    'rehabilitacion-servicio':         '/procedures/suspension',   // misma sección por ahora
-    'cambio-medidor':                  '/procedures/cambio-titular', // próximamente
-    'certificado-no-adeudar':          '/procedures/cambio-titular', // próximamente
-    'beneficio-tercera-edad':          '/procedures/tercera-edad',
-    'beneficio-discapacidad':          '/procedures/discapacidad',
+    'nueva-acometida-natural': '/procedures/acometidas',
+    'nueva-acometida-juridica': '/procedures/acometidas',
+    'acometida-alcantarillado-natural': '/procedures/acometidas',
+    'acometida-alcantarillado-juridica': '/procedures/acometidas',
+    'cambio-titular': '/procedures/cambio-titular',
+    'suspension-servicio': '/procedures/suspension',
+    'rehabilitacion-servicio': '/procedures/suspension',   // misma sección por ahora
+    'cambio-medidor': '/procedures/cambio-titular', // próximamente
+    'certificado-no-adeudar': '/procedures/cambio-titular', // próximamente
+    'beneficio-tercera-edad': '/procedures/tercera-edad',
+    'beneficio-discapacidad': '/procedures/discapacidad',
   };
 
   const getRoute = (id: string) => tramiteRouteMap[id] ?? '/procedures/acometidas';
 
 
   const stats = [
-    { icon: <Droplets size={24} />, label: 'Total Solicitudes', value: 0, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.12)', to: '/solicitudes/lista' },
-    { icon: <Clock size={24} />,    label: 'En Proceso',        value: 0, color: '#f59e0b', bgColor: 'rgba(245,158,11,0.12)',  to: '/solicitudes/en-proceso' },
-    { icon: <CheckCircle size={24} />, label: 'Aprobadas',      value: 0, color: '#10b981', bgColor: 'rgba(16,185,129,0.12)', to: '/solicitudes/aprobadas' },
-    { icon: <XCircle size={24} />,  label: 'Rechazadas',        value: 0, color: '#ef4444', bgColor: 'rgba(239,68,68,0.12)',   to: '/solicitudes/rechazadas' },
+    { icon: <Droplets size={24} />, label: 'Total Solicitudes', value: kpis?.totalSolicitudes || 0, color: '#3b82f6', bgColor: 'rgba(59,130,246,0.12)', to: '/solicitudes/lista' },
+    { icon: <Clock size={24} />, label: 'En Proceso', value: kpis?.enProceso || 0, color: '#f59e0b', bgColor: 'rgba(245,158,11,0.12)', to: '/solicitudes/en-proceso' },
+    { icon: <CheckCircle size={24} />, label: 'Aprobadas', value: kpis?.completadas || 0, color: '#10b981', bgColor: 'rgba(16,185,129,0.12)', to: '/solicitudes/aprobadas' },
+    { icon: <XCircle size={24} />, label: 'Rechazadas', value: kpis?.rechazadas || 0, color: '#ef4444', bgColor: 'rgba(239,68,68,0.12)', to: '/solicitudes/rechazadas' },
   ];
 
   const activeTramites = tramites.filter(t => t.activo);
@@ -114,27 +116,27 @@ export const DashboardHome: React.FC = () => {
         {activeTramites.map((tramite) => (
           <div key={tramite.id} className="tramite-dashboard-card-wrapper" onClick={() => navigate(getRoute(tramite.id))}>
 
-             <div 
-               className="card tramite-dashboard-card" 
-               style={{ '--tramite-color': tramite.color } as React.CSSProperties}
-             >
-                <div className="tramite-dashboard-card__icon-wrapper">
-                   {tramite.icono === 'droplets' ? <Droplets size={28} /> : 
-                    tramite.icono === 'building2' ? <Building2 size={28} /> :
+            <div
+              className="card tramite-dashboard-card"
+              style={{ '--tramite-color': tramite.color } as React.CSSProperties}
+            >
+              <div className="tramite-dashboard-card__icon-wrapper">
+                {tramite.icono === 'droplets' ? <Droplets size={28} /> :
+                  tramite.icono === 'building2' ? <Building2 size={28} /> :
                     tramite.icono === 'users' ? <Users size={28} /> :
-                    tramite.icono === 'x-circle' ? <XCircle size={28} /> :
-                    tramite.icono === 'heart' ? <Heart size={28} /> :
-                    <FileText size={28} />}
-                </div>
-                <div className="tramite-dashboard-card__content">
-                  <h3 className="tramite-dashboard-card__title">
-                    {tramite.nombre}
-                  </h3>
-                  <p className="tramite-dashboard-card__desc">
-                    {tramite.descripcion.length > 70 ? tramite.descripcion.substring(0, 70) + '...' : tramite.descripcion}
-                  </p>
-                </div>
-             </div>
+                      tramite.icono === 'x-circle' ? <XCircle size={28} /> :
+                        tramite.icono === 'heart' ? <Heart size={28} /> :
+                          <FileText size={28} />}
+              </div>
+              <div className="tramite-dashboard-card__content">
+                <h3 className="tramite-dashboard-card__title">
+                  {tramite.nombre}
+                </h3>
+                <p className="tramite-dashboard-card__desc">
+                  {tramite.descripcion.length > 70 ? tramite.descripcion.substring(0, 70) + '...' : tramite.descripcion}
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>

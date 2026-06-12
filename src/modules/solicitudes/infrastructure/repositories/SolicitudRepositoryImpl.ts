@@ -1,4 +1,9 @@
-import type { RequestDetailByClientResponse, Solicitud, TrackingSolicitudResponse } from '../../domain/models/Solicitud';
+import type {
+  DashboardKpisResponse,
+  RequestDetailByClientResponse,
+  Solicitud,
+  TrackingSolicitudResponse
+} from '../../domain/models/Solicitud';
 import type { SolicitudRepository } from '../../domain/repositories/SolicitudRepository';
 import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
 import type { HttpClientInterface } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
@@ -53,7 +58,7 @@ export interface ExpedienteResponse {
   numeroMedidor: string | null;
   servicioActivo: boolean | null;
   fechaActivacion: Date | string | null;
-  solicitudNumero: string | null;   // optional at API level — may be null until backend adds it
+  solicitudNumero: string | null; // optional at API level — may be null until backend adds it
 }
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -109,13 +114,15 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
   }
 
   // ── DIP: satisfies the contract declared in SolicitudRepository ───────────────
-  async getTrackingByClienteId(clienteId: string): Promise<TrackingSolicitudResponse[]> {
+  async getTrackingByClienteId(
+    clienteId: string
+  ): Promise<TrackingSolicitudResponse[]> {
     if (!clienteId) throw new Error('Cliente ID is required');
 
     try {
-      const response = await this.client.get<ApiResponse<TrackingSolicitudResponse[]>>(
-        `/requests/${clienteId}/tracking`
-      );
+      const response = await this.client.get<
+        ApiResponse<TrackingSolicitudResponse[]>
+      >(`/requests/${clienteId}/tracking`);
       return response.data?.data || [];
     } catch (err: any) {
       // Business rule: 404 = no tracking data yet — return empty list.
@@ -123,7 +130,6 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
       throw err;
     }
   }
-
 
   async getRequestDetailByRequestIdOrNumber(
     requestNumberOrId: string
@@ -179,8 +185,8 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+            'Content-Type': 'multipart/form-data'
+          }
         }
       );
       return response.status_code === 200 || response.status_code === 201;
@@ -205,8 +211,8 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+            'Content-Type': 'multipart/form-data'
+          }
         }
       );
       return response.status_code === 200 || response.status_code === 201;
@@ -215,4 +221,19 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
     }
   }
 
+  async getDashboardKpisByClienteId(
+    clienteId: string
+  ): Promise<DashboardKpisResponse | null> {
+    if (!clienteId) throw new Error('El ID del cliente es requerido');
+
+    try {
+      const response = await this.client.get<
+        ApiResponse<DashboardKpisResponse>
+      >(`/requests/${clienteId}/dashboard/kpis`);
+      return response.data?.data || null;
+    } catch (err: any) {
+      if (isNotFoundError(err)) return null;
+      throw err;
+    }
+  }
 }
