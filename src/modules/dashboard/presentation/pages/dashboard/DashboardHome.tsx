@@ -43,7 +43,7 @@ export const DashboardHome: React.FC = () => {
   const { user } = useAuth();
   const { tramites } = useTramites();
   const navigate = useNavigate();
-  const { kpis, isLoading, error } = useDashboardKpi();
+  const { kpis } = useDashboardKpi();
 
   const displayName = user?.firstName
     ? `${user.firstName} ${user.lastName ?? ''}`.trim()
