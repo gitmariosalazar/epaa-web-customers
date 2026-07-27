@@ -404,8 +404,9 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
                     Datos adicionales
                   </span>
                   <div className="sol-expand__pills">
-                    {datosExtra.map((d) => (
+                    {datosExtra.map((d, idx) => (
                       <ColorChip
+                        key={idx}
                         label={d}
                         variant="soft"
                         size="xs"

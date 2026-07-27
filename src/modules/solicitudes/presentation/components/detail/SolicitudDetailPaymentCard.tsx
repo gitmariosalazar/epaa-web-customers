@@ -2,25 +2,23 @@ import React from 'react';
 import { CreditCard, Upload, Clock, CheckCircle } from 'lucide-react';
 import '../../styles/SolicitudDetailPaymentCard.css';
 
+import type { RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
+
 interface SolicitudDetailPaymentCardProps {
-  estado: string;
+  solicitud: RequestDetailByClientResponse;
   isPaymentConfirmed: boolean;
-  numeroFactura?: string | null;
-  montofactura?: number | null;
   isUploadingReceipt: boolean;
   onUploadReceipt: (file: File) => void;
 }
 
 export const SolicitudDetailPaymentCard: React.FC<SolicitudDetailPaymentCardProps> = ({
-  estado,
+  solicitud,
   isPaymentConfirmed,
-  numeroFactura,
-  montofactura,
   isUploadingReceipt,
   onUploadReceipt
 }) => {
-  const displayMonto = montofactura ?? 0;
-  if (estado === 'FACTURA_INSPECCION_EMITIDA') {
+  const displayMonto = solicitud.montofactura ?? 0;
+  if (solicitud.estado === 'FACTURA_INSPECCION_EMITIDA') {
     return (
       <div className="sol-detail-payment-card">
         <div className="sol-detail-payment-card__header">
@@ -44,9 +42,9 @@ export const SolicitudDetailPaymentCard: React.FC<SolicitudDetailPaymentCardProp
               <span className="sol-detail-payment-summary__title">
                 Tasa de Inspección
               </span>
-              {numeroFactura && (
+              {solicitud.numeroFactura && (
                 <span className="sol-detail-payment-summary__meta">
-                  Factura: {numeroFactura}
+                  Factura: {solicitud.numeroFactura}
                 </span>
               )}
             </div>
@@ -145,7 +143,7 @@ export const SolicitudDetailPaymentCard: React.FC<SolicitudDetailPaymentCardProp
     );
   }
 
-  if (estado === 'PAGO_PENDIENTE') {
+  if (solicitud.estado === 'PAGO_PENDIENTE') {
     return (
       <div className="sol-detail-payment-status-card sol-detail-payment-status-card--pending">
         <Clock

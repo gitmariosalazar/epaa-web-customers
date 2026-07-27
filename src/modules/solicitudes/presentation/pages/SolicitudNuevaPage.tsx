@@ -64,6 +64,7 @@ export const SolicitudNuevaPage: React.FC = () => {
   const [createdSolicitudId, setCreatedSolicitudId] = useState<string | null>(
     null
   );
+  const [createdRequestNumber, setCreatedRequestNumber] = useState<string | null>(null);
 
   const validateStepUseCase = React.useMemo(() => new ValidateSolicitudStepUseCase(), []);
 
@@ -137,7 +138,9 @@ export const SolicitudNuevaPage: React.FC = () => {
       const apiResponse = response.data as any;
       if (apiResponse && apiResponse.data) {
         const solicitudId = apiResponse.data.solicitudId;
+        const solicitudNumero = apiResponse.data.solicitudNumero || (solicitudId ? `SOL-${solicitudId.slice(0, 8).toUpperCase()}` : null);
         setCreatedSolicitudId(solicitudId);
+        setCreatedRequestNumber(solicitudNumero);
       }
 
       setSubmitted(true);
@@ -181,6 +184,8 @@ export const SolicitudNuevaPage: React.FC = () => {
         tramite={tramite}
         docsSubidos={docsSubidos}
         createdSolicitudId={createdSolicitudId}
+        requestNumber={createdRequestNumber}
+        onGoDetail={() => navigate(`/solicitudes/${createdSolicitudId}`)}
         onGoToTramites={() => navigate('/tramites')}
         onCreateAnother={() => {
           setSubmitted(false);
@@ -188,6 +193,7 @@ export const SolicitudNuevaPage: React.FC = () => {
           setForm(INITIAL_FORM);
           setDocumentos({});
           setCreatedSolicitudId(null);
+          setCreatedRequestNumber(null);
         }}
       />
     );

@@ -2,7 +2,8 @@ import type {
   DashboardKpisResponse,
   RequestDetailByClientResponse,
   Solicitud,
-  TrackingSolicitudResponse
+  TrackingSolicitudResponse,
+  SolicitudOrdenTrabajoResponse
 } from '../models/Solicitud';
 
 export interface SolicitudRepository {
@@ -22,6 +23,10 @@ export interface SolicitudRepository {
     solicitudId: string
   ): Promise<TrackingSolicitudResponse | null>;
 
+  getOrdenesTrabajoBysSolicitudId(
+    solicitudId: string
+  ): Promise<SolicitudOrdenTrabajoResponse[]>;
+
   getDashboardKpisByClienteId(
     clienteId: string
   ): Promise<DashboardKpisResponse | null>;
@@ -37,5 +42,12 @@ export interface SolicitudRepository {
   uploadInspectionInvoiceReceipt(
     invoiceId: string,
     file: File
+  ): Promise<boolean>;
+
+  submitCorrections(
+    solicitudId: string,
+    userId: string,
+    files: File[],
+    documentIds: string[]
   ): Promise<boolean>;
 }

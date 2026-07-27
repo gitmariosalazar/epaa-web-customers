@@ -2,7 +2,8 @@ import type {
   DashboardKpisResponse,
   RequestDetailByClientResponse,
   Solicitud,
-  TrackingSolicitudResponse
+  TrackingSolicitudResponse,
+  SolicitudOrdenTrabajoResponse
 } from '../../domain/models/Solicitud';
 import type { SolicitudRepository } from '../../domain/repositories/SolicitudRepository';
 import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
@@ -108,7 +109,8 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
       return {
         ...exp,
         estado,
-        solicitudNumero: exp.solicitudNumero ?? exp.solicitudId
+        solicitudNumero: exp.solicitudNumero ?? exp.solicitudId,
+        historial: []
       };
     });
   }
@@ -159,6 +161,23 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
       return response.data?.data || null;
     } catch (err: any) {
       if (isNotFoundError(err)) return null;
+      throw err;
+    }
+  }
+
+  async getOrdenesTrabajoBysSolicitudId(
+    solicitudId: string
+  ): Promise<SolicitudOrdenTrabajoResponse[]> {
+    if (!solicitudId) {
+      throw new Error('El ID de la solicitud es requerido');
+    }
+    try {
+      const response = await this.client.get<
+        ApiResponse<SolicitudOrdenTrabajoResponse[]>
+      >(`/requests/${solicitudId}/ordenes-trabajo`);
+      return response.data?.data || [];
+    } catch (err: any) {
+      if (isNotFoundError(err)) return [];
       throw err;
     }
   }
@@ -218,6 +237,37 @@ export class SolicitudRepositoryImpl implements SolicitudRepository {
       return response.status_code === 200 || response.status_code === 201;
     } catch (err: any) {
       throw err;
+    }
+  }
+
+  async submitCorrections(
+    solicitudId: string,
+    userId: string,
+    files: File[],
+    documentIds: string[]
+  ): Promise<boolean> {
+    try {
+      const formData = new FormData();
+      formData.append('userId', userId);
+      formData.append('documentIds', documentIds.join(','));
+
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+
+      const response = await this.client.post<any>(
+        `/requests/${solicitudId}/corrections`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.status_code === 200 || response.status_code === 201 || !!response.data;
+    } catch (error) {
+      console.error('Error in submitCorrections:', error);
+      return false;
     }
   }
 

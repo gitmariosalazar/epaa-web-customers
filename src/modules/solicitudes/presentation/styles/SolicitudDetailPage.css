@@ -18,7 +18,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .sol-detail-error {
@@ -67,11 +69,7 @@
   gap: 1.25rem;
 }
 
-.sol-detail-sidebar-col {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
+
 
 /* ── Layout Card Styling ── */
 .sol-detail-card {
@@ -81,7 +79,9 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sol-detail-card__title-row {
@@ -101,4 +101,23 @@
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-main);
+}
+.sol-detail-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: sticky;
+  top: 1.25rem;
+  align-self: start;
+  max-height: calc(100vh - 2.5rem);
+}
+
+.sol-detail-sidebar-col > .sol-detail-card {
+  flex-shrink: 0;
+}
+
+.sol-detail-sidebar-col .sol-detail-card--timeline {
+  flex: 1;
+  flex-shrink: 1;
+  min-height: 0; /* Crucial for allowing flex children to scroll */
 }

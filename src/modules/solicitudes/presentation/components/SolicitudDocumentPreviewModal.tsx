@@ -224,20 +224,22 @@ export const SolicitudDocumentPreviewModal: React.FC<
   const [localDecisions, setLocalDecisions] = useState<
     Record<
       string,
-      { status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'; observation: string }
+      { status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CORREGIDO'; observation: string }
     >
   >(() => {
     const initial: Record<
       string,
-      { status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'; observation: string }
+      { status: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CORREGIDO'; observation: string }
     > = {};
     documentos.forEach((d) => {
-      let mappedStatus: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' = 'PENDIENTE';
+      let mappedStatus: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CORREGIDO' = 'PENDIENTE';
       const dbStatus = (d.estadoValidacion || '').toUpperCase();
       if (dbStatus === 'VALIDO' || dbStatus === 'APROBADO') {
         mappedStatus = 'APROBADO';
       } else if (dbStatus === 'INVALIDO' || dbStatus === 'RECHAZADO') {
         mappedStatus = 'RECHAZADO';
+      } else if (dbStatus === 'CORREGIDO') {
+        mappedStatus = 'CORREGIDO';
       }
       initial[d.id] = {
         status: mappedStatus,
@@ -283,12 +285,14 @@ export const SolicitudDocumentPreviewModal: React.FC<
     return documentos.some((d) => {
       const dec = localDecisions[d.id];
       if (!dec) return false;
-      let mappedStatus: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' = 'PENDIENTE';
+      let mappedStatus: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CORREGIDO' = 'PENDIENTE';
       const dbStatus = (d.estadoValidacion || '').toUpperCase();
       if (dbStatus === 'VALIDO' || dbStatus === 'APROBADO') {
         mappedStatus = 'APROBADO';
       } else if (dbStatus === 'INVALIDO' || dbStatus === 'RECHAZADO') {
         mappedStatus = 'RECHAZADO';
+      } else if (dbStatus === 'CORREGIDO') {
+        mappedStatus = 'CORREGIDO';
       }
       return (
         dec.status !== mappedStatus || dec.observation !== (d.observacion || '')

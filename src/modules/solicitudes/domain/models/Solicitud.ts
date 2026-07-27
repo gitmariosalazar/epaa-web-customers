@@ -54,6 +54,7 @@ export interface ExpedienteResponse {
   servicioActivo: boolean | null;
   fechaActivacion: Date | string | null;
   solicitudNumero: string;
+  historial: HistorialTrackingEntry[];
 }
 
 export type Solicitud = ExpedienteResponse;
@@ -194,4 +195,18 @@ export interface CompanyResponse {
 export interface RequestDetailByClientResponse extends ExpedienteResponse {
   company: CompanyResponse | null;
   person: ClientResponse | null;
+}
+
+export interface SolicitudOrdenTrabajoResponse {
+  workOrderId: string;
+  codigoOrden: string;
+  tipoOrden: string;
+  estadoOt: string;
+  prioridad: string | null;
+  descripcion: string | null;
+  tecnicoAsignado: string | null;
+  fechaCreacion: Date | string;
+  fechaAsignacion: Date | string | null;
+  fechaProgramada: Date | string | null;
+  fechaCompletada: Date | string | null;
 }

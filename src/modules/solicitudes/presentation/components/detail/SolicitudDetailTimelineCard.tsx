@@ -1,76 +1,56 @@
 import React from 'react';
-import { Activity, MessageSquare, Clock } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
-import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
-import type { HistorialTrackingEntry } from '../../../domain/models/Solicitud';
+import type { HistorialTrackingEntry, TrackingSolicitudResponse } from '../../../domain/models/Solicitud';
 import '../../styles/SolicitudDetailTimelineCard.css';
+import { StatusTimeline, type TimelineItem } from '@/shared/presentation/components/Timeline';
+import { getEstadoConfig } from '../SolicitudConfig';
+import { HistorialModal } from './HistorialModal';
 
 interface SolicitudDetailTimelineCardProps {
-  historial?: HistorialTrackingEntry[];
+  matchedTracking?: TrackingSolicitudResponse | null;
+}
+
+// ─── Domain → generic adapter (pure function, module-level) ───────────────────
+
+function toTimelineItem(entry: HistorialTrackingEntry): TimelineItem {
+  const config = getEstadoConfig(entry.estado);
+  const prevConfig = entry.estadoAnterior ? getEstadoConfig(entry.estadoAnterior) : null;
+
+  return {
+    status: entry.estado,
+    statusLabel: entry.estadoLabel,
+    previousStatus: entry.estadoAnterior ?? undefined,
+    previousStatusLabel: prevConfig?.label ?? undefined,
+    date: entry.fecha,
+    comment: entry.comentario ?? undefined,
+    color: config.color,
+  };
 }
 
 export const SolicitudDetailTimelineCard: React.FC<SolicitudDetailTimelineCardProps> = ({
-  historial
+  matchedTracking
 }) => {
-  const hasHistorial = historial && historial.length > 0;
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const matchedHistorial = matchedTracking?.historial ?? [];
+  const items: TimelineItem[] = matchedHistorial.map(toTimelineItem);
 
   return (
     <Card className="sol-detail-card sol-detail-card--timeline">
-      <div className="sol-detail-card__title-row">
-        <Activity size={16} className="sol-detail-card__title-icon" />
-        <h3
-          className="sol-detail-card__title"
-          style={{ fontSize: '0.875rem' }}
-        >
-          Línea de Tiempo (Seguimiento)
-        </h3>
+      <div className="sol-detail-timeline-scroll">
+        <StatusTimeline
+          title="Historial de Movimientos"
+          items={items}
+          limit={3}
+          onViewAll={() => setIsModalOpen(true)}
+          emptyMessage="No se registran movimientos de seguimiento."
+          emptySubMessage="Los cambios de estado se mostrarán aquí."
+        />
       </div>
-
-      {!hasHistorial ? (
-        <div style={{ padding: '2rem' }}>
-          <EmptyState
-            message="Sin historial de seguimiento"
-            description="No se registran movimientos ni historial de seguimiento en línea."
-            icon={Clock}
-            variant="info"
-          />
-        </div>
-      ) : (
-        <div className="sol-detail-timeline">
-          {historial.map((entry, idx) => (
-            <div key={idx} className="sol-detail-timeline-node">
-              <div className="sol-detail-timeline-node__line" />
-              <div className="sol-detail-timeline-node__dot" />
-              <div className="sol-detail-timeline-node__content">
-                <span className="sol-detail-timeline-node__date">
-                  {new Date(entry.fecha).toLocaleDateString('es-EC', {
-                    day: '2-digit',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </span>
-                <h4 className="sol-detail-timeline-node__title">
-                  {entry.estadoLabel}
-                </h4>
-                {entry.comentario && (
-                  <div className="sol-detail-timeline-node__comment">
-                    <MessageSquare
-                      size={10}
-                      style={{
-                        marginRight: 4,
-                        flexShrink: 0,
-                        marginTop: 2
-                      }}
-                    />
-                    <p>{entry.comentario}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <HistorialModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        historial={matchedHistorial}
+      />
     </Card>
   );
 };

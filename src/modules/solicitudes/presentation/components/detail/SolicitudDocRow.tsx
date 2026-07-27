@@ -1,8 +1,11 @@
 import React from 'react';
-import { FileText } from 'lucide-react';
+import { Clock, Upload } from 'lucide-react';
 import { ColorChip } from '@/shared/presentation/components/chip/ColorChip';
 import type { DocumentoAdjuntoResponse } from '../../../domain/models/Solicitud';
 import { getDocEstadoUI } from '@/shared/presentation/utils/colors/docs.colors';
+import { Button } from '@/shared/presentation/components/Button/Button';
+import { Tooltip } from '@/shared/presentation/components/common/Tooltip/Tooltip';
+import { DocumentIcon } from '@/shared/presentation/utils/icons/DocumentIcon';
 
 const TIPO_DOC_LABEL: Record<number | string, string> = {
   1: 'Cédula de Identidad',
@@ -17,11 +20,15 @@ const TIPO_DOC_LABEL: Record<number | string, string> = {
 interface SolicitudDocRowProps {
   doc: DocumentoAdjuntoResponse;
   onClick: () => void;
+  uploadingDocId?: string | null;
+  onFileReplace?: (docId: string, file: File, documentTypeId: number) => void;
 }
 
 export const SolicitudDocRow: React.FC<SolicitudDocRowProps> = ({
   doc,
-  onClick
+  onClick,
+  uploadingDocId,
+  onFileReplace
 }) => {
   const docUI = getDocEstadoUI(doc.estadoValidacion);
   const docLabel =
@@ -30,13 +37,14 @@ export const SolicitudDocRow: React.FC<SolicitudDocRowProps> = ({
   const StateIcon = docUI.icon;
 
   return (
-    <div
+    <Tooltip
       className="sol-detail-doc-row sol-detail-doc-row--interactive"
       onClick={onClick}
-      title="Haz clic para abrir el visor en este documento"
+      themeColor='amber'
+      content="Haz clic para abrir el visor en este documento"
     >
       <div className="sol-detail-doc-row__icon">
-        <FileText size={16} />
+        <DocumentIcon fileName={doc.url} size={16} />
       </div>
       <div className="sol-detail-doc-row__info">
         <h4 className="sol-detail-doc-row__label">{docLabel}</h4>
@@ -44,12 +52,17 @@ export const SolicitudDocRow: React.FC<SolicitudDocRowProps> = ({
           {doc.url.split('/').pop()}
         </span>
         {doc.observacion && (
-          <p className="sol-detail-doc-row__feedback">
-            <span style={{ fontWeight: 600 }}>Obs:</span> {doc.observacion}
-          </p>
+          <ColorChip
+            color={docUI.color}
+            label={`Obs: ${doc.observacion}`}
+            variant="soft"
+            borderRadius={3}
+            size="xs"
+            icon={<StateIcon size={12} />}
+          />
         )}
       </div>
-      <div className="sol-detail-doc-row__badge">
+      <div className="sol-detail-doc-row__badge" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
         <ColorChip
           color={docUI.color}
           label={doc.estadoValidacion}
@@ -57,7 +70,42 @@ export const SolicitudDocRow: React.FC<SolicitudDocRowProps> = ({
           size="xs"
           icon={<StateIcon size={12} />}
         />
+        {onFileReplace && (doc.estadoValidacion.toUpperCase() === 'RECHAZADO' || doc.estadoValidacion.toUpperCase() === 'INVALIDO') && (
+          <>
+            <Button
+              type="button"
+              disabled={uploadingDocId === doc.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                const input = document.getElementById(`file-input-admin-${doc.id}`);
+                if (input) input.click();
+              }}
+              variant='dashed'
+              size='compact'
+            >
+              {uploadingDocId === doc.id ? (
+                <Clock size={10} className="sol-detail-loading__spinner" />
+              ) : (
+                <Upload size={10} />
+              )}
+              {uploadingDocId === doc.id ? 'Subiendo...' : 'Subir Corrección'}
+            </Button>
+            <input
+              type="file"
+              id={`file-input-admin-${doc.id}`}
+              style={{ display: 'none' }}
+              accept=".pdf,image/*"
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && onFileReplace) {
+                  onFileReplace(doc.id, file, Number(doc.tipodocumento));
+                }
+              }}
+            />
+          </>
+        )}
       </div>
-    </div>
+    </Tooltip>
   );
 };

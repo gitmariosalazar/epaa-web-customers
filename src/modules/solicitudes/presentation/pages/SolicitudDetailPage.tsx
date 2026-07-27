@@ -7,16 +7,20 @@ import { GetRequestDetailByRequestIdOrNumberUseCase } from '../../application/us
 import { SolicitudRepositoryImpl } from '../../infrastructure/repositories/SolicitudRepositoryImpl';
 import type {
   RequestDetailByClientResponse,
-  TrackingSolicitudResponse
+  TrackingSolicitudResponse,
+  SolicitudOrdenTrabajoResponse
 } from '../../domain/models/Solicitud';
 import { SolicitudDocumentPreviewModal } from '../components/SolicitudDocumentPreviewModal';
 import { SolicitudPhasePanel } from '../components/SolicitudPhasePanel';
 import { SolicitudProgressBar } from '../components/SolicitudProgressBar';
 import { GetTrackingBySolicitudIdUseCase } from '../../application/usecases/GetTrackingBySolicitudIdUseCase';
+import { GetOrdenesTrabajoBysSolicitudIdUseCase } from '../../application/usecases/GetOrdenesTrabajoBysSolicitudIdUseCase';
 import { useAuth } from '@/shared/presentation/context/AuthContext';
 import { UpdateConnectionDocumentUseCase } from '../../application/usecases/UpdateConnectionDocumentUseCase';
+import { SubmitCorrectionsUseCase } from '../../application/usecases/SubmitCorrectionsUseCase';
 import { MessageToastCustom } from '@/shared/presentation/components/toast/CustomMessageToast';
 import { UploadInspectionInvoiceReceiptUseCase } from '../../application/usecases/UploadInspectionInvoiceReceiptUseCase';
+import { SubmitCorrectionsModal } from '../components/modals/SubmitCorrectionsModal';
 
 // Sub-components
 import { SolicitudDetailHeader } from '../components/detail/SolicitudDetailHeader';
@@ -26,6 +30,8 @@ import { SolicitudDetailInfoCard } from '../components/detail/SolicitudDetailInf
 import { SolicitudDetailDocumentsCard } from '../components/detail/SolicitudDetailDocumentsCard';
 import { SolicitudDetailMetricsCard } from '../components/detail/SolicitudDetailMetricsCard';
 import { SolicitudDetailTimelineCard } from '../components/detail/SolicitudDetailTimelineCard';
+import { SolicitudDetailTechnicalReportCard } from '../components/detail/SolicitudDetailTechnicalReportCard';
+import { SolicitudDetailWorkOrderCard } from '../components/detail/SolicitudDetailWorkOrderCard';
 
 import '../styles/SolicitudDetailPage.css';
 
@@ -36,6 +42,8 @@ export const SolicitudDetailPage: React.FC = () => {
     useState<RequestDetailByClientResponse | null>(null);
   const [matchedTracking, setMatchedTracking] =
     useState<TrackingSolicitudResponse | null>(null);
+  const [workOrders, setWorkOrders] = 
+    useState<SolicitudOrdenTrabajoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [docsOpen, setDocsOpen] = useState(false);
@@ -44,6 +52,9 @@ export const SolicitudDetailPage: React.FC = () => {
   );
 
   const [reloadTrigger, setReloadTrigger] = useState(0);
+
+  const [submitCorrectionsModalOpen, setSubmitCorrectionsModalOpen] = useState(false);
+  const [isSubmittingCorrections, setIsSubmittingCorrections] = useState(false);
 
   const { user } = useAuth();
   const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
@@ -60,8 +71,16 @@ export const SolicitudDetailPage: React.FC = () => {
     () => new GetTrackingBySolicitudIdUseCase(new SolicitudRepositoryImpl()),
     []
   );
+  const workOrderUseCase = React.useMemo(
+    () => new GetOrdenesTrabajoBysSolicitudIdUseCase(new SolicitudRepositoryImpl()),
+    []
+  );
   const updateDocUseCase = React.useMemo(
     () => new UpdateConnectionDocumentUseCase(new SolicitudRepositoryImpl()),
+    []
+  );
+  const submitCorrectionsUseCase = React.useMemo(
+    () => new SubmitCorrectionsUseCase(new SolicitudRepositoryImpl()),
     []
   );
   const uploadReceiptUseCase = React.useMemo(
@@ -174,6 +193,41 @@ export const SolicitudDetailPage: React.FC = () => {
     }
   };
 
+  const handleBulkCorrectionsSubmit = async (files: File[], documentIds: string[]) => {
+    if (!solicitud || !user) return;
+    setIsSubmittingCorrections(true);
+    try {
+      const uploadPromises = files.map((file, index) => {
+        const docId = documentIds[index];
+        const doc = solicitud.documentos.find(d => d.id === docId);
+        if (!doc) throw new Error(`Documento original no encontrado: ${docId}`);
+        
+        return updateDocUseCase.execute(
+          docId,
+          file,
+          user.userId,
+          solicitud.solicitudId,
+          Number(doc.tipodocumento)
+        );
+      });
+
+      const results = await Promise.all(uploadPromises);
+      const allSuccess = results.every(r => r === true);
+
+      if (allSuccess) {
+        MessageToastCustom('success', 'Correcciones Subidas', 'Los documentos fueron subidos y enviados a revisión correctamente.');
+        setSubmitCorrectionsModalOpen(false);
+        setReloadTrigger((prev) => prev + 1);
+      } else {
+        throw new Error('Error al subir las correcciones en lote.');
+      }
+    } catch (e: any) {
+      MessageToastCustom('error', 'Error', e.message || 'Error al subir las correcciones en lote.');
+    } finally {
+      setIsSubmittingCorrections(false);
+    }
+  };
+
   React.useEffect(() => {
     if (!id) return;
 
@@ -182,14 +236,16 @@ export const SolicitudDetailPage: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const [solDetail, trackDetail] = await Promise.all([
+        const [solDetail, trackDetail, workOrdersData] = await Promise.all([
           requestDetailUseCase.execute(id),
-          trackingUseCase.execute(id)
+          trackingUseCase.execute(id),
+          workOrderUseCase.execute(id)
         ]);
 
         if (isMounted) {
           setSolicitud(solDetail);
           setMatchedTracking(trackDetail);
+          setWorkOrders(workOrdersData);
         }
       } catch (err) {
         const error = err as Error;
@@ -265,8 +321,7 @@ export const SolicitudDetailPage: React.FC = () => {
     <PageLayout
       header={
         <SolicitudDetailHeader
-          solicitudNumero={solicitud.solicitudNumero}
-          fechaSolicitud={solicitud.fechaSolicitud}
+          solicitud={solicitud}
           onBack={() => navigate(-1)}
         />
       }
@@ -278,23 +333,24 @@ export const SolicitudDetailPage: React.FC = () => {
         {/* ── COLUMNA IZQUIERDA: Detalles principales ── */}
         <div className="sol-detail-main-col">
           <SolicitudDetailHeroCard
-            estado={solicitud.estado}
-            diasEnProceso={solicitud.diasEnProceso}
-            tipoAcometida={solicitud.tipoAcometida}
-            updatedAt={solicitud.updatedAt}
+            solicitud={solicitud}
           />
 
           <SolicitudDetailPaymentCard
-            estado={solicitud.estado}
-            isPaymentConfirmed={isPaymentConfirmed}
-            numeroFactura={solicitud.numeroFactura}
-            montofactura={solicitud.montofactura}
+            solicitud={solicitud}
+            isPaymentConfirmed={solicitud.estado === 'PAGO_CONFIRMADO'}
             isUploadingReceipt={isUploadingReceipt}
             onUploadReceipt={handleReceiptUpload}
           />
 
           {/* ── Panel contextual de fase (post-pago) ── */}
           <SolicitudPhasePanel solicitud={solicitud} />
+
+          {/* ── Panel informe técnico ── */}
+          <SolicitudDetailTechnicalReportCard solicitud={solicitud} />
+
+          {/* ── Panel órdenes de trabajo ── */}
+          <SolicitudDetailWorkOrderCard workOrders={workOrders} />
 
           <SolicitudDetailInfoCard solicitud={solicitud} />
 
@@ -308,6 +364,7 @@ export const SolicitudDetailPage: React.FC = () => {
               setSelectedDocId(docId);
               setDocsOpen(true);
             }}
+            onBulkCorrectionsClick={() => setSubmitCorrectionsModalOpen(true)}
           />
         </div>
 
@@ -315,7 +372,7 @@ export const SolicitudDetailPage: React.FC = () => {
         <div className="sol-detail-sidebar-col">
           <SolicitudDetailMetricsCard solicitud={solicitud} />
 
-          <SolicitudDetailTimelineCard historial={matchedTracking?.historial} />
+          <SolicitudDetailTimelineCard matchedTracking={matchedTracking} />
         </div>
       </div>
 
@@ -332,6 +389,18 @@ export const SolicitudDetailPage: React.FC = () => {
           solicitudId={solicitud.solicitudId}
           onValidationSuccess={() => setReloadTrigger((prev) => prev + 1)}
           initialActiveId={selectedDocId}
+        />
+      )}
+
+      {submitCorrectionsModalOpen && (
+        <SubmitCorrectionsModal
+          isOpen={submitCorrectionsModalOpen}
+          onClose={() => setSubmitCorrectionsModalOpen(false)}
+          rejectedDocuments={solicitud.documentos.filter(
+            (d) => d.estadoValidacion === 'RECHAZADO' || d.estadoValidacion === 'INVALIDO'
+          )}
+          onSubmitCorrections={handleBulkCorrectionsSubmit}
+          isSubmitting={isSubmittingCorrections}
         />
       )}
     </PageLayout>

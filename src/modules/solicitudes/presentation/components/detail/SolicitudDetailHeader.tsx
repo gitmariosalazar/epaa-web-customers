@@ -3,19 +3,19 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/shared/presentation/components/Button/Button';
 import '../../styles/SolicitudDetailHeader.css';
 
+import type { RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
+
 interface SolicitudDetailHeaderProps {
-  solicitudNumero: string;
-  fechaSolicitud?: string | Date;
+  solicitud: RequestDetailByClientResponse;
   onBack: () => void;
 }
 
 export const SolicitudDetailHeader: React.FC<SolicitudDetailHeaderProps> = ({
-  solicitudNumero,
-  fechaSolicitud,
+  solicitud,
   onBack
 }) => {
-  const fechaStr = fechaSolicitud
-    ? new Date(fechaSolicitud).toLocaleDateString('es-EC', {
+  const fechaStr = solicitud.fechaSolicitud
+    ? new Date(solicitud.fechaSolicitud).toLocaleDateString('es-EC', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
@@ -36,7 +36,7 @@ export const SolicitudDetailHeader: React.FC<SolicitudDetailHeaderProps> = ({
       </Button>
       <div className="sol-detail-header-nav__info">
         <h2 className="sol-detail-header-nav__title">
-          Expediente: {solicitudNumero}
+          Expediente: {solicitud.solicitudNumero}
         </h2>
         <span className="sol-detail-header-nav__subtitle">
           Creado el {fechaStr}
