@@ -3,8 +3,11 @@ import {
   createContext,
   useContext,
   useEffect,
-  useState
+  useState,
+  useMemo
 } from 'react';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { createAppMuiTheme } from '@/shared/infrastructure/theme/muiTheme';
 
 type Theme = 'light' | 'dark';
 
@@ -39,9 +42,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
+  // Sync MUI theme with app theme mode
+  const muiTheme = useMemo(() => createAppMuiTheme(theme), [theme]);
+
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      <MuiThemeProvider theme={muiTheme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   );
 };
