@@ -17,7 +17,6 @@ import { GetTrackingBySolicitudIdUseCase } from '../../application/usecases/GetT
 import { GetOrdenesTrabajoBysSolicitudIdUseCase } from '../../application/usecases/GetOrdenesTrabajoBysSolicitudIdUseCase';
 import { useAuth } from '@/shared/presentation/context/AuthContext';
 import { UpdateConnectionDocumentUseCase } from '../../application/usecases/UpdateConnectionDocumentUseCase';
-import { SubmitCorrectionsUseCase } from '../../application/usecases/SubmitCorrectionsUseCase';
 import { MessageToastCustom } from '@/shared/presentation/components/toast/CustomMessageToast';
 import { UploadInspectionInvoiceReceiptUseCase } from '../../application/usecases/UploadInspectionInvoiceReceiptUseCase';
 import { SubmitCorrectionsModal } from '../components/modals/SubmitCorrectionsModal';
@@ -42,7 +41,7 @@ export const SolicitudDetailPage: React.FC = () => {
     useState<RequestDetailByClientResponse | null>(null);
   const [matchedTracking, setMatchedTracking] =
     useState<TrackingSolicitudResponse | null>(null);
-  const [workOrders, setWorkOrders] = 
+  const [workOrders, setWorkOrders] =
     useState<SolicitudOrdenTrabajoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,10 +76,6 @@ export const SolicitudDetailPage: React.FC = () => {
   );
   const updateDocUseCase = React.useMemo(
     () => new UpdateConnectionDocumentUseCase(new SolicitudRepositoryImpl()),
-    []
-  );
-  const submitCorrectionsUseCase = React.useMemo(
-    () => new SubmitCorrectionsUseCase(new SolicitudRepositoryImpl()),
     []
   );
   const uploadReceiptUseCase = React.useMemo(
@@ -127,7 +122,7 @@ export const SolicitudDetailPage: React.FC = () => {
         'error',
         'Error al Subir',
         error.message ||
-          'Ocurrió un error inesperado al subir el comprobante de pago.'
+        'Ocurrió un error inesperado al subir el comprobante de pago.'
       );
     } finally {
       setIsUploadingReceipt(false);
@@ -201,7 +196,7 @@ export const SolicitudDetailPage: React.FC = () => {
         const docId = documentIds[index];
         const doc = solicitud.documentos.find(d => d.id === docId);
         if (!doc) throw new Error(`Documento original no encontrado: ${docId}`);
-        
+
         return updateDocUseCase.execute(
           docId,
           file,
@@ -316,6 +311,8 @@ export const SolicitudDetailPage: React.FC = () => {
     'SUMINISTRO_ACTIVO'
   ];
   const isPaymentConfirmed = paymentConfirmedStates.includes(solicitud.estado);
+
+  console.log('solicitud', isPaymentConfirmed)
 
   return (
     <PageLayout

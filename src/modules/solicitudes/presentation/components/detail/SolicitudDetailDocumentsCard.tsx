@@ -1,9 +1,8 @@
 import React from 'react';
-import { FolderOpen, FileText, Upload, Clock, ClipboardList } from 'lucide-react';
+import { FolderOpen, FileText, Upload, ClipboardList } from 'lucide-react';
 import { Card } from '@/shared/presentation/components/Card/Card';
 import { Button } from '@/shared/presentation/components/Button/Button';
-import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
-import type { DocumentoAdjuntoResponse, RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
+import type { DocumentoAdjuntoResponse } from '../../../domain/models/Solicitud';
 import '../../styles/SolicitudDetailDocumentsCard.css';
 import { SolicitudDocRow } from './SolicitudDocRow';
 
