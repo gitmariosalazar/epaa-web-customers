@@ -20,7 +20,9 @@ export type SemanticColor =
   | 'rose'
   | 'fuchsia'
   | 'slate'
-  | 'violet';
+  | 'violet'
+  | 'magenta'
+  | 'gray';
 
 export interface ColorDefinition {
   base: string;
@@ -61,12 +63,13 @@ const MASTER_PALETTE_DATA: { name: SemanticColor; hex: string }[] = [
   { name: 'emerald', hex: '#10b981' },
   { name: 'green', hex: '#22c55e' },
   { name: 'yellow', hex: '#eab308' },
-  { name: 'violet', hex: '#7c3aed' }
+  { name: 'violet', hex: '#7c3aed' },
+  { name: 'magenta', hex: '#d946ef' },
+  { name: 'gray', hex: '#6b7280' }
 ];
 
-const PROFESSIONAL_HEX_PALETTE = MASTER_PALETTE_DATA.map(p => p.hex);
-const SEMANTIC_ORDERED_NAMES = MASTER_PALETTE_DATA.map(p => p.name);
-
+const PROFESSIONAL_HEX_PALETTE = MASTER_PALETTE_DATA.map((p) => p.hex);
+const SEMANTIC_ORDERED_NAMES = MASTER_PALETTE_DATA.map((p) => p.name);
 
 const SEMANTIC_MAP: Record<string, string> = {
   blue: '#3b82f6',
@@ -86,7 +89,9 @@ const SEMANTIC_MAP: Record<string, string> = {
   emerald: '#10b981',
   green: '#22c55e',
   yellow: '#eab308',
-  violet: '#7c3aed'
+  violet: '#7c3aed',
+  magenta: '#d946ef',
+  gray: '#6b7280'
 };
 
 export class ChartColorService implements IChartColorService {

@@ -1,0 +1,96 @@
+/* ── Container — single flat flex row ────────────────────────────────── */
+.payment-filters {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 0.75rem 1rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.payment-filters .filter-section-left,
+.payment-filters .filter-section-right {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  flex: 0 1 auto;
+}
+
+.payment-filters .filter-section-left {
+  justify-content: flex-start;
+}
+
+.payment-filters .filter-section-right {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+
+/* ── Individual group ────────────────────────────────────────────────── */
+.payment-filters .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: max-content;
+  flex: 0 0 auto;
+  width: max-content;
+}
+
+.payment-filters .filter-group--range {
+  min-width: unset;
+}
+
+.payment-filters .filter-group--search {
+  flex: 0 0 auto;
+}
+
+
+/* ── Label ───────────────────────────────────────────────────────────── */
+.payment-filters .filter-label {
+  font-size: 0.675rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Input wrapper ───────────────────────────────────────────────────── */
+.payment-filters .filter-input-wrapper {
+  position: relative;
+  width: max-content;
+}
+
+.payment-filters .filter-input-wrapper.full-width {
+  width: 100%;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────── */
+.filter-button-spinner {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 
+   REMOVED: Legacy height overrides.
+   Utilizing standardized 'compact' size (34px) from global components.
+*/

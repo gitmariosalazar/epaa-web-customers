@@ -1,4 +1,4 @@
-import type { AuthSession, LoginCredentials, RegisterCredentials } from '../models/Auth';
+import type { AuthSession, LoginCredentials, RegisterCredentials, VerifyUserRequest, VerifyUserResult } from '../models/Auth';
 
 export interface AuthRepository {
   signIn(credentials: LoginCredentials): Promise<AuthSession>;
@@ -7,4 +7,5 @@ export interface AuthRepository {
   refreshToken(): Promise<AuthSession>;
   registerNatural(payload: any): Promise<any>;
   registerCompany(payload: any): Promise<any>;
+  verifyUser(payload: VerifyUserRequest): Promise<VerifyUserResult>;
 }

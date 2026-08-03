@@ -1,0 +1,251 @@
+.connection-datalist-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0.5rem;
+}
+
+.connection-card-data-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  background-color: var(--surface);
+  color: var(--text-color);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  min-height: 125px;
+}
+
+/* Agua Potable Specifics */
+.connection-card-data-list.card-agua {
+  background: var(--water-background);
+  border: var(--water-border);
+}
+.connection-card-data-list.card-agua:hover {
+  border: var(--water-border-hover);
+  box-shadow: var(--water-shadow);
+  transform: translateY(-2px);
+  background: var(--water-gradient);
+}
+
+/* Alcantarillado Specifics */
+.connection-card-data-list.card-alcantarillado {
+  background: var(--sewer-background);
+  border: var(--sewer-border);
+}
+.connection-card-data-list.card-alcantarillado:hover {
+  border: var(--sewer-border-hover);
+  box-shadow: var(--sewer-shadow);
+  transform: translateY(-2px);
+  background: var(--sewer-gradient);
+}
+
+.connection-card-icon-data-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #0ea5e9;
+  flex-shrink: 0;
+  width: 60px;
+}
+
+.connection-card-icon-data-list.agua {
+  color: var(--water-icon);
+  background-color: var(--water-background-hover);
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: var(--water-shadow);
+  border: var(--water-border);
+}
+
+.connection-card-icon-data-list.alcantarillado {
+  color: var(--sewer-icon);
+  background-color: var(--sewer-background-hover);
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: var(--sewer-shadow);
+  border: var(--sewer-border);
+}
+
+.connection-card-content-data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.connection-card-header-data-list {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.connection-card-header-data-list h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.connection-card-meta-data-list {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.connection-card-tags-data-list,
+.connection-card-stats-data-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.connection-card-tags-data-list span,
+.connection-card-stats-data-list span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.connection-card-stats-data-list strong {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.stat-alert {
+  color: #ef4444 !important;
+  font-weight: 600;
+}
+
+.stat-ok {
+  color: #10b981 !important;
+}
+
+.connection-card-actions-wrapper-data-list {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.connection-card-buttons-data-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.connection-card-side-actions-data-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  border-left: 1px solid var(--border-color);
+  padding-left: 1rem;
+}
+
+/* Custom button styles to match the Portainer-like look */
+.conn-action-btn-data-list {
+  width: 130px;
+  justify-content: center;
+}
+
+/* --- Responsive Adjustments --- */
+@media (min-width: 631px) and (max-width: 800px) {
+  .connection-card-data-list {
+    align-items: flex-start;
+    min-height: auto;
+  }
+
+  .connection-card-actions-wrapper-data-list {
+    width: 100%;
+    margin-left: 0;
+    flex-direction: column;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    gap: 0.75rem;
+  }
+
+  .connection-card-buttons-data-list {
+    flex-direction: row;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .conn-action-btn-data-list {
+    flex: 1;
+    width: auto;
+  }
+
+  .connection-card-side-actions-data-list {
+    flex-direction: row;
+    justify-content: space-evenly;
+    border-left: none;
+    border-top: 1px dashed var(--border-color);
+    padding-left: 0;
+    padding-top: 0.75rem;
+    gap: 1rem;
+  }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 630px) {
+  .connection-card-data-list {
+    align-items: flex-start;
+    min-height: auto;
+    position: relative;
+  }
+
+  .connection-card-icon-data-list {
+    text-align: center;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 100% !important;
+  }
+
+  .connection-card-actions-wrapper-data-list {
+    width: 100%;
+    margin-left: 0;
+    flex-direction: column;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    gap: 0.75rem;
+  }
+
+  .connection-card-buttons-data-list {
+    flex-direction: row;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .conn-action-btn-data-list {
+    flex: 1;
+    width: auto;
+  }
+
+  .connection-card-side-actions-data-list {
+    flex-direction: row;
+    justify-content: space-evenly;
+    border-left: none;
+    border-top: 1px dashed var(--border-color);
+    padding-left: 0;
+    padding-top: 0.75rem;
+    gap: 1rem;
+  }
+}

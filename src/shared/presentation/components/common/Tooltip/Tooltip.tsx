@@ -251,6 +251,9 @@ export const Tooltip: React.FC<TooltipProps> = ({
       className={`tooltip-container ${className}`}
       style={style}
       onMouseEnter={(e: React.MouseEvent) => {
+        // Prevent events bubbling from React portals (like dropdowns)
+        if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) return;
+        
         if (!disabled) {
           if (followCursor) setMouseCoords({ x: e.clientX, y: e.clientY });
           setIsVisible(true);
@@ -258,6 +261,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
         onMouseEnter?.(e);
       }}
       onMouseMove={(e: React.MouseEvent) => {
+        if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) return;
+        
         if (!disabled && followCursor) {
           setMouseCoords({ x: e.clientX, y: e.clientY });
         }
@@ -268,6 +273,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
         onMouseLeave?.(e);
       }}
       onClick={(e: React.MouseEvent) => {
+        setIsVisible(false);
         onClick?.(e);
       }}
     >
@@ -284,7 +290,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
               opacity: 1,
               visibility: 'visible',
               transition: 'opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              zIndex: 30000,
+              zIndex: 9999999,
               display: 'flex',
               alignItems: 'center',
               gap: '8px',

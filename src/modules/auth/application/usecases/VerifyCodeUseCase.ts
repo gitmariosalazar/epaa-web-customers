@@ -10,8 +10,12 @@ export class VerifyCodeUseCase {
   async execute(
     clienteUsuarioId: string,
     codigo: string,
-    tipoCodigo = 'EMAIL_CODE',
+    tipoCodigo = 'EMAIL_CODE'
   ): Promise<{ verified: boolean; message: string }> {
-    return this.repo.verifyCode(clienteUsuarioId, codigo, tipoCodigo);
+    return this.repo.verifyCode(
+      clienteUsuarioId,
+      codigo,
+      tipoCodigo
+    );
   }
 }

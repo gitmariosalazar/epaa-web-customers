@@ -66,8 +66,20 @@ export class EcuadorDateService implements IDateService {
       if (isNaN(d.getTime())) {
         return String(date || '');
       }
-      return new Intl.DateTimeFormat(this.locale, {
+
+      const baseOptions: Intl.DateTimeFormatOptions = {
         timeZone: this.timeZone,
+        hour12: false
+      };
+
+      if (!options || Object.keys(options).length === 0) {
+        baseOptions.day = '2-digit';
+        baseOptions.month = '2-digit';
+        baseOptions.year = 'numeric';
+      }
+
+      return new Intl.DateTimeFormat(this.locale, {
+        ...baseOptions,
         ...options
       }).format(d);
     } catch (error) {
@@ -102,6 +114,60 @@ export class EcuadorDateService implements IDateService {
       hour12: false
     });
     return formatter.format(d);
+  }
+
+  // Returns "YYYY-MM-DD HH:mm:ss" in Ecuador timezone.
+  // Example: new Date() → "2026-05-03 14:30:45"
+  formatToDateTimeString(date: Date | string | number): string {
+    const d = new Date(date);
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: this.timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).formatToParts(d);
+
+    const get = (type: string) =>
+      parts.find((p) => p.type === type)?.value ?? '00';
+
+    return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`;
+  }
+
+  // Returns "YYYY-NOMBRE_MES" in uppercase Spanish.
+  // Accepts a Date, a timestamp number, or a "YYYY-MM" / "YYYY-MM-DD" string.
+  // Examples: "2026-05" → "2026-MAYO"  |  new Date() → "2026-MAYO"
+  getMonthString(date: Date | string | number): string {
+    // If input is a "YYYY-MM" string, append "-01T12:00:00" so Date can parse it correctly
+    // If input is a "YYYY-MM-DD" string, append "T12:00:00" to avoid timezone shift to previous day
+    let normalized = date;
+    if (typeof date === 'string') {
+      if (/^\d{4}-\d{2}$/.test(date)) {
+        normalized = `${date}-01T12:00:00`;
+      } else if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        normalized = `${date}T12:00:00`;
+      }
+    }
+
+    const d = new Date(normalized);
+
+    const yearFormatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: this.timeZone,
+      year: 'numeric'
+    });
+
+    const monthFormatter = new Intl.DateTimeFormat('es-ES', {
+      timeZone: this.timeZone,
+      month: 'long'
+    });
+
+    const year = yearFormatter.format(d);
+    const month = monthFormatter.format(d).toUpperCase();
+
+    return `${year}-${month}`;
   }
 }
 

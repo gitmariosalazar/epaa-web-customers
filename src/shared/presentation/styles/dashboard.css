@@ -144,34 +144,54 @@
   margin: 0;
 }
 
-/* Icon Colors */
-.icon-blue {
-  color: #3b82f6;
-  background-color: #dbeafe;
-}
-.icon-green {
-  color: #10b981;
-  background-color: #d1fae5;
-}
-.icon-cyan {
-  color: #06b6d4;
-  background-color: #cffafe;
-}
-.icon-yellow {
-  color: #f59e0b;
-  background-color: #fef3c7;
-}
-.icon-indigo {
-  color: #6366f1;
-  background-color: #e0e7ff;
-}
-.icon-red {
-  color: #ef4444;
-  background-color: #fee2e2;
-}
-.icon-purple {
-  color: #8b5cf6;
-  background-color: #ede9fe;
+/* Icon Colors - Adaptive Light/Dark using variables and color-mix */
+.icon-blue { --icon-color: #3b82f6; }
+.icon-sky { --icon-color: #0ea5e9; }
+.icon-cyan { --icon-color: #06b6d4; }
+.icon-teal { --icon-color: #14b8a6; }
+.icon-emerald { --icon-color: #10b981; }
+.icon-green { --icon-color: #22c55e; }
+.icon-lime { --icon-color: #84cc16; }
+.icon-yellow { --icon-color: #eab308; }
+.icon-amber { --icon-color: #f59e0b; }
+.icon-orange { --icon-color: #f97316; }
+.icon-red { --icon-color: #ef4444; }
+.icon-rose { --icon-color: #f43f5e; }
+.icon-pink { --icon-color: #ec4899; }
+.icon-fuchsia { --icon-color: #d946ef; }
+.icon-magenta { --icon-color: #d946ef; }
+.icon-purple { --icon-color: #a855f7; }
+.icon-violet { --icon-color: #8b5cf6; }
+.icon-indigo { --icon-color: #6366f1; }
+.icon-slate { --icon-color: #64748b; }
+.icon-gray { --icon-color: #6b7280; }
+
+/* Dark mode: slightly brighten the colors for better contrast */
+.dark .icon-blue { --icon-color: #60a5fa; }
+.dark .icon-sky { --icon-color: #38bdf8; }
+.dark .icon-cyan { --icon-color: #22d3ee; }
+.dark .icon-teal { --icon-color: #2dd4bf; }
+.dark .icon-emerald { --icon-color: #34d399; }
+.dark .icon-green { --icon-color: #4ade80; }
+.dark .icon-lime { --icon-color: #a3e635; }
+.dark .icon-yellow { --icon-color: #fde047; }
+.dark .icon-amber { --icon-color: #fbbf24; }
+.dark .icon-orange { --icon-color: #fb923c; }
+.dark .icon-red { --icon-color: #f87171; }
+.dark .icon-rose { --icon-color: #fb7185; }
+.dark .icon-pink { --icon-color: #f472b6; }
+.dark .icon-fuchsia { --icon-color: #e879f9; }
+.dark .icon-magenta { --icon-color: #e879f9; }
+.dark .icon-purple { --icon-color: #c084fc; }
+.dark .icon-violet { --icon-color: #a78bfa; }
+.dark .icon-indigo { --icon-color: #818cf8; }
+.dark .icon-slate { --icon-color: #94a3b8; }
+.dark .icon-gray { --icon-color: #9ca3af; }
+
+/* Apply to all icon classes */
+.icon-blue, .icon-sky, .icon-cyan, .icon-teal, .icon-emerald, .icon-green, .icon-lime, .icon-yellow, .icon-amber, .icon-orange, .icon-red, .icon-rose, .icon-pink, .icon-fuchsia, .icon-magenta, .icon-purple, .icon-violet, .icon-indigo, .icon-slate, .icon-gray {
+  color: var(--icon-color);
+  background-color: color-mix(in srgb, var(--icon-color) 15%, transparent);
 }
 
 /* Dashboard New Grid Layout */

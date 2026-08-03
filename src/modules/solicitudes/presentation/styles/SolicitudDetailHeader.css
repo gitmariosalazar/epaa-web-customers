@@ -7,7 +7,6 @@
 .sol-detail-header-nav__info {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
 }
 
 .sol-detail-header-nav__title {
@@ -20,4 +19,16 @@
 .sol-detail-header-nav__subtitle {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.sol-detail-header-nav__analist {
+  display: flex;
+  width: auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sol-detail-header-nav__analist__label {
+  font-size: 0.875rem;
+  color: var(--text-main);
 }

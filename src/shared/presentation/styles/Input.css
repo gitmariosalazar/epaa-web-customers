@@ -207,8 +207,10 @@ select.input__field {
 }
 
 /* Read-only / disabled style overrides */
-.input__field[readonly],
-.input__field:read-only {
+input.input__field[readonly],
+input.input__field:read-only,
+textarea.input__field[readonly],
+textarea.input__field:read-only {
   background-color: color-mix(in srgb, var(--surface) 60%, var(--background-page, #1a202c)) !important;
   color: var(--text-muted) !important;
   border-color: color-mix(in srgb, var(--border-color) 60%, transparent) !important;
@@ -216,13 +218,17 @@ select.input__field {
   caret-color: transparent !important; /* Hide blinking cursor */
 }
 
-.input__field[readonly]:hover,
-.input__field:read-only:hover {
+input.input__field[readonly]:hover,
+input.input__field:read-only:hover,
+textarea.input__field[readonly]:hover,
+textarea.input__field:read-only:hover {
   border-color: color-mix(in srgb, var(--border-color) 60%, transparent) !important;
 }
 
-.input__field[readonly]:focus,
-.input__field:read-only:focus {
+input.input__field[readonly]:focus,
+input.input__field:read-only:focus,
+textarea.input__field[readonly]:focus,
+textarea.input__field:read-only:focus {
   border-color: color-mix(in srgb, var(--border-color) 60%, transparent) !important;
   box-shadow: none !important;
 }

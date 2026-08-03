@@ -14,12 +14,14 @@ interface PersonalDataStepProps {
   errors?: Record<string, string>;
 }
 
+
 export const PersonalDataStep: React.FC<PersonalDataStepProps> = ({
   form,
   tramite,
   onDetallesChange,
   errors
 }) => {
+  const fullName: string = form.tipo_persona === 'JURIDICA' ? `${form.nombres}` : `${form.nombres} ${form.apellidos}`
   return (
     <div className="solicitud-form-section">
       <div className="solicitud-form-section__header">
@@ -35,12 +37,11 @@ export const PersonalDataStep: React.FC<PersonalDataStepProps> = ({
 
         <div className="solicitud-titular-card__avatar">
           <div className="solicitur-titular-card__avatar-inner">
-            {form.nombres.charAt(0) || '👤'}
-            {form.apellidos.charAt(0) || ''}
+            {fullName.charAt(0).toUpperCase() || '👤'}
           </div>
           <div>
             <h4 className="solicitud-titular-card__name">
-              {form.nombres} {form.apellidos}
+              {fullName}
             </h4>
             <p className="solicitud-titular-card__role">
               Cliente Registrado EPAA-AA
@@ -131,6 +132,7 @@ export const PersonalDataStep: React.FC<PersonalDataStepProps> = ({
               provinceId={form.detalles?.provinceId || ''}
               cantonId={form.detalles?.cantonId || ''}
               parishId={form.detalles?.parishId || ''}
+              size='small'
               onLocationChange={(location) =>
                 onDetallesChange({
                   ...form.detalles,

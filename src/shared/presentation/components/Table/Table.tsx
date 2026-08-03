@@ -20,6 +20,13 @@ import { Tooltip } from '../common/Tooltip/Tooltip';
 import { Modal } from '../Modal/Modal';
 import { HiViewGridAdd } from 'react-icons/hi';
 import { CircularProgress } from '../CircularProgress';
+import { Select } from '../Input/Select';
+import { TbFilter2Search } from 'react-icons/tb';
+import type { FilterModel } from './types/TableFilter';
+import { applyTableFilters } from './utils/filterUtils';
+import { TableFilterModal } from './TableFilterModal';
+import { TableSortModal } from './TableSortModal';
+
 
 export interface Column<T> {
   header: string;
@@ -30,6 +37,8 @@ export interface Column<T> {
   sortKey?: keyof T;
   isNumeric?: boolean;
   id?: string;
+  isColumnVisible?: boolean;
+  filterValueGetter?: (item: T) => any;
 }
 
 export interface SummaryRow {
@@ -74,6 +83,10 @@ interface TableProps<T> {
   showColumnModal?: boolean;
   showTotalRecords?: boolean;
   showRowsPerPage?: boolean;
+  showFilters?: boolean;
+  filterModel?: FilterModel[];
+  onFilterModelChange?: (model: FilterModel[]) => void;
+  disableLocalFiltering?: boolean;
 }
 
 export const Table = <T extends { [key: string]: any }>({
@@ -100,15 +113,48 @@ export const Table = <T extends { [key: string]: any }>({
   hasMore,
   showColumnModal = true,
   showTotalRecords = true,
-  showRowsPerPage = true
+  showRowsPerPage = true,
+  showFilters = true,
+  filterModel,
+  onFilterModelChange,
+  disableLocalFiltering = false
 }: TableProps<T>) => {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = React.useState(1);
   const [currentLimit, setCurrentLimit] = React.useState(pageSize);
   const [hiddenColumnKeys, setHiddenColumnKeys] = React.useState<Set<string>>(
-    new Set()
+    () => {
+      const initialHidden = new Set<string>();
+      columns.forEach((col, index) => {
+        if (col.isColumnVisible === false) {
+          const key =
+            col.id ||
+            (typeof col.accessor === 'string' ? col.accessor : `col-${index}`);
+          initialHidden.add(key);
+        }
+      });
+      return initialHidden;
+    }
   );
   const [isColumnModalOpen, setIsColumnModalOpen] = React.useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
+  const [filterAnchorEl, setFilterAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [internalFilters, setInternalFilters] = React.useState<FilterModel[]>([]);
+
+
+  const [isSortModalOpen, setIsSortModalOpen] = React.useState(false);
+  const [sortAnchorEl, setSortAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  const filters = filterModel !== undefined ? filterModel : internalFilters;
+
+  const handleFilterChange = React.useCallback(
+    (newFilters: FilterModel[]) => {
+      setInternalFilters(newFilters);
+      onFilterModelChange?.(newFilters);
+      setCurrentPage(1);
+    },
+    [onFilterModelChange]
+  );
 
   const [draftHiddenColumns, setDraftHiddenColumns] = React.useState<
     Set<string>
@@ -153,14 +199,21 @@ export const Table = <T extends { [key: string]: any }>({
     setCurrentLimit(pageSize);
   }, [pageSize]);
 
+  const processedData = React.useMemo(() => {
+    if (disableLocalFiltering || filters.length === 0) {
+      return data;
+    }
+    return applyTableFilters(data, filters, columns);
+  }, [data, filters, columns, disableLocalFiltering]);
+
   // Adjust page when data changes (e.g. new search or data refresh)
   React.useEffect(() => {
-    const totalPages = Math.ceil(data.length / currentLimit);
+    const totalPages = Math.ceil(processedData.length / currentLimit);
     // Only reset if current page is out of bounds
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(1);
     }
-  }, [data, currentLimit, currentPage]);
+  }, [processedData, currentLimit, currentPage]);
 
   const handleSort = (key: keyof T | string) => {
     if (!onSort) return;
@@ -193,10 +246,10 @@ export const Table = <T extends { [key: string]: any }>({
   }, [onEndReached, hasMore]);
 
   const hasExports = !!(onExportExcel || onExportPdf);
-  const totalPages = Math.ceil(data.length / currentLimit);
+  const totalPages = Math.ceil(processedData.length / currentLimit);
   const paginatedData = pagination
-    ? data.slice((currentPage - 1) * currentLimit, currentPage * currentLimit)
-    : data;
+    ? processedData.slice((currentPage - 1) * currentLimit, currentPage * currentLimit)
+    : processedData;
 
   const handlePrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const handleNext = () => {
@@ -214,9 +267,8 @@ export const Table = <T extends { [key: string]: any }>({
 
   return (
     <div
-      className={`table-container table--w-${width} ${
-        fullHeight ? 'table--full-height' : ''
-      } ${containerClassName}`}
+      className={`table-container table--w-${width} ${fullHeight ? 'table--full-height' : ''
+        } ${containerClassName}`}
       style={containerStyle}
     >
       <div className="table-body-wrapper">
@@ -227,13 +279,14 @@ export const Table = <T extends { [key: string]: any }>({
                 const isSortable = col.sortable;
                 const sortKey =
                   col.sortKey ||
+                  col.id ||
                   (typeof col.accessor === 'string' ? col.accessor : undefined);
                 const isSorted = sortConfig?.key === sortKey;
 
                 return (
                   <th
                     key={index}
-                    className={col.className}
+                    className={`table-column-header ${col.className}`}
                     style={{
                       ...col.style,
                       cursor: isSortable ? 'pointer' : 'default',
@@ -280,9 +333,8 @@ export const Table = <T extends { [key: string]: any }>({
                 const customClassName = getRowClassName
                   ? getRowClassName(item)
                   : '';
-                const rowClassName = `table-row ${
-                  rowColor ? `table-row--${rowColor}` : ''
-                } ${customClassName}`.trim();
+                const rowClassName = `table-row ${rowColor ? `table-row--${rowColor}` : ''
+                  } ${customClassName}`.trim();
 
                 return (
                   <tr key={rowIndex} className={rowClassName}>
@@ -311,27 +363,27 @@ export const Table = <T extends { [key: string]: any }>({
                 >
                   {isLoading
                     ? loadingState || (
-                        <div
-                          className="table-loader"
-                          style={{ padding: '2rem' }}
-                        >
-                          <div className="spinner"></div>
-                          {t('common.table.loading')}
-                        </div>
-                      )
+                      <div
+                        className="table-loader"
+                        style={{ padding: '2rem' }}
+                      >
+                        <div className="spinner"></div>
+                        {t('common.table.loading')}
+                      </div>
+                    )
                     : emptyState || (
-                        <div className="default-empty-state">
-                          <EmptyState
-                            message={t('common.table.noData')}
-                            icon={SearchX}
-                            minHeight="300px"
-                          />
-                        </div>
-                      )}
+                      <div className="default-empty-state">
+                        <EmptyState
+                          message={t('common.table.noData')}
+                          icon={SearchX}
+                          minHeight="300px"
+                        />
+                      </div>
+                    )}
                 </td>
               </tr>
             )}
-            {data && data.length > 0 && (
+            {processedData && processedData.length > 0 && (
               <tr
                 className="table-row--spacer"
                 style={{ height: '100%', background: 'transparent' }}
@@ -423,9 +475,9 @@ export const Table = <T extends { [key: string]: any }>({
                       totalContent =
                         typeof matchingTotal.value === 'number'
                           ? new Intl.NumberFormat('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            }).format(matchingTotal.value)
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          }).format(matchingTotal.value)
                           : matchingTotal.value;
                       if (matchingTotal.percentage) {
                         totalContent = (
@@ -481,9 +533,8 @@ export const Table = <T extends { [key: string]: any }>({
             {summaryRows.map((row, idx) => (
               <div
                 key={idx}
-                className={`table-summary-row ${
-                  row.highlight ? 'table-summary-row--highlight' : ''
-                }`}
+                className={`table-summary-row ${row.highlight ? 'table-summary-row--highlight' : ''
+                  }`}
               >
                 <div className="table-summary-label">
                   <span>{row.label}</span>
@@ -496,9 +547,9 @@ export const Table = <T extends { [key: string]: any }>({
                 <div className="table-summary-value">
                   {typeof row.value === 'number'
                     ? new Intl.NumberFormat('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      }).format(row.value)
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    }).format(row.value)
                     : row.value}
                 </div>
               </div>
@@ -533,12 +584,59 @@ export const Table = <T extends { [key: string]: any }>({
               </Tooltip>
             </div>
           )}
+          {columns.some(c => c.sortable) && onSort && (
+            <div className="table-hide-unhide-columns">
+              <Tooltip
+                content={t('common.table.sortBy', 'Ordenar')}
+                position="top"
+                followCursor={false}
+                themeColor="primary"
+              >
+                <Button
+                  variant="dashed"
+                  color="blue"
+                  iconOnly
+                  size="xs"
+                  leftIcon={<ArrowUpDown size={20} />}
+                  onClick={(e) => {
+                    setSortAnchorEl(e.currentTarget);
+                    setIsSortModalOpen(true);
+                  }}
+                />
+              </Tooltip>
+            </div>
+          )}
+          {showFilters && (
+            <div className="table-hide-unhide-columns">
+              <Tooltip
+                content={t(
+                  'common.table.filters',
+                  'Filtros'
+                )}
+                position="top"
+                followCursor={false}
+                themeColor="primary"
+              >
+                <Button
+                  variant="dashed"
+                  color="warning"
+                  iconOnly
+                  size="xs"
+                  leftIcon={<TbFilter2Search size={18} />}
+                  onClick={(e) => {
+                    setFilterAnchorEl(e.currentTarget);
+                    setIsFilterModalOpen(true);
+                  }}
+                />
+              </Tooltip>
+            </div>
+          )}
           <div className="table-pagination-left">
             {showTotalRecords && (
               <span className="table-pagination-records">
                 {t('common.table.totalRecords', {
-                  count: data.length,
-                  defaultValue: `Total: ${data.length}${hasMore ? '+' : ''}`
+                  count: processedData.length,
+                  defaultValue: `Total: ${processedData.length}${hasMore ? '+' : ''}`
                 })}
               </span>
             )}
@@ -559,21 +657,21 @@ export const Table = <T extends { [key: string]: any }>({
                     defaultValue: 'Mostrar:'
                   })}
                 </span>
-                <Tooltip content={t('common.table.rowsPerPage', 'Mostrar:')}>
-                  <select
+                <Tooltip content={t('common.table.rowsPerPage', 'Mostrar:')} followCursor={false}>
+                  <Select
                     value={currentLimit}
                     onChange={(e) => {
                       setCurrentLimit(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="table-rows-select"
+                    size="small"
                   >
                     {[5, 10, 15, 20, 50, 100].map((val) => (
                       <option key={val} value={val}>
                         {val}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </Tooltip>
               </div>
             )}
@@ -648,7 +746,7 @@ export const Table = <T extends { [key: string]: any }>({
                     color="green"
                     iconOnly
                     size="xs"
-                    disabled={data.length === 0}
+                    disabled={processedData.length === 0}
                     leftIcon={ColoredIcons.Excel}
                   />
                 </Tooltip>
@@ -666,7 +764,7 @@ export const Table = <T extends { [key: string]: any }>({
                     color="red"
                     iconOnly
                     size="xs"
-                    disabled={data.length === 0}
+                    disabled={processedData.length === 0}
                     leftIcon={ColoredIcons.Pdf}
                   />
                 </Tooltip>
@@ -843,6 +941,32 @@ export const Table = <T extends { [key: string]: any }>({
           </div>
         </div>
       </Modal>
+
+      <TableFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => {
+          setIsFilterModalOpen(false);
+          setFilterAnchorEl(null);
+        }}
+        columns={columns}
+        initialFilters={filters}
+        onApply={handleFilterChange}
+        getColumnKey={getColumnKey}
+        anchorElement={filterAnchorEl}
+      />
+      {isSortModalOpen && (
+        <TableSortModal
+          isOpen={isSortModalOpen}
+          onClose={() => {
+            setIsSortModalOpen(false);
+            setSortAnchorEl(null);
+          }}
+          columns={columns}
+          sortConfig={sortConfig || null}
+          onSort={(key, dir) => onSort?.(key, dir)}
+          anchorElement={sortAnchorEl}
+        />
+      )}
     </div>
   );
 };

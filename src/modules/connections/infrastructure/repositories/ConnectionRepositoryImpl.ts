@@ -1,0 +1,181 @@
+import type { HttpClientInterface } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
+import type {
+  Connection,
+  ConnectionAndPropertyResponse,
+  ConnectionWithProperty,
+  Rate
+} from '../../domain/models/Connection';
+import type {
+  ConnectionRepository,
+  CreateConnectionRequest,
+  UpdateConnectionRequest
+} from '../../domain/repositories/ConnectionRepository';
+import type {
+  DashboardAdvanceResponse,
+  LiveMapConnectionResponse
+} from '../../domain/models/DashboardStats';
+import type { ApiResponse } from '@/shared/infrastructure/api/response/ApiResponse';
+import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
+import type {
+  ClientDashboardResponse,
+  ConnectionDashboardResponse
+} from '../../domain/models/view-dashboard.response';
+
+export class ConnectionRepositoryImpl implements ConnectionRepository {
+  private readonly client: HttpClientInterface;
+  constructor(client: HttpClientInterface = apiClient) {
+    this.client = client;
+  }
+
+  async getAdvanceDashboardStats(): Promise<DashboardAdvanceResponse> {
+    const response = await this.client.get<
+      ApiResponse<DashboardAdvanceResponse>
+    >('/connections/dashboard/advancement-stats');
+    return response.data.data;
+  }
+
+  async getLiveUpdateMapConnections(): Promise<LiveMapConnectionResponse[]> {
+    const response = await this.client.get<
+      ApiResponse<LiveMapConnectionResponse[]>
+    >('/connections/live-update-map-connections');
+    return response.data.data;
+  }
+
+  async getConnections(
+    limit: number,
+    offset: number,
+    query?: string,
+    hasIncidents?: 'yes' | 'no',
+    status?: string,
+    sewerage?: 'yes' | 'no',
+    hasCoordinates?: 'yes' | 'no',
+    searchField?: string
+  ): Promise<Connection[]> {
+    const response = await this.client.get<ApiResponse<Connection[]>>(
+      `/connections/get-connections-paginated`,
+      {
+        params: {
+          limit,
+          offset,
+          ...(query ? { query } : {}),
+          ...(hasIncidents ? { hasIncidents } : {}),
+          ...(status ? { status } : {}),
+          ...(sewerage ? { sewerage } : {}),
+          ...(hasCoordinates ? { hasCoordinates } : {}),
+          ...(searchField ? { searchField } : {})
+        }
+      }
+    );
+    return response.data.data;
+  }
+
+  async createConnection(
+    connection: CreateConnectionRequest
+  ): Promise<Connection> {
+    const response = await this.client.post<ApiResponse<Connection>>(
+      '/connections/create-connection',
+      connection
+    );
+    return response.data.data;
+  }
+
+  async updateConnection(
+    id: string,
+    connection: UpdateConnectionRequest
+  ): Promise<Connection> {
+    const response = await this.client.put<ApiResponse<Connection>>(
+      `/connections/update-connection/${id}`,
+      connection
+    );
+    return response.data.data;
+  }
+
+  async deleteConnection(id: string): Promise<void> {
+    await this.client.delete<ApiResponse<void>>(
+      `/connections/delete-connection/${id}`
+    );
+  }
+  async getRates(): Promise<Rate[]> {
+    const response = await this.client.get<ApiResponse<Rate[]>>(
+      '/connection-gateway/get-all-rates'
+    );
+    return response.data.data;
+  }
+
+  async findConnectionWithPropertyByCadastralKey(
+    cadastralKey: string
+  ): Promise<ConnectionWithProperty | null> {
+    const response = await this.client.get<ApiResponse<ConnectionWithProperty>>(
+      `/connections/find-connection-with-property-by-cadastral-key/${cadastralKey}`
+    );
+    return response.data.data;
+  }
+
+  async findConnectionsBySector(
+    sector: string,
+    limit: number,
+    offset: number
+  ): Promise<Connection[]> {
+    const response = await this.client.get<ApiResponse<Connection[]>>(
+      `/connections/find-connections-by-sector/${sector}`,
+      {
+        params: {
+          limit,
+          offset
+        }
+      }
+    );
+    return response.data.data;
+  }
+
+  async findAllConnectionsByClientId(
+    clientId: string,
+    limit: number,
+    offset: number
+  ): Promise<Connection[]> {
+    const response = await this.client.get<ApiResponse<Connection[]>>(
+      `/connections/find-connections-by-client-id/${clientId}`,
+      {
+        params: {
+          limit,
+          offset
+        }
+      }
+    );
+    return response.data.data;
+  }
+
+  async findConnectionAndPropertyByCadastralKeyOrCardId(
+    searchValue: string,
+    limit: number,
+    offset: number
+  ): Promise<ConnectionAndPropertyResponse[]> {
+    const response = await this.client.get<
+      ApiResponse<ConnectionAndPropertyResponse[]>
+    >(`/connections/find-connection-by-cadastral-key-or-card-id/${searchValue}`, {
+      params: {
+        limit,
+        offset
+      }
+    });
+    return response.data.data;
+  }
+
+  async getDashboardGlobalClientId(
+    clientId: string
+  ): Promise<ClientDashboardResponse | null> {
+    const response = await this.client.get<
+      ApiResponse<ClientDashboardResponse>
+    >(`/connections/get-dashboard-global-client-id/${clientId}`);
+    return response.data.data;
+  }
+
+  async getDashboardConnectionsByClientId(
+    clientId: string
+  ): Promise<ConnectionDashboardResponse[]> {
+    const response = await this.client.get<
+      ApiResponse<ConnectionDashboardResponse[]>
+    >(`/connections/get-dashboard-connections-by-client-id/${clientId}`);
+    return response.data.data;
+  }
+}

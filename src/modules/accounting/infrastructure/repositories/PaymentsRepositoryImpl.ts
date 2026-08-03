@@ -1,0 +1,100 @@
+import type { HttpClientInterface } from '@/shared/infrastructure/api/interfaces/HttpClientInterface';
+import type { PaymentsRepository } from '../../domain/repositories/PaymentsRepository';
+import type { PaymentReading } from '../../domain/models/PaymentReading';
+import type { ApiResponse } from '@/shared/infrastructure/api/response/ApiResponse';
+import type { Payment } from '../../domain/models/Payment';
+import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
+import type {
+  MonthlyDebtSummary,
+  OverduePayment,
+  OverdueSummary,
+  YearlyOverdueSummary
+} from '../../domain/models/OverdueReading';
+import type { PendingReading } from '../../domain/models/PendingReading';
+
+export class PaymentsRepositoryImpl implements PaymentsRepository {
+  private readonly client: HttpClientInterface;
+
+  constructor(client: HttpClientInterface = apiClient) {
+    this.client = client;
+  }
+
+  private handleResponse<T>(data: any): T {
+    // Some endpoints return { data: [...] } while others return [...] directly.
+    if (data && typeof data === 'object' && 'data' in data) {
+      return data.data;
+    }
+    return data as T;
+  }
+
+  async findAllPaymentReadingPayrollsByDate(
+    paymentDate: string
+  ): Promise<PaymentReading[]> {
+    const response = await this.client.get<ApiResponse<PaymentReading[]>>(
+      `/accounting/find-payment-readings-by-payment-date/${paymentDate}`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findAllPaymentByDateAndOrderValue(
+    paymentDate: string,
+    orderValue: number
+  ): Promise<Payment[]> {
+    const response = await this.client.get<ApiResponse<Payment[]>>(
+      `/accounting/find-payment-by-payment-date-and-order/${paymentDate}/${orderValue}`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findAllPaymentsByDateRange(
+    initDate: string,
+    endDate: string,
+    limit: number,
+    offset: number
+  ): Promise<Payment[]> {
+    const response = await this.client.get<ApiResponse<Payment[]>>(
+      `/accounting/find-payment-by-init-date-and-end-date/${initDate}/${endDate}/${limit}/${offset}`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findAllOverduePayments(
+    limit?: number,
+    offset?: number
+  ): Promise<OverduePayment[]> {
+    const response = await this.client.get<ApiResponse<OverduePayment[]>>(
+      `/accounting/find-all-overdue-payments/${limit}/${offset}`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findPendingReadingsByCadastralKeyOrCardId(
+    searchValue: string
+  ): Promise<PendingReading[]> {
+    const response = await this.client.get<ApiResponse<PendingReading[]>>(
+      `/accounting/find-pending-reading-by-cadastral-key-or-card-id-all/${searchValue}`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findOverdueSummary(): Promise<OverdueSummary | null> {
+    const response = await this.client.get<ApiResponse<OverdueSummary>>(
+      `/accounting/find-overdue-summary`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findYearlyOverdueSummary(): Promise<YearlyOverdueSummary[]> {
+    const response = await this.client.get<ApiResponse<YearlyOverdueSummary[]>>(
+      `/accounting/find-yearly-overdue-summary`
+    );
+    return this.handleResponse(response.data);
+  }
+
+  async findMonthlyDebtSummary(): Promise<MonthlyDebtSummary[]> {
+    const response = await this.client.get<ApiResponse<MonthlyDebtSummary[]>>(
+      `/accounting/find-monthly-debt-summary`
+    );
+    return this.handleResponse(response.data);
+  }
+}

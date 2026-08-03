@@ -47,6 +47,21 @@
   --purple: #8b5cf6;
   --pink: #ec4899;
   --magenta: #d946ef;
+  --gray: #475569;
+
+  /* Agua Potable (Water) - Light Mode */
+  --water-background: #eff6ff; /* Blue 50 */
+  --water-background-hover: #dbeafe; /* Blue 100 */
+  --water-border: #3b82f6; /* Blue 500 */
+  --water-gradient: linear-gradient(145deg, #ffffff, #eff6ff);
+  --water-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+
+  /* Alcantarillado (Sewer) - Light Mode */
+  --sewer-background: #fff7ed; /* Orange 50 */
+  --sewer-background-hover: #ffedd5; /* Orange 100 */
+  --sewer-border: #f97316; /* Orange 500 */
+  --sewer-gradient: linear-gradient(145deg, #ffffff, #fff7ed);
+  --sewer-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -83,6 +98,8 @@
   --font-weight-black: 900;
 
   /*Typography sizes*/
+  --font-size-xs: 0.625rem;
+  --font-size-2xs: 0.5rem;
   --font-size-base: 0.875rem;
   --font-size-sm: 0.75rem;
   --font-size-md: 1rem;
@@ -115,12 +132,14 @@
 .dark {
   --primary: #f8fafc;
   --primary-light: #cbd5e1;
+  --accent-rgb: 59 130 246;
 
   --background: #020617; /* Slate 950 - Deep dark background */
   --surface: #0f172a; /* Slate 900 - Card background */
   --surface-hover: #1e293b; /* Slate 800 - Input/Hover background */
 
   --border-color: #1e293b; /* Slate 800 - Subtle border */
+  --border-hover: #334155; /* Slate 700 - Hover border */
 
   --text-main: #f8fafc; /* Slate 50 */
   --text-secondary: #94a3b8; /* Slate 400 */
@@ -138,4 +157,24 @@
   --table-row-hover: #1e293b; /* Slate 800 */
   --table-row-striped: #020617; /* Slate 950 - Darker alternate */
   --table-border: #1e293b; /* Slate 800 */
+
+  /* Agua Potable (Water) - Dark Mode */
+  --water-background: #0f172a; /* Slate 900 base */
+  --water-background-hover: #1e293b; /* Slate 800 */
+  --water-border: 1px solid #1c4c60; /* Sky 400 */
+  --water-border-hover: 1px solid #00b3ff; /* Sky 400 */
+  --water-icon: #38bdf8; /* Sky 400 */
+  --water-icon-hover: #006aff; /* Sky 400 */
+  --water-gradient: linear-gradient(145deg, #0f172a, rgba(2, 132, 199, 0.2));
+  --water-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+
+  /* Alcantarillado (Sewer) - Dark Mode */
+  --sewer-background: #0f172a; /* Slate 900 base */
+  --sewer-background-hover: #1e293b; /* Slate 800 */
+  --sewer-border: 1px solid #624126; /* Orange 400 */
+  --sewer-border-hover: 1px solid #ff7300; /* Orange 400 */
+  --sewer-icon: #fb923c; /* Orange 400 */
+  --sewer-icon-hover: #ff4400; /* Orange 400 */
+  --sewer-gradient: linear-gradient(145deg, #0f172a, rgba(234, 88, 12, 0.15));
+  --sewer-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
 }

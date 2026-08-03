@@ -1,0 +1,138 @@
+.carousel-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: var(--surface-light, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-container:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Sizing Variables */
+.carousel-size-xs {
+  min-height: 150px;
+  max-height: 200px;
+}
+.carousel-size-sm {
+  min-height: 250px;
+  max-height: 300px;
+}
+.carousel-size-md {
+  min-height: 350px;
+  max-height: 400px;
+}
+.carousel-size-lg {
+  min-height: 450px;
+  max-height: 500px;
+}
+.carousel-size-xl {
+  min-height: 600px;
+  max-height: 700px;
+}
+
+.carousel-track-wrapper {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Controls */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn-prev {
+  left: 1rem;
+}
+
+.carousel-btn-next {
+  right: 1rem;
+}
+
+/* Modal Expand Button */
+.carousel-expand-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.carousel-expand-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Dots */
+.carousel-dots {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 5px;
+  margin-bottom: -4px !important;
+}
+
+.carousel-dot:hover {
+  background-color: var(--magenta) !important;
+  box-shadow: 0 0 0 2px var(--magenta) !important;
+}
+
+.carousel-dot.active {
+  background-color: var(--magenta) !important;
+  box-shadow: 0 0 0 2px var(--magenta) !important;
+  transform: scale(1.1);
+  width: 34px;
+  border-radius: 9999px;
+}
+
+/* Dark mode overrides (if needed, although current variables should handle it) */
+.dark .carousel-container {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.05);
+}

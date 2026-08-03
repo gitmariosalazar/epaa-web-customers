@@ -1,7 +1,9 @@
 import type {
   AuthSession,
   LoginCredentials,
-  RegisterCredentials
+  RegisterCredentials,
+  VerifyUserRequest,
+  VerifyUserResult
 } from '@/modules/auth/domain/models/Auth';
 import type { AuthRepository } from '@/modules/auth/domain/repositories/AuthRepository';
 import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
@@ -66,6 +68,14 @@ export class AuthRepositoryImpl implements AuthRepository {
       '/customer-gateway/register-company',
       payload,
       { skipAuth: true }
+    );
+    return response.data.data;
+  }
+
+  async verifyUser(payload: VerifyUserRequest): Promise<VerifyUserResult> {
+    const response = await this.client.post<ApiResponse<VerifyUserResult>>(
+      '/auth/verify',
+      payload
     );
     return response.data.data;
   }

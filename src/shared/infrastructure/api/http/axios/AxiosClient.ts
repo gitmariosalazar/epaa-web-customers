@@ -1,42 +1,32 @@
 import axios, { type AxiosResponse, type AxiosRequestConfig } from 'axios';
-import type { HttpClientInterface, HttpRequestOptions } from '../../interfaces/HttpClientInterface';
+import type {
+  HttpClientInterface,
+  HttpRequestOptions
+} from '../../interfaces/HttpClientInterface';
 import type { ApiResponse } from '../../response/ApiResponse';
 import { environments } from '@/settings/environments/environments';
 import { localStorageService } from '@/shared/infrastructure/storage/LocalStorageService';
 import { dateService } from '@/shared/infrastructure/services/EcuadorDateService';
+import { tokenRefreshCoordinator } from '@/shared/infrastructure/services/TokenRefreshCoordinator';
 
 export class AxiosHttpClient implements HttpClientInterface {
   private axiosInstance = axios.create();
   private unauthorizedHandler?: (error: any) => Promise<void>;
 
-  // --- Queue to prevent multiple simultaneous refresh calls ---
-  private isRefreshing = false;
-  private failedQueue: {
-    resolve: (value: unknown) => void;
-    reject: (reason?: any) => void;
-  }[] = [];
-
   constructor() {
-    console.log(`AxiosHttpClient initialized with API URL: ${environments.API_URL}`);
+    console.log(
+      `AxiosHttpClient initialized with API URL: ${environments.API_URL}`
+    );
     this.setupResponseInterceptor();
-  }
-
-  private processQueue(error: any, token: string | null = null) {
-    this.failedQueue.forEach(({ resolve, reject }) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(token);
-      }
-    });
-    this.failedQueue = [];
   }
 
   private setupResponseInterceptor() {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        const originalRequest = error.config as AxiosRequestConfig & {
+          _retry?: boolean;
+        };
         if (!originalRequest) {
           return Promise.reject(error);
         }
@@ -63,59 +53,20 @@ export class AxiosHttpClient implements HttpClientInterface {
           return Promise.reject(error);
         }
 
-        // If already refreshing, queue this request
-        if (this.isRefreshing) {
-          return new Promise((resolve, reject) => {
-            this.failedQueue.push({ resolve, reject });
-          }).then((newToken) => {
-            originalRequest.headers = {
-              ...originalRequest.headers,
-              Authorization: `Bearer ${newToken}`
-            };
-            return this.axiosInstance(originalRequest);
-          });
-        }
-
-        // Start the refresh process
         originalRequest._retry = true;
-        this.isRefreshing = true;
-
-        const storedRefreshToken = localStorageService.getItem('refreshToken');
-        if (!storedRefreshToken) {
-          this.isRefreshing = false;
-          if (this.unauthorizedHandler) {
-            await this.unauthorizedHandler(error);
-          }
-          return Promise.reject(error);
-        }
 
         try {
-          const response: AxiosResponse = await this.axiosInstance.post(
-            `${environments.API_URL}/auth/refresh`,
-            { refreshToken: storedRefreshToken },
-            { withCredentials: true }
-          );
-
-          const session = response.data?.data;
-          const newAccessToken: string = session?.accessToken;
-          const newRefreshToken: string = session?.refreshToken;
-
-          if (!newAccessToken) throw new Error('No access token in refresh response');
-
-          localStorageService.setItem('token', newAccessToken);
-          if (newRefreshToken) {
-            localStorageService.setItem('refreshToken', newRefreshToken);
-          }
-
-          this.processQueue(null, newAccessToken);
+          // Shared with AuthContext's proactive refresh timer: concurrent
+          // callers await the same in-flight request instead of racing the
+          // backend's single-use refresh token rotation.
+          const session = await tokenRefreshCoordinator.refresh();
 
           originalRequest.headers = {
             ...originalRequest.headers,
-            Authorization: `Bearer ${newAccessToken}`
+            Authorization: `Bearer ${session.accessToken}`
           };
           return this.axiosInstance(originalRequest);
         } catch (refreshError) {
-          this.processQueue(refreshError, null);
           localStorageService.removeItem('token');
           localStorageService.removeItem('refreshToken');
           localStorageService.removeItem('user');
@@ -124,8 +75,6 @@ export class AxiosHttpClient implements HttpClientInterface {
             await this.unauthorizedHandler(refreshError);
           }
           return Promise.reject(refreshError);
-        } finally {
-          this.isRefreshing = false;
         }
       }
     );
@@ -141,7 +90,12 @@ export class AxiosHttpClient implements HttpClientInterface {
     body?: unknown,
     options: HttpRequestOptions = {}
   ): Promise<ApiResponse<T>> {
-    const { skipAuth = false, params, headers: extraHeaders, ...axiosOptions } = options;
+    const {
+      skipAuth = false,
+      params,
+      headers: extraHeaders,
+      ...axiosOptions
+    } = options;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -187,23 +141,41 @@ export class AxiosHttpClient implements HttpClientInterface {
     }
   }
 
-  async get<T>(url: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+  async get<T>(
+    url: string,
+    options: HttpRequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>('GET', url, undefined, options);
   }
 
-  async post<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+  async post<T>(
+    url: string,
+    body?: unknown,
+    options: HttpRequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>('POST', url, body, options);
   }
 
-  async put<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+  async put<T>(
+    url: string,
+    body?: unknown,
+    options: HttpRequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>('PUT', url, body, options);
   }
 
-  async delete<T>(url: string, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+  async delete<T>(
+    url: string,
+    options: HttpRequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>('DELETE', url, undefined, options);
   }
 
-  async patch<T>(url: string, body?: unknown, options: HttpRequestOptions = {}): Promise<ApiResponse<T>> {
+  async patch<T>(
+    url: string,
+    body?: unknown,
+    options: HttpRequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>('PATCH', url, body, options);
   }
 }

@@ -14,15 +14,22 @@ import type {
 import { SessionExpirationDialog } from '@/shared/presentation/components/Auth/SessionExpirationDialog';
 import { LoginUseCase } from '@/modules/auth/application/usecases/LoginUseCase';
 import { LogoutUseCase } from '@/modules/auth/application/usecases/LogoutUseCase';
-import { RefreshTokenUseCase } from '@/modules/auth/application/usecases/RefreshTokenUseCase';
+import {
+  VerifyUserUseCase,
+  UserNotFoundError,
+  UserInactiveError
+} from '@/modules/auth/application/usecases/VerifyUserUseCase';
 import { AuthRepositoryImpl } from '@/modules/auth/infrastructure/repositories/AuthRepositoryImpl';
 import { apiClient } from '@/shared/infrastructure/api/client/ApiClient';
 import { localStorageService } from '@/shared/infrastructure/storage/LocalStorageService';
+import { tokenRefreshCoordinator } from '@/shared/infrastructure/services/TokenRefreshCoordinator';
 import {
   getTokenExpirationMs,
   isTokenExpired
 } from '@/shared/infrastructure/services/JwtService';
 import { userActivityService } from '@/shared/infrastructure/services/UserActivityService';
+import { realtimeService } from '@/shared/infrastructure/services/WebSocketService';
+import { environments } from '@/settings/environments/environments';
 
 interface AuthContextType {
   user: AuthSession['user'] | null;
@@ -30,7 +37,16 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   updateUserSession: (user: AuthSession['user']) => void;
+  /**
+   * Re-runs the backend verify check for the current session.
+   * Returns true if the session is still valid, false if it was invalidated.
+   * Components (e.g. ProtectedRoute) can call this on mount for an extra
+   * security assertion beyond just checking the local token.
+   */
+  verifySessionIntegrity: () => Promise<boolean>;
   isLoading: boolean;
+  /** True while the initial POST /auth/verify call is in-flight on startup. */
+  isVerifying: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,21 +57,32 @@ const REFRESH_BUFFER_MS = 30_000; // 30 seconds
 // How much time a user must be idle to stop automatic refreshes (e.g. 15 minutes)
 const MAX_IDLE_TIME_MS = 15 * 60 * 1000; // 15 minutes
 
+// How often the idle watcher polls activity. Must be independent from the
+// token-refresh timer: piggybacking idle detection on that timer only checks
+// every ~access-token-lifetime, which can delay detecting inactivity by up
+// to 2x the token lifetime when both values are close to each other.
+const IDLE_CHECK_INTERVAL_MS = 30_000; // 30 seconds
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthSession['user'] | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [isSessionExpired, setIsSessionExpired] = useState(false);
   const [isExtendingSession, setIsExtendingSession] = useState(false);
 
   // Timer ref for proactive token expiration detection
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Interval ref for the idle watcher, independent of the refresh timer
+  const idleCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null
+  );
 
-  // Use cases via Dependency Injection
+  // Use cases via Dependency Injection (DIP)
   const authRepository = new AuthRepositoryImpl();
   const loginUseCase = new LoginUseCase(authRepository);
   const logoutUseCase = new LogoutUseCase(authRepository);
-  const refreshTokenUseCase = new RefreshTokenUseCase(authRepository);
+  const verifyUserUseCase = new VerifyUserUseCase(authRepository);
 
   /**
    * Attempts a silent token refresh when the proactive timer fires.
@@ -74,7 +101,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const session = await refreshTokenUseCase.execute();
+      // Shared coordinator: if the axios 401 interceptor is already
+      // refreshing, this awaits that same in-flight request instead of
+      // racing it with a second /auth/refresh call.
+      const session = await tokenRefreshCoordinator.refresh();
       // persistSession will also reschedule the timer for the new token
       persistSession(session);
     } catch {
@@ -100,7 +130,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const expMs = getTokenExpirationMs(accessToken);
       if (expMs === null) {
         // Token has no `exp` claim — fall back to reactive (401) approach
-        console.warn('[AuthContext] Token has no `exp` claim; proactive refresh disabled.');
+        console.warn(
+          '[AuthContext] Token has no `exp` claim; proactive refresh disabled.'
+        );
         return;
       }
 
@@ -108,7 +140,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (delay <= 0) {
         // Token is already expired or about to expire — attempt refresh immediately
-        console.info('[AuthContext] Token already expired or within buffer — refreshing now.');
+        console.info(
+          '[AuthContext] Token already expired or within buffer — refreshing now.'
+        );
         attemptSilentRefresh();
         return;
       }
@@ -123,6 +157,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [attemptSilentRefresh]
   );
 
+  /**
+   * Starts an independent poller that expires the session as soon as the
+   * user crosses MAX_IDLE_TIME_MS, regardless of when the next proactive
+   * token-refresh check happens to be scheduled.
+   */
+  const startIdleWatcher = useCallback(() => {
+    if (idleCheckIntervalRef.current) return; // already running
+    idleCheckIntervalRef.current = setInterval(() => {
+      if (userActivityService.isIdle(MAX_IDLE_TIME_MS)) {
+        console.info(
+          '[AuthContext] Idle watcher detected inactivity — expiring session.'
+        );
+        // Stop any pending proactive refresh so it can't silently extend an idle session.
+        if (refreshTimerRef.current) {
+          clearTimeout(refreshTimerRef.current);
+          refreshTimerRef.current = null;
+        }
+        setIsSessionExpired(true);
+      }
+    }, IDLE_CHECK_INTERVAL_MS);
+  }, []);
+
+  const stopIdleWatcher = useCallback(() => {
+    if (idleCheckIntervalRef.current) {
+      clearInterval(idleCheckIntervalRef.current);
+      idleCheckIntervalRef.current = null;
+    }
+  }, []);
+
   const persistSession = (session: AuthSession) => {
     setToken(session.accessToken);
     setUser(session.user);
@@ -131,6 +194,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorageService.setItem('user', JSON.stringify(session.user));
     // Schedule proactive refresh for the new access token
     scheduleTokenRefresh(session.accessToken);
+    // Idle detection must run independently of the refresh schedule
+    startIdleWatcher();
+    // ── Reconectar WebSocket con el token del usuario autenticado ──────────────
+    // disconnect() limpia el socket anterior (sin token o con token viejo)
+    // y connect() crea uno nuevo autenticado.
+    realtimeService.disconnect();
+    realtimeService.connect(environments.API_URL, session.accessToken);
   };
 
   const clearSession = () => {
@@ -139,12 +209,86 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clearTimeout(refreshTimerRef.current);
       refreshTimerRef.current = null;
     }
+    stopIdleWatcher();
+    // ── Desconectar WebSocket limpiamente ANTES de limpiar la sesión ─────────
+    // disconnect() detiene la reconexion automática de socket.io.
+    // Sin esto, el socket se reconectaría sin token mostrando
+    // "Client connected without authentication".
+    realtimeService.disconnect();
     setToken(null);
     setUser(null);
     localStorageService.removeItem('token');
     localStorageService.removeItem('refreshToken');
     localStorageService.removeItem('user');
   };
+
+  /**
+   * SECURITY: Verifies the cached session against the backend.
+   *
+   * Algorithm:
+   * 1. Read the stored user identifier (username or email) from localStorage.
+   * 2. Call POST /auth/verify — the backend asserts the account exists and is active.
+   * 3. On any failure (network error, user not found, account inactive):
+   *    wipe the local session and redirect to /login to prevent unauthorized access.
+   *
+   * SECURITY POLICY: fail-closed — any ambiguous or failed verify call
+   * results in session revocation, not silent pass-through.
+   *
+   * @returns `true` if the session is valid, `false` if it was invalidated.
+   */
+  const verifySessionIntegrity = useCallback(async (): Promise<boolean> => {
+    const storedUser = localStorageService.getItem('user');
+    if (!storedUser) return false;
+
+    let parsedUser: AuthSession['user'];
+    try {
+      parsedUser = JSON.parse(storedUser);
+    } catch {
+      // Corrupted storage — clear and bail
+      clearSession();
+      return false;
+    }
+
+    // Use `username` as the primary identifier; fall back to `email`
+    const identifier = parsedUser.username ?? parsedUser.email;
+    if (!identifier) {
+      console.warn(
+        '[AuthContext] No identifier found in stored user — clearing session.'
+      );
+      clearSession();
+      return false;
+    }
+
+    setIsVerifying(true);
+    try {
+      await verifyUserUseCase.execute({ username_or_email: identifier });
+      console.info('[AuthContext] Session integrity verified ✓');
+      return true;
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        console.warn(
+          '[AuthContext] SECURITY: User no longer exists — invalidating session.'
+        );
+      } else if (error instanceof UserInactiveError) {
+        console.warn(
+          '[AuthContext] SECURITY: User account is inactive — invalidating session.'
+        );
+      } else {
+        // Network failure, timeout, 5xx, or unexpected error.
+        // FAIL-CLOSED: revoke the local session to prevent stale access.
+        console.error(
+          '[AuthContext] Verify call failed — failing closed for security.',
+          error
+        );
+      }
+      clearSession();
+      window.location.href = '/login';
+      return false;
+    } finally {
+      setIsVerifying(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useLayoutEffect(() => {
     // SECURITY: Initialize activity tracking
@@ -167,18 +311,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Token still valid — schedule the proactive refresh timer
         scheduleTokenRefresh(storedToken);
       }
+      // Idle detection must run independently of the refresh schedule
+      startIdleWatcher();
+
+      // SECURITY: Even with a valid local token, verify the account still
+      // exists and is active on the backend. This guards against:
+      //  - deleted accounts with cached tokens
+      //  - deactivated accounts
+      //  - revoked sessions not yet reflected locally
+      verifySessionIntegrity();
     }
 
     setIsLoading(false);
 
-    // Fallback: when a request fails even after silent refresh, show the expiration dialog
+    // Fallback: when a request fails even after silent refresh, show the expiration dialog.
+    // IMPORTANT: Only trigger if there is an active session (user is logged in).
+    // This prevents the dialog from appearing on the login page when there is no token.
     apiClient.setUnauthorizedHandler(async () => {
-      setIsSessionExpired(true);
+      const storedToken = localStorageService.getItem('token');
+      if (storedToken) {
+        setIsSessionExpired(true);
+      }
     });
 
     return () => {
       // Cleanup activity listeners
       userActivityService.cleanup();
+      stopIdleWatcher();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -203,7 +362,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleExtendSession = async () => {
     setIsExtendingSession(true);
     try {
-      const session = await refreshTokenUseCase.execute();
+      const session = await tokenRefreshCoordinator.refresh();
       persistSession(session);
       setIsSessionExpired(false);
     } catch {
@@ -220,15 +379,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, updateUserSession, isLoading }}
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        updateUserSession,
+        verifySessionIntegrity,
+        isLoading,
+        isVerifying
+      }}
     >
       {children}
-      <SessionExpirationDialog
-        isOpen={isSessionExpired}
-        onExtend={handleExtendSession}
-        onCancel={logout}
-        isExtending={isExtendingSession}
-      />
+      {/* Only render the expiration dialog when a session is active to
+          prevent it from appearing on the login page. */}
+      {user !== null && (
+        <SessionExpirationDialog
+          isOpen={isSessionExpired}
+          onExtend={handleExtendSession}
+          onCancel={logout}
+          isExtending={isExtendingSession}
+        />
+      )}
     </AuthContext.Provider>
   );
 };

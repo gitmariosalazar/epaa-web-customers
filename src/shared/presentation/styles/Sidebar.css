@@ -31,5 +31,6 @@
     position: fixed;
     height: 100vh;
     box-shadow: var(--shadow-lg);
+    z-index: 1100; /* Ensure sidebar overlays the sticky header (z-index 1000) on mobile */
   }
 }

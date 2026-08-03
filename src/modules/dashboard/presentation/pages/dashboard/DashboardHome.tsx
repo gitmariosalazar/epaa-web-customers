@@ -45,9 +45,9 @@ export const DashboardHome: React.FC = () => {
   const navigate = useNavigate();
   const { kpis } = useDashboardKpi();
 
-  const displayName = user?.firstName
+  const displayName = user?.isNaturalPerson
     ? `${user.firstName} ${user.lastName ?? ''}`.trim()
-    : user?.username ?? 'Usuario';
+    : user?.firstName ?? 'Usuario';
 
   /** Maps each tramite catalog ID → the actual route in App.tsx */
   const tramiteRouteMap: Record<string, string> = {

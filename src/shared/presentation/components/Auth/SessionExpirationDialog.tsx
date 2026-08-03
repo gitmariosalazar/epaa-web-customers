@@ -22,18 +22,21 @@ export const SessionExpirationDialog: React.FC<
           <AlertTriangle size={32} />
         </div>
 
-        <h2 className="session-dialog__title">Session Expired</h2>
+        <h2 className="session-dialog__title">Tu sesión ha expirado</h2>
 
         <p className="session-dialog__message">
-          Your session has effectively expired due to inactivity. Would you like
-          to extend your session or log out?
+          Tu sesión ha expirado debido a inactividad. ¿Te gustaría extender tu sesión o cerrar sesión?
         </p>
 
         <div className="session-dialog__actions">
-          <Button variant="ghost" onClick={onCancel} disabled={isExtending}>
+          <Button variant="dashed" onClick={onCancel} disabled={isExtending}
+            color='error'
+          >
             Log Out
           </Button>
-          <Button variant="primary" onClick={onExtend} isLoading={isExtending}>
+          <Button variant="dashed" onClick={onExtend} isLoading={isExtending}
+            color='success'
+          >
             Extend Session
           </Button>
         </div>

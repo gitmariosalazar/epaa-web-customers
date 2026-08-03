@@ -1,0 +1,116 @@
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  Table,
+  type Column
+} from '@/shared/presentation/components/Table/Table';
+import type { PendingReadingConnection } from '../../domain/models/Reading';
+import { Avatar } from '@/shared/presentation/components/Avatar/Avatar';
+import { Button } from '@/shared/presentation/components/Button/Button';
+import { Eye } from 'lucide-react';
+import { IoAdd, IoInformationCircleOutline } from 'react-icons/io5';
+import { EmptyState } from '@/shared/presentation/components/common/EmptyState';
+import { Tooltip } from '@/shared/presentation/components/common/Tooltip/Tooltip';
+
+interface PropTypes {
+  data: PendingReadingConnection[];
+  isLoading: boolean;
+  onAction?: (mode: 'create' | 'update', cadastralKey: string) => void;
+}
+
+export const PendingReadingConnectionTable: React.FC<PropTypes> = ({
+  data,
+  isLoading,
+  onAction
+}) => {
+  const { t } = useTranslation();
+
+  const columns: Column<PendingReadingConnection>[] = useMemo(
+    () => [
+      { header: t('readings.columns.cadastralKey'), accessor: 'cadastralKey' },
+      {
+        header: t('readings.columns.meter'),
+        accessor: (r) => r.meterNumber || t('readings.columns.noMeter')
+      },
+      {
+        header: t('readings.columns.client'),
+        accessor: (row) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Avatar name={row.clientName} size="sm" />
+            <div>
+              <div style={{ fontWeight: 300 }}>{row.clientName}</div>
+              <div
+                style={{ fontSize: '0.85em', color: 'var(--text-secondary)' }}
+              >
+                {row.cardId}
+              </div>
+            </div>
+          </div>
+        )
+      },
+      { header: t('readings.columns.sector'), accessor: 'sector' },
+      { header: t('readings.columns.account'), accessor: 'account' },
+      { header: t('readings.columns.address'), accessor: 'address' },
+      {
+        header: t('readings.columns.average'),
+        accessor: (r) => `${r.averageConsumption} m³`
+      },
+      {
+        header: t('common.actions', 'Acciones'),
+        accessor: (reading) => (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Tooltip
+              themeColor="info"
+              content={t('common.viewDetails', 'Ver Detalles')}
+            >
+              <Button size="sm" variant="ghost" onClick={() => {}} circle>
+                <Eye size={16} />
+              </Button>
+            </Tooltip>
+            <Tooltip
+              themeColor="success"
+              content={t('common.add', 'Agregar Lectura')}
+            >
+              <Button
+                size="sm"
+                variant="ghost"
+                color="success"
+                onClick={() =>
+                  onAction && onAction('create', reading.cadastralKey)
+                }
+                circle
+              >
+                <IoAdd size={16} />
+              </Button>
+            </Tooltip>
+          </div>
+        )
+      }
+    ],
+    [t]
+  );
+
+  return (
+    <div className="cr-table-container">
+      <h3 style={{ marginBottom: '5px', color: 'var(--text-primary)' }}>
+        {t('readings.tabs.pending')}
+      </h3>
+      <Table<PendingReadingConnection>
+        data={data}
+        columns={columns}
+        isLoading={isLoading}
+        pagination
+        pageSize={10}
+        emptyState={
+          <EmptyState
+            message="No se encontraron lecturas pendientes"
+            description="Intenta ajustar los filtros de búsqueda para ver los resultados."
+            icon={IoInformationCircleOutline}
+            minHeight="300px"
+            variant="info"
+          />
+        }
+      />
+    </div>
+  );
+};

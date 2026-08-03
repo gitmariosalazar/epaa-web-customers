@@ -482,9 +482,9 @@ export const en = {
       noDataDescription:
         'No connections found with current filters. Use Fetch to load data.',
       tabs: {
-        all: 'All Connections',
-        sector: 'By Sector',
-        client: 'By Client'
+        allConnections: 'All Connections',
+        overdueAccounts: 'Overdue Accounts',
+        pendingReadings: 'Pending Readings'
       },
       wizard: {
         title: 'New Connection Wizard',

@@ -41,8 +41,8 @@
 }
 
 .epaa-page-layout__footer {
-  flex-shrink: 0;          /* Never compresses — always fully visible */
-  z-index: 40;             /* Above body content */
+  flex-shrink: 0; /* Never compresses — always fully visible */
+  z-index: 40; /* Above body content */
   position: relative;
   min-width: 0;
   max-width: 100%;
@@ -55,3 +55,27 @@
   flex-direction: column !important;
 }
 
+@media (max-width: 768px) {
+  .epaa-page-layout {
+    width: 100%;
+    /* Tighten gap slightly on mobile devices to maximize space */
+    gap: 0.5rem !important;
+  }
+
+  .epaa-page-layout__body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+    width: 100%;
+    /* Ensure content flows naturally from top to bottom without forced centering */
+    justify-content: flex-start;
+    align-items: stretch;
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .epaa-page-layout {
+    /* Even tighter spacing on very small screens */
+    gap: 0.25rem !important;
+  }
+}

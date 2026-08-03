@@ -11,6 +11,8 @@ export interface AuthUser {
   registeredAt: Date;
   lastLogin?: Date | null;
   twoFactorEnabled?: boolean;
+  isNaturalPerson?: boolean;
+  cardId?: string;
 }
 
 export interface AuthSession {
@@ -30,4 +32,20 @@ export interface RegisterCredentials {
   password: string;
   firstName?: string;
   lastName?: string;
+}
+/** Payload sent to POST /auth/verify */
+export interface VerifyUserRequest {
+  username_or_email: string;
+}
+/**
+ * Result from the backend verify endpoint.
+ * `exists` — user record found in DB.
+ * `isActive` — account is enabled and allowed to operate.
+ */
+export interface VerifyUserResult {
+  exists: boolean;
+  userId?: string;
+  username?: string;
+  email?: string;
+  isActive?: boolean;
 }

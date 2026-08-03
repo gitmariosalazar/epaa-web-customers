@@ -129,7 +129,7 @@
 
 .solicitud-form-section__header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 0.99rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -400,13 +400,14 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  text-transform: uppercase;
 }
 
 .solicitud-titular-card__name {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.01em;
@@ -429,7 +430,7 @@
 .solicitud-titular-card__item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .solicitud-titular-card__item--full {
@@ -466,11 +467,11 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-muted);
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.015rem;
 }
 
 .solicitud-titular-card__value {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: var(--text-main);
   font-weight: 600;
 }

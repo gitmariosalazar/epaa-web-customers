@@ -3,7 +3,8 @@
   height: 64px; /* Even tighter height for that "elite" feel */
   background-color: var(--surface);
   border-bottom: 1px solid var(--border-color);
-  padding: 0 var(--spacing-xl);
+  /* Align padding with dashboard-main */
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   position: sticky;
@@ -16,6 +17,7 @@
 
 .header__content {
   width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: space-between; /* Keeps logo/title left and actions right */
@@ -117,7 +119,7 @@
 
 .header__username {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-main);
   white-space: nowrap;
   overflow: hidden;
@@ -193,7 +195,7 @@
 .header__dropdown-name {
   font-weight: 700;
   color: var(--text-main);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
 .header__dropdown-email {

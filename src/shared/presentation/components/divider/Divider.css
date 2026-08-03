@@ -1,0 +1,179 @@
+:root {
+  --divider-color: #e2e8f0;
+  --divider-color-subtle: #f1f5f9;
+  --text-muted: #64748b;
+}
+
+.dark {
+  --divider-color: #334155;
+  --divider-color-subtle: #1e293b;
+  --text-muted: #94a3b8;
+}
+
+/* ====================== DIVIDER BASE ====================== */
+
+.divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.incident-description {
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  width: fit-content;
+}
+
+.incident-text-description {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* Orientación */
+.divider-horizontal {
+  flex-direction: row;
+  width: 100%;
+  height: auto;
+}
+
+.divider-vertical {
+  flex-direction: column;
+  width: auto;
+  align-self: stretch;
+  min-height: 20px;
+  height: auto;
+}
+
+/* Variantes Horizontales */
+.divider-horizontal.divider-solid {
+  border-top: 1px solid var(--divider-color);
+}
+
+.divider-horizontal.divider-dashed {
+  border-top: 1px dashed var(--divider-color);
+}
+
+.divider-horizontal.divider-dotted {
+  border-top: 1px dotted var(--divider-color);
+}
+
+.divider-horizontal.divider-subtle {
+  border-top: 1px solid var(--divider-color-subtle);
+}
+
+/* Variantes Verticales */
+.divider-vertical.divider-solid {
+  border-left: 1px solid var(--divider-color);
+}
+
+.divider-vertical.divider-dashed {
+  border-left: 1px dashed var(--divider-color);
+}
+
+.divider-vertical.divider-dotted {
+  border-left: 1px dotted var(--divider-color);
+}
+
+.divider-vertical.divider-subtle {
+  border-left: 1px solid var(--divider-color-subtle);
+}
+
+/* Grosor */
+.divider-thin {
+  --divider-thickness: 1px;
+}
+.divider-medium {
+  --divider-thickness: 1.5px;
+}
+.divider-thick {
+  --divider-thickness: 2.5px;
+}
+
+.divider-solid,
+.divider-dashed,
+.divider-dotted,
+.divider-subtle {
+  border-width: var(--divider-thickness);
+}
+
+/* Margenes Horizontales (Arriba / Abajo) */
+.divider-horizontal.divider-margin-none {
+  margin: 0;
+}
+.divider-horizontal.divider-margin-sm {
+  margin: 12px 0;
+}
+.divider-horizontal.divider-margin-md {
+  margin: 20px 0;
+}
+.divider-horizontal.divider-margin-lg {
+  margin: 32px 0;
+}
+
+/* Margenes Verticales (Izquierda / Derecha) */
+.divider-vertical.divider-margin-none {
+  margin: 0;
+}
+.divider-vertical.divider-margin-sm {
+  margin: 0 12px;
+}
+.divider-vertical.divider-margin-md {
+  margin: 0 20px;
+}
+.divider-vertical.divider-margin-lg {
+  margin: 0 32px;
+}
+
+/* Label (Texto centrado) */
+.divider-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  padding: 0 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.divider-label::before,
+.divider-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--divider-color);
+}
+
+/* Vertical Ajustes */
+.divider-vertical {
+  width: var(--divider-thickness);
+}
+
+.divider-vertical .divider-label {
+  position: static;
+  transform: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 16px 0;
+  left: auto;
+  top: 50%;
+  background: transparent;
+}
+
+.divider-vertical .divider-label::before,
+.divider-vertical .divider-label::after {
+  display: none;
+}
+
+/* Hover effect sutil */
+.divider:hover {
+  opacity: 0.95;
+}

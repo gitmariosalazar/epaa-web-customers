@@ -30,14 +30,15 @@
 @media (max-width: 768px) {
   .dashboard-content-wrapper {
     margin-left: 0 !important; /* Override inline styles if any */
-    padding-left: 80px; /* Space for collapsed sidebar */
+    padding-left: 60px; /* Exact space for collapsed sidebar (60px) */
   }
 
   .dashboard-layout--collapsed .dashboard-content-wrapper {
-    padding-left: 80px;
+    padding-left: 60px;
   }
 
   .dashboard-main {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    max-width: 100%; /* Fully utilize available space on mobile */
   }
 }

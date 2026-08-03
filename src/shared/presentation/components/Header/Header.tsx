@@ -49,17 +49,17 @@ export const Header: React.FC = () => {
   };
 
   const displayName =
-    user?.firstName && user?.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user?.username || t('common.user');
+    user?.isNaturalPerson
+      ? `${user.firstName} ${user.lastName ?? ''}`.trim()
+      : user?.firstName || t('common.user');
 
   // Derive title from path for professional feel
   const currentPath = location.pathname.split('/').pop() || '';
   const pageTitle = currentPath
     ? t(
-        `menu.${currentPath}`,
-        currentPath.charAt(0).toUpperCase() + currentPath.slice(1)
-      )
+      `menu.${currentPath}`,
+      currentPath.charAt(0).toUpperCase() + currentPath.slice(1)
+    )
     : '';
 
   return (

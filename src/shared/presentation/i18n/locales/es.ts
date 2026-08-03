@@ -484,9 +484,9 @@ export const es = {
       noDataDescription:
         'No se encontraron conexiones con los filtros actuales. Usa Consultar para cargar datos.',
       tabs: {
-        all: 'Todas las Conexiones',
-        sector: 'Por Sector',
-        client: 'Por Cliente'
+        allConnections: 'Mis Acometidas',
+        overdueAccounts: 'Cartera Vencida',
+        pendingReadings: 'Lecturas Pendientes'
       },
       wizard: {
         title: 'Asistente de Nueva Conexión',

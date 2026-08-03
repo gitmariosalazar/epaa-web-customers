@@ -1,9 +1,12 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import { Button } from '@/shared/presentation/components/Button/Button';
 import '../../styles/SolicitudDetailHeader.css';
 
 import type { RequestDetailByClientResponse } from '../../../domain/models/Solicitud';
+import { ColorChip } from '@/shared/presentation/components/chip/ColorChip';
+import { GiMatterStates } from 'react-icons/gi';
+import { maskString } from '@/shared/utils/text/maskString';
 
 interface SolicitudDetailHeaderProps {
   solicitud: RequestDetailByClientResponse;
@@ -16,12 +19,12 @@ export const SolicitudDetailHeader: React.FC<SolicitudDetailHeaderProps> = ({
 }) => {
   const fechaStr = solicitud.fechaSolicitud
     ? new Date(solicitud.fechaSolicitud).toLocaleDateString('es-EC', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
     : '—';
 
   return (
@@ -41,6 +44,45 @@ export const SolicitudDetailHeader: React.FC<SolicitudDetailHeaderProps> = ({
         <span className="sol-detail-header-nav__subtitle">
           Creado el {fechaStr}
         </span>
+      </div>
+      <div className="sol-detail-header-nav__info">
+        <div className='sol-detail-header-nav__analist'>
+          <p className="sol-detail-header-nav__analist__label">
+            Analista Asignado:
+          </p>
+          {
+            solicitud.analistaUsername ? (
+              <ColorChip
+                label={maskString(solicitud.analistaUsername)}
+                variant="ghost"
+                size="sm"
+                color='green'
+                icon={<User size={16} />}
+                borderRadius={4}
+              />
+            ) : (
+              <ColorChip
+                label="Sin asignar"
+                variant="ghost"
+                size="sm"
+                color='red'
+                icon={<User size={16} />}
+                borderRadius={4}
+              />
+            )
+          }
+        </div>
+        <div className='sol-detail-header-nav__analist'>
+          <p className="sol-detail-header-nav__analist__label">Estado:</p>
+          <ColorChip
+            label={(solicitud.estado)}
+            variant="ghost"
+            size="sm"
+            color='gray'
+            icon={<GiMatterStates size={16} />}
+            borderRadius={4}
+          />
+        </div>
       </div>
     </div>
   );

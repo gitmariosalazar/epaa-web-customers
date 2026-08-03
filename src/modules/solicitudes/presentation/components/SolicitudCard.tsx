@@ -102,23 +102,25 @@ export const SolicitudCard: React.FC<SolicitudCardProps> = ({
 
   const fechaStr = solicitud.fechaSolicitud
     ? new Date(solicitud.fechaSolicitud).toLocaleDateString('es-EC', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      })
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    })
     : '—';
 
   const updatedStr = solicitud.updatedAt
     ? new Date(solicitud.updatedAt).toLocaleDateString('es-EC', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
     : '—';
 
-  const titular =
+  console.log(solicitud)
+
+  const titular = solicitud.tipoPersona === 'JURIDICA' ? solicitud.datosAdicionales.nombres :
     solicitud.datosAdicionales?.nombres && solicitud.datosAdicionales?.apellidos
       ? `${solicitud.datosAdicionales.nombres} ${solicitud.datosAdicionales.apellidos}`
       : solicitud.clienteId;

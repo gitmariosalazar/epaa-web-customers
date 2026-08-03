@@ -22,9 +22,17 @@ import {
   ShieldCheck,
   Zap,
   AlertTriangle,
-  Calendar
+  Calendar,
+  Ruler,
+  Hash,
+  CalendarCheck,
+  Cable,
+  Home
 } from 'lucide-react';
 import '../styles/SolicitudPhasePanel.css';
+import { StatsGrid } from '@/shared/presentation/components/Stats/StatsGrid';
+import { ConverDate } from '@/shared/utils/datetime/ConverDate';
+import { CurrencyFormatter } from '@/shared/utils/formatters/CurrencyFormatter';
 
 interface PhasePanelProps {
   solicitud: RequestDetailByClientResponse;
@@ -33,15 +41,6 @@ interface PhasePanelProps {
 // ── Helper ────────────────────────────────────────────────────────────────────
 const fmt = (n: number | null | undefined): string =>
   n != null ? `$${n.toFixed(2)}` : '—';
-
-const fmtDate = (d: Date | string | null | undefined): string => {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('es-EC', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  });
-};
 
 // ── INSPECCION panels ─────────────────────────────────────────────────────────
 
@@ -361,26 +360,21 @@ export const SuministroActivoPanel: React.FC<PhasePanelProps> = ({ solicitud }) 
         </p>
       </div>
     </div>
-    <div className="phase-panel__active-data">
-      {solicitud.numeroMedidor && (
-        <div className="phase-panel__active-card">
-          <span className="phase-panel__active-card__label">N° de Medidor</span>
-          <span className="phase-panel__active-card__value">{solicitud.numeroMedidor}</span>
-        </div>
-      )}
-      {solicitud.numeroCuenta && (
-        <div className="phase-panel__active-card">
-          <span className="phase-panel__active-card__label">N° de Cuenta</span>
-          <span className="phase-panel__active-card__value">{solicitud.numeroCuenta}</span>
-        </div>
-      )}
-      {solicitud.fechaActivacion && (
-        <div className="phase-panel__active-card">
-          <span className="phase-panel__active-card__label">Fecha de Activación</span>
-          <span className="phase-panel__active-card__value">{fmtDate(solicitud.fechaActivacion)}</span>
-        </div>
-      )}
-    </div>
+    {solicitud.numeroMedidor && (
+      <>
+        <StatsGrid
+          className="phase-panel__active-data"
+          items={[
+            { title: 'N° de Medidor', value: solicitud.numeroMedidor, icon: Ruler, color: "blue" as const },
+            ...(solicitud.numeroCuenta ? [{ title: 'N° de Cuenta', value: solicitud.numeroCuenta, icon: Hash, color: "indigo" as const }] : []),
+            ...(solicitud.fechaActivacion ? [{ title: 'F. Activación', value: ConverDate(solicitud.fechaActivacion), icon: CalendarCheck, color: "cyan" as const }] : []),
+            ...(solicitud.claveCatastral ? [{ title: 'Clave Catastral', value: solicitud.claveCatastral, icon: Cable, color: "purple" as const }] : []),
+            ...(solicitud.usoPredio ? [{ title: 'Uso del Predio', value: solicitud.usoPredio, icon: Home, color: "yellow" as const }] : []),
+            ...(solicitud.costoTotal ? [{ title: 'Costo Total', value: CurrencyFormatter.format(solicitud.costoTotal), icon: DollarSign, color: "green" as const }] : []),
+          ]}
+        />
+      </>
+    )}
     <p className="phase-panel__active-notice">
       Para consultas sobre facturación, acérquese a las ventanillas de recaudación de EPAA
       o comuníquese a través de los canales oficiales.
@@ -392,6 +386,8 @@ export const SuministroActivoPanel: React.FC<PhasePanelProps> = ({ solicitud }) 
 
 export const SolicitudPhasePanel: React.FC<PhasePanelProps> = ({ solicitud }) => {
   const { estado } = solicitud;
+
+  console.log('solicitud', solicitud);
 
   switch (estado) {
     // ── Inspección

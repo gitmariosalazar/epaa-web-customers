@@ -1,0 +1,317 @@
+/* src/modules/accounting/presentation/styles/PaymentsTable.css */
+
+.payments-table-wrapper {
+  display: flex; /* EXTREMELY CRITICAL: Pass flex capabilities down to Table */
+  flex-direction: column;
+  flex: 1; /* Claim available height from PageLayout */
+  min-height: 450px; /* Guarantee at least 10 rows visually regardless of flex-crunch */
+  background-color: var(--surface);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.payments-table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+  color: var(--text-secondary);
+  text-align: center;
+  background-color: transparent; /* Seamless blend */
+}
+
+.payments-table-empty svg {
+  color: rgba(
+    var(--primary-rgb, 148, 163, 184),
+    0.4
+  ); /* Professional faded icon */
+}
+
+.payments-table-empty p {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.payments-table-empty span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.payments-table-wrapper table th,
+.payments-table-wrapper table td {
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+}
+
+.menu-info-header-pending {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.8rem 1rem;
+  background-color: var(--menu-header-bg, #f8fafc);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.menu-info-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.menu-info-subtitle p {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.menu-info-subtitle span {
+  font-size: 0.75rem;
+  color: var(--text-main);
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+}
+
+@media (max-width: 640px) {
+  .payments-table-wrapper table th,
+  .payments-table-wrapper table td {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Dropdown Menu Styles */
+.table-actions-dropdown-container {
+  display: inline-flex;
+}
+
+/* Animations that preserve horizontal transform for Portal */
+/* Clean, transform-agnostic animations for the Portal menu */
+@keyframes fadeInPortalSimpleBase {
+  from {
+    opacity: 0;
+    margin-top: 0; /* Starts at top coordinate */
+  }
+  to {
+    opacity: 1;
+    margin-top: 8px; /* Final offset for Down-placement */
+  }
+}
+
+@keyframes fadeInPortalSimpleUpBase {
+  from {
+    opacity: 0;
+    margin-top: 8px; /* Starts further down */
+  }
+  to {
+    opacity: 1;
+    margin-top: -8px; /* Final offset for Up-placement */
+  }
+}
+
+.table-actions-menu {
+  position: absolute;
+  top: var(--menu-top);
+  left: var(--menu-left);
+  transform: var(--menu-transform);
+  z-index: 10000;
+  min-width: 190px;
+  background-color: var(--menu-body-bg, #ffffff);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 0 0 0.4rem 0;
+  animation: fadeInPortalSimpleBase 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-actions-menu.menu-up {
+  animation: fadeInPortalSimpleUpBase 0.2s cubic-bezier(0.16, 1, 0.3, 1)
+    forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Caret Arrow */
+.table-actions-menu::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 11px; /* Centered for 32px button button (32/2 - 5 = 11) */
+  width: 10px;
+  height: 10px;
+  background-color: var(--menu-header-bg, #f8fafc);
+  border-top: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+  transform: rotate(45deg);
+  z-index: 10001;
+}
+
+.table-actions-menu.menu-up::after {
+  top: auto;
+  bottom: -6px;
+  right: 11px;
+  background-color: var(--menu-body-bg, #ffffff);
+  border-top: none;
+  border-left: none;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.775rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.menu-item:hover {
+  background-color: #f1f5f9; /* slate 100 */
+  color: var(--primary);
+}
+
+.menu-item svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.menu-item:hover svg {
+  color: var(--info);
+  transform: scale(1.05);
+}
+
+/* Dark mode overrides for menu */
+.dark .table-actions-menu {
+  background-color: var(--surface);
+  --menu-header-bg: #1e2126; /* Darker header matching user UI */
+  --menu-body-bg: var(--surface);
+  border-color: var(--border-color);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.6),
+    0 4px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+.dark .menu-info-header-pending {
+  background-color: var(--menu-header-bg);
+  border-bottom-color: var(--border-color);
+}
+
+.dark .table-actions-menu::after {
+  background-color: var(--menu-header-bg) !important;
+  border-color: var(--border-color);
+}
+
+.dark .table-actions-menu.menu-up::after {
+  background-color: var(--menu-body-bg) !important;
+}
+
+.dark .menu-info-subtitle span {
+  color: var(--text-primary);
+}
+
+.dark .menu-item {
+  color: var(--text-secondary);
+}
+
+.dark .menu-item:hover {
+  background-color: var(--surface-hover);
+  color: var(--info);
+}
+
+/* Table Cell Specific Styles */
+.client-id-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.client-id-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.client-id-text {
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+
+.client-name-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.months-past-due-badge {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.past-due-critical {
+  color: var(--error);
+}
+
+.past-due-warning {
+  color: var(--warning);
+}
+
+.total-debt-amount-text {
+  font-weight: 700;
+  color: var(--error);
+}
+
+.total-interest-text {
+  font-weight: 600;
+  color: var(--warning);
+}
+
+.btn-view-details {
+  color: var(--success) !important;
+}
+
+.menu-button-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.btn-view-pending-list {
+  color: var(--info) !important;
+}
