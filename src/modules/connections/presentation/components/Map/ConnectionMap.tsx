@@ -105,6 +105,8 @@ export const ConnectionMap: React.FC<ConnectionMapProps> = ({
     [onEdit]
   );
 
+  console.log('_handleEdit', _handleEdit);
+
   const handleClose = useCallback(() => {
     setInfoWindowShown(false);
   }, []);
