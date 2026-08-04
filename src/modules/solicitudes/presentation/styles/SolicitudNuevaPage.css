@@ -612,6 +612,7 @@
   max-width: 65%;
   text-align: right;
   word-break: break-all;
+  font-size: var(--font-size-sm);
 }
 
 .text-accent-highlight {

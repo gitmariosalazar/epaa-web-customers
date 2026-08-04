@@ -216,7 +216,7 @@ export const ConnectionDataList: React.FC<ConnectionDataListProps> = ({
       <div key={item.connectionId || index} className={`connection-card-data-list ${isWater ? 'card-agua' : 'card-alcantarillado'}`}>
         {/* Left Icon Area */}
         <div className={`connection-card-icon-data-list ${isWater ? 'agua' : 'alcantarillado'}`}>
-          {isWater ? <IoWaterSharp /> : <GiHexagonalNut />}
+          {isWater ? <IoWaterSharp color={isWater ? "#3b82f6" : "#b98110"} /> : <GiHexagonalNut color={isWater ? "#3b82f6" : "#b98110"} />}
         </div>
 
         {/* Center Content */}

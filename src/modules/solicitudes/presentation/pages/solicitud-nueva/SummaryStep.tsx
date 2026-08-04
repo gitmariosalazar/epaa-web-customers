@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, MapPin, Globe, Compass, 
-  FileCheck, Landmark, Phone, Mail, 
+import {
+  FileText, MapPin, Globe, Compass,
+  FileCheck, Landmark, Phone, Mail,
   User, DollarSign, Calendar, Sparkles, ShieldCheck
 } from 'lucide-react';
 import type { DocumentosMap } from '@/modules/tramites/domain/models/DocumentoAdjunto';
@@ -41,6 +41,10 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({
     parish: ''
   });
   const [loading, setLoading] = useState(false);
+
+
+  const fullDisplayName: string = form.tipo_persona === 'JURIDICA' ? form.nombres : `${form.nombres} ${form.apellidos}`;
+
 
   useEffect(() => {
     const resolveNames = async () => {
@@ -117,13 +121,13 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({
         <FileText size={20} className="header-icon-premium" />
         <h3>Resumen de la Solicitud</h3>
       </div>
-      
+
       <p className="summary-step-premium__intro">
         Revisa los datos de tu trámite antes de enviarlo. Asegúrate de que toda la información ingresada sea verídica.
       </p>
 
       <div className="summary-grid-premium">
-        
+
         {/* CARD 1: DATOS DEL SOLICITANTE */}
         <div className="summary-card-premium">
           <div className="summary-card-premium__header card-header--user">
@@ -133,7 +137,7 @@ export const SummaryStep: React.FC<SummaryStepProps> = ({
           <div className="summary-card-premium__content">
             <div className="summary-card-premium__row">
               <span className="premium-label"><User size={13} /> Nombres:</span>
-              <strong className="premium-value">{form.nombres} {form.apellidos}</strong>
+              <strong className="premium-value">{fullDisplayName || ''}</strong>
             </div>
             <div className="summary-card-premium__row">
               <span className="premium-label"><ShieldCheck size={13} /> Cédula:</span>
